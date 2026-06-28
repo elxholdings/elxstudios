@@ -69,7 +69,7 @@ export default function HomePage() {
         <div className="noise" />
         <nav className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-6 py-6">
           <a href="#top" className="text-xl font-semibold tracking-tight">Elx<span className="text-[#8EA5FF]">.</span> Studio</a>
-          <div className="hidden items-center gap-8 text-sm text-white/78 md:flex">
+          <div className="hidden items-center gap-8 text-sm text-white/[0.78] md:flex">
             <a href="#services">Services</a>
             <a href="#workflow">Workflow</a>
             <a href="#start">Start project</a>
@@ -79,20 +79,20 @@ export default function HomePage() {
 
         <div id="top" className="relative z-10 mx-auto grid max-w-7xl gap-12 px-6 pb-20 pt-20 md:grid-cols-[1.1fr_.9fr] md:items-center md:pt-28">
           <div>
-            <p className="mb-5 inline-flex rounded-full border border-white/15 bg-white/8 px-4 py-2 text-sm text-white/78 backdrop-blur">Elx Holdings presents Elx Studio</p>
+            <p className="mb-5 inline-flex rounded-full border border-white/[0.15] bg-white/[0.08] px-4 py-2 text-sm text-white/[0.78] backdrop-blur">Elx Holdings presents Elx Studio</p>
             <h1 className="max-w-4xl text-5xl font-semibold leading-[.97] tracking-[-0.05em] md:text-7xl">
               Project support for students and professionals who need work done right.
             </h1>
-            <p className="mt-7 max-w-2xl text-lg leading-8 text-white/72">
+            <p className="mt-7 max-w-2xl text-lg leading-8 text-white/[0.72]">
               Writing, documentation, STEM, architecture, CAD, 3D rendering, finance and accounting support. Submit your brief today and continue on WhatsApp for fast onboarding.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <a href="#start" className="rounded-full bg-elx-blue px-7 py-4 text-center text-sm font-semibold text-white transition hover:brightness-95">Start a project</a>
-              <a href="#services" className="rounded-full border border-white/18 bg-white/8 px-7 py-4 text-center text-sm font-semibold text-white backdrop-blur transition hover:bg-white/12">Explore services</a>
+              <a href="#services" className="rounded-full border border-white/[0.18] bg-white/[0.08] px-7 py-4 text-center text-sm font-semibold text-white backdrop-blur transition hover:bg-white/[0.12]">Explore services</a>
             </div>
           </div>
 
-          <div className="rounded-[2rem] border border-white/12 bg-white/8 p-4 shadow-2xl backdrop-blur-xl">
+          <div className="rounded-[2rem] border border-white/[0.12] bg-white/[0.08] p-4 shadow-2xl backdrop-blur-xl">
             <div className="rounded-[1.5rem] bg-white p-4 text-elx-ink">
               <div className="flex items-center justify-between border-b border-black/5 pb-4">
                 <div>
@@ -128,7 +128,7 @@ export default function HomePage() {
           </div>
           <div className="grid gap-4 md:grid-cols-3">
             {serviceCards.map((card) => (
-              <article key={card.title} className="group rounded-[1.75rem] border border-black/8 bg-elx-fog p-6 transition hover:-translate-y-1 hover:bg-white hover:shadow-elx-soft">
+              <article key={card.title} className="group rounded-[1.75rem] border border-black/[0.08] bg-elx-fog p-6 transition hover:-translate-y-1 hover:bg-white hover:shadow-elx-soft">
                 <span className="mb-10 inline-flex rounded-full bg-white px-3 py-1 text-xs font-semibold text-elx-blue shadow-sm">{card.tag}</span>
                 <h3 className="text-2xl font-semibold tracking-tight">{card.title}</h3>
                 <p className="mt-4 leading-7 text-elx-muted">{card.desc}</p>
@@ -144,13 +144,13 @@ export default function HomePage() {
             <div>
               <p className="mb-3 text-sm font-semibold uppercase tracking-[.24em] text-[#8EA5FF]">MVP workflow</p>
               <h2 className="text-4xl font-semibold tracking-[-0.04em] md:text-5xl">Built to operate today, not someday.</h2>
-              <p className="mt-5 text-lg leading-8 text-white/68">This first version removes unnecessary complexity. No heavy client portal yet. No complex expert marketplace yet. It captures demand, creates an order trail, and moves the client to WhatsApp where business can happen immediately.</p>
+              <p className="mt-5 text-lg leading-8 text-white/[0.68]">This first version removes unnecessary complexity. No heavy client portal yet. No complex expert marketplace yet. It captures demand, creates an order trail, and moves the client to WhatsApp where business can happen immediately.</p>
             </div>
             <div className="grid gap-3">
               {['Submit project brief', 'Receive order ID', 'Continue onboarding on WhatsApp', 'Admin quotes and collects payment manually', 'Work is delivered through WhatsApp, email or secure file link'].map((step, index) => (
-                <div key={step} className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/6 p-4">
+                <div key={step} className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.06] p-4">
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-sm font-bold text-elx-midnight">{index + 1}</span>
-                  <p className="text-white/82">{step}</p>
+                  <p className="text-white/[0.82]">{step}</p>
                 </div>
               ))}
             </div>
@@ -170,7 +170,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <form onSubmit={submitProject} className="rounded-[2rem] border border-black/8 bg-white p-5 shadow-elx-soft md:p-8">
+          <form onSubmit={submitProject} className="rounded-[2rem] border border-black/[0.08] bg-white p-5 shadow-elx-soft md:p-8">
             <div className="grid gap-4 md:grid-cols-2">
               <label className="block">
                 <span className="text-sm font-semibold">Full name</span>
@@ -223,7 +223,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <footer className="border-t border-black/8 bg-white px-6 py-10 text-sm text-elx-muted">
+      <footer className="border-t border-black/[0.08] bg-white px-6 py-10 text-sm text-elx-muted">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <p>© {year} Elx Holdings. Elx Studio is a project support platform.</p>
           <div className="flex flex-wrap gap-5">
