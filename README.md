@@ -44,6 +44,18 @@ NEXT_PUBLIC_WHATSAPP_NUMBER=254712345678
 
 Do not include +, spaces, or dashes.
 
+## Automatic language translation
+
+The site detects the visitor's country and browser language, then selects a matching language. The picker follows Google Cloud Translation's full current NMT language catalog, including Russian and all major European languages. English and Simplified Chinese are built in. Other supported languages are translated with Google Cloud Translation and cached for 30 days.
+
+Enable the Cloud Translation API (Basic v2), create an API key restricted to Cloud Translation, and add:
+
+```bash
+GOOGLE_TRANSLATE_API_KEY=your_server_api_key
+```
+
+On Vercel, add the variable to Production, Preview and Development as needed. IP-country detection only runs after deployment; use `?lang=ru`, `?lang=fr`, or another supported code for local testing.
+
 ## Deploy to Vercel today
 
 1. Push this folder to a GitHub repository.
