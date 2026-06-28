@@ -17,7 +17,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
     ? '为计算、理工科、建筑、CAD、3D 渲染、写作、财务和商业项目提供技术与专业支持。'
     : dictionary['Technical and professional project support for calculations, STEM, architecture, CAD, 3D rendering, writing, finance and business work.'] || 'Technical and professional project support for calculations, STEM, architecture, CAD, 3D rendering, writing, finance and business work.';
 
-  return { title: `Elx Studio | ${title}`, description };
+  return { title: { absolute: `Elx Studio | ${title}` }, description };
 }
 
 export default async function Page({ searchParams }: PageProps) {

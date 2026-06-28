@@ -202,15 +202,16 @@ export default function LandingPage({ locale, dictionary = {} }: { locale: Local
     <main lang={locale === 'zh' ? 'zh-CN' : locale} dir={isRtlLocale(locale) ? 'rtl' : 'ltr'} className="overflow-hidden bg-[#F5F2E8] text-[#102321]">
       <header className="sticky top-0 z-50 bg-[#F5F2E8]">
         <nav className="mx-auto flex h-20 max-w-[1440px] items-center justify-between px-5 md:px-10">
-          <a href="#top" className="text-2xl font-black tracking-[-0.06em]">Elx<span className="text-[#F06449]">.</span>Studio</a>
+          <a href={`/?lang=${locale}`} className="text-2xl font-black tracking-[-0.06em]">Elx<span className="text-[#F06449]">.</span>Studio</a>
           <div className="hidden items-center gap-8 text-sm font-semibold md:flex">
-            <a href="#services" className="transition hover:opacity-60">{t('Expertise')}</a>
-            <a href="#workflow" className="transition hover:opacity-60">{t('How it works')}</a>
+            <a href={`/services?lang=${locale}`} className="transition hover:opacity-60">{t('Expertise')}</a>
+            <a href={`/how-it-works?lang=${locale}`} className="transition hover:opacity-60">{t('How it works')}</a>
+            <a href={`/pricing?lang=${locale}`} className="transition hover:opacity-60">Pricing</a>
             <a href="#start" className="transition hover:opacity-60">{t('Send a brief')}</a>
           </div>
           <div className="flex items-center gap-4">
             <LanguageSwitcher locale={locale} />
-            <a href="#start" className="hidden bg-[#102321] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#F06449] sm:block">{t('Start a project')} <span aria-hidden="true">↗</span></a>
+            <a href={`/start?lang=${locale}`} className="hidden bg-[#102321] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#F06449] sm:block">{t('Start a project')} <span aria-hidden="true">↗</span></a>
           </div>
         </nav>
       </header>
@@ -229,8 +230,8 @@ export default function LandingPage({ locale, dictionary = {} }: { locale: Local
             <div className="max-w-xl pb-2 lg:pb-5">
               <p className="text-xl leading-8 text-white/72 md:text-2xl md:leading-9">{t("Bring us the difficult brief—the calculations, drawings, models, reports and details. We'll help turn it into clear, polished work you can use with confidence.")}</p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <a href="#start" className="bg-[#DDF65C] px-7 py-4 text-center text-sm font-bold text-[#102321] transition hover:bg-white">{t('Send your brief')}</a>
-                <a href="#services" className="px-1 py-4 text-center text-sm font-bold underline decoration-white/35 underline-offset-8 transition hover:decoration-white">{t('Explore our expertise')}</a>
+                <a href={`/start?lang=${locale}`} className="bg-[#DDF65C] px-7 py-4 text-center text-sm font-bold text-[#102321] transition hover:bg-white">{t('Send your brief')}</a>
+                <a href={`/services?lang=${locale}`} className="px-1 py-4 text-center text-sm font-bold underline decoration-white/35 underline-offset-8 transition hover:decoration-white">{t('Explore our expertise')}</a>
               </div>
             </div>
           </div>
@@ -318,7 +319,7 @@ export default function LandingPage({ locale, dictionary = {} }: { locale: Local
             <div className="lg:sticky lg:top-28 lg:self-start">
               <p className="text-sm font-bold uppercase tracking-[.18em] text-[#DDF65C]">{t('How it works')}</p>
               <h2 className="mt-5 text-5xl font-black leading-[.9] tracking-[-0.065em] md:text-7xl">{t('A clear path from brief to done.')}</h2>
-              <a href="#start" className="mt-8 inline-flex bg-[#DDF65C] px-6 py-4 text-sm font-bold text-[#102321]">{t('Start your project →')}</a>
+              <a href={`/start?lang=${locale}`} className="mt-8 inline-flex bg-[#DDF65C] px-6 py-4 text-sm font-bold text-[#102321]">{t('Start your project →')}</a>
             </div>
             <div className="border-t border-white/10">
               {workflow.map(([title, text], index) => (
@@ -387,6 +388,10 @@ export default function LandingPage({ locale, dictionary = {} }: { locale: Local
                 <span className="text-sm font-bold">{t('Tell us about the project')}</span>
                 <textarea name="brief" required rows={6} className="mt-2 w-full resize-none border-0 border-b border-black/20 bg-transparent px-0 py-3.5 outline-none transition focus:border-[#073C3E] focus:ring-0" placeholder={t('Describe the goal, requirements, format, software, references and finished files you expect...')} />
               </label>
+              <label className="flex items-start gap-3 bg-[#FFF4E8] p-4 text-sm leading-6 md:col-span-2">
+                <input name="integrityConfirmed" value="true" type="checkbox" required className="mt-1" />
+                <span>I will use the work responsibly and accept the <a href={`/academic-integrity?lang=${locale}`} className="font-black underline">Academic Integrity Policy</a>.</span>
+              </label>
             </div>
             <button disabled={loading} className="mt-6 w-full bg-[#102321] px-7 py-4 text-sm font-bold text-white transition hover:bg-[#F06449] disabled:cursor-not-allowed disabled:opacity-60">
               {loading ? t('Sending your brief...') : t('Send my brief and continue on WhatsApp →')}
@@ -413,6 +418,9 @@ export default function LandingPage({ locale, dictionary = {} }: { locale: Local
             <a href={`/terms?lang=${locale}`}>{t('Terms')}</a>
             <a href={`/privacy?lang=${locale}`}>{t('Privacy')}</a>
             <a href={`/academic-integrity?lang=${locale}`}>{t('Academic integrity')}</a>
+            <a href={`/refund-policy?lang=${locale}`}>Refunds</a>
+            <a href={`/revision-policy?lang=${locale}`}>Revisions</a>
+            <a href={`/dashboard?lang=${locale}`}>Workspace</a>
           </div>
         </div>
       </footer>

@@ -26,6 +26,12 @@ body {
 a { color: inherit; text-decoration: none; }
 button, input, textarea, select { font: inherit; }
 
+@layer components {
+  .elx-field {
+    @apply w-full border-0 border-b border-black/20 bg-transparent px-0 py-3.5 outline-none transition focus:border-[#073C3E] focus:ring-0;
+  }
+}
+
 .noise {
   position: absolute;
   inset: 0;

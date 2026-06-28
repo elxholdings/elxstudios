@@ -12,17 +12,23 @@ A same-day launch MVP for Elx Studio by Elx Holdings.
 - Optional Supabase database storage
 - Optional Resend email alert to admin
 - Basic Terms, Privacy and Academic Integrity pages
+- Seven service departments with dedicated service pages
+- About, How It Works, Pricing and Contact pages
+- Four-step project brief and manual quote flow
+- Device-local client workspace and operations workflow preview
+- Refund and revision policies
+- SEO sitemap, robots rules, social metadata and structured data
 
 ## What is intentionally not included yet
 
-- Full client dashboard
+- Secure cloud-synced client accounts
 - Expert dashboard
-- Complex file uploads
+- Private cloud file uploads
 - Integrated payment checkout
-- Revision dashboard
-- Advanced admin panel
+- Production revision and delivery records
+- Authenticated admin panel with audit logs
 
-Those should be added after launch. The goal of this version is to start taking real client briefs today.
+The browser-local workspace and operations preview validate those workflows without pretending to provide secure persistence. See `DEVELOPMENT_STATUS.md` for the full boundary and build sequence.
 
 ## Quick local setup
 

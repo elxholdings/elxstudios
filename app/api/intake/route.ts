@@ -9,6 +9,12 @@ type IntakePayload = {
   budget?: string;
   filesLink?: string;
   brief?: string;
+  title?: string;
+  purpose?: string;
+  outputFormat?: string;
+  addOns?: string;
+  attachmentNames?: string;
+  integrityConfirmed?: boolean | string;
 };
 
 function clean(value: unknown) {
@@ -66,6 +72,15 @@ export async function POST(request: Request) {
   try {
     const body = (await request.json()) as IntakePayload;
 
+    const structuredBrief = [
+      clean(body.brief),
+      clean(body.title) && `Project title: ${clean(body.title)}`,
+      clean(body.purpose) && `Purpose: ${clean(body.purpose)}`,
+      clean(body.outputFormat) && `Output format: ${clean(body.outputFormat)}`,
+      clean(body.addOns) && `Add-ons: ${clean(body.addOns)}`,
+      clean(body.attachmentNames) && `File checklist: ${clean(body.attachmentNames)}`,
+    ].filter(Boolean).join('\n\n');
+
     const record = {
       order_id: createOrderId(),
       name: clean(body.name),
@@ -75,12 +90,13 @@ export async function POST(request: Request) {
       deadline: clean(body.deadline),
       budget: clean(body.budget),
       files_link: clean(body.filesLink),
-      brief: clean(body.brief),
+      brief: clean(structuredBrief),
       status: 'new',
       created_at: new Date().toISOString(),
     };
 
-    if (!record.name || !record.whatsapp || !record.service || !record.deadline || !record.brief) {
+    const integrityConfirmed = body.integrityConfirmed === true || body.integrityConfirmed === 'true';
+    if (!record.name || !record.whatsapp || !record.service || !record.deadline || !record.brief || !integrityConfirmed) {
       return NextResponse.json({ error: 'Missing required fields.' }, { status: 400 });
     }
 

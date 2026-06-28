@@ -4,8 +4,32 @@ import { headers } from 'next/headers';
 import { isRtlLocale } from './locale-config';
 
 export const metadata: Metadata = {
-  title: 'Elx Studio | Get It Right',
+  metadataBase: new URL('https://elxstudios.vercel.app'),
+  title: {
+    default: 'Elx Studio | Get It Right',
+    template: '%s | Elx Studio',
+  },
   description: 'Technical and professional project support for calculations, STEM, architecture, CAD, 3D rendering, writing, finance and business work.',
+  applicationName: 'Elx Studio',
+  keywords: ['technical project support', 'CAD drafting', '3D rendering', 'STEM support', 'professional documentation', 'financial modeling'],
+  authors: [{ name: 'Elx Holdings' }],
+  creator: 'Elx Holdings',
+  publisher: 'Elx Holdings',
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    siteName: 'Elx Studio',
+    title: 'Elx Studio | Get It Right',
+    description: 'Technical and professional project support from brief to accountable delivery.',
+    url: '/',
+    images: [{ url: '/images/technical-render.jpg', alt: 'Elx Studio technical rendering work' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Elx Studio | Get It Right',
+    description: 'Technical and professional project support from brief to accountable delivery.',
+    images: ['/images/technical-render.jpg'],
+  },
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -14,7 +38,23 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang={locale === 'zh' ? 'zh-CN' : locale} dir={isRtlLocale(locale) ? 'rtl' : 'ltr'}>
-      <body>{children}</body>
+      <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'ProfessionalService',
+              name: 'Elx Studio',
+              parentOrganization: { '@type': 'Organization', name: 'Elx Holdings' },
+              url: 'https://elxstudios.vercel.app',
+              description: 'Technical and professional project support for documentation, STEM, architecture, CAD, 3D, finance and business work.',
+              areaServed: 'Worldwide',
+            }),
+          }}
+        />
+        {children}
+      </body>
     </html>
   );
 }
