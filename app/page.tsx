@@ -20,7 +20,6 @@ const capabilities = [
     text: 'Get structured support for mathematics, science, engineering, data and technical problem-solving.',
     image: '/images/math-formulas.jpg',
     alt: 'Mathematical equations viewed through a magnifying glass',
-    href: 'https://www.pexels.com/photo/monochrome-photo-of-math-formulas-3729557/',
     color: 'bg-[#DDF65C]',
   },
   {
@@ -29,7 +28,6 @@ const capabilities = [
     text: 'Move from an early idea to clear floor plans, CAD drawings, models and technical documentation.',
     image: '/images/blueprint-tools.jpg',
     alt: 'Architectural plans with rulers and a protractor',
-    href: 'https://www.pexels.com/photo/brown-rulers-on-the-table-6281140/',
     color: 'bg-[#AFC8FF]',
   },
   {
@@ -38,7 +36,6 @@ const capabilities = [
     text: 'Build budgets, forecasts, reports and Excel models that make the story behind the figures easier to see.',
     image: '/images/analytics-dashboard.jpg',
     alt: 'A laptop displaying analytical charts and financial data',
-    href: 'https://www.pexels.com/photo/a-laptop-showing-graphs-7109316/',
     color: 'bg-[#FF9A76]',
   },
   {
@@ -47,7 +44,6 @@ const capabilities = [
     text: 'Present concepts with refined 3D models, renderings, diagrams, boards and presentation-ready visuals.',
     image: '/images/technical-render.jpg',
     alt: 'A geometric three-dimensional digital render',
-    href: 'https://www.pexels.com/photo/3d-render-graphics-12939552/',
     color: 'bg-[#C9B8FF]',
   },
 ];
@@ -136,7 +132,6 @@ export default function HomePage() {
               <Image src="/images/technical-render.jpg" alt="A geometric three-dimensional digital render" fill priority sizes="100vw" className="object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#073C3E]/70 via-transparent to-transparent" />
               <div className="absolute left-4 top-4 rounded-full bg-[#F5F2E8] px-4 py-2 text-xs font-bold text-[#102321] md:left-7 md:top-7">Technical thinking. Beautifully finished.</div>
-              <a href="https://www.pexels.com/photo/3d-render-graphics-12939552/" target="_blank" rel="noreferrer" className="absolute right-4 top-4 rounded-full bg-black/35 px-3 py-2 text-xs text-white/80 backdrop-blur md:right-7 md:top-7">Pexels ↗</a>
               <div className="absolute inset-x-4 bottom-4 grid gap-2 sm:grid-cols-3 md:inset-x-7 md:bottom-7">
                 {['CAD + 3D', 'STEM + analysis', 'Reports + finance'].map((item) => (
                   <div key={item} className="rounded-2xl border border-white/20 bg-black/25 px-5 py-4 font-bold backdrop-blur-xl">{item}</div>
@@ -193,10 +188,9 @@ export default function HomePage() {
                     <p className="mt-5 max-w-xl leading-7 text-black/65">{item.text}</p>
                   </div>
                 </div>
-                <a href={item.href} target="_blank" rel="noreferrer" className="relative block aspect-[16/10] overflow-hidden border-t border-black/10">
+                <div className="relative block aspect-[16/10] overflow-hidden border-t border-black/10">
                   <Image src={item.image} alt={item.alt} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover transition duration-700 group-hover:scale-[1.035]" />
-                  <span className="absolute bottom-4 right-4 rounded-full bg-black/50 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur">Photo: Pexels</span>
-                </a>
+                </div>
               </article>
             ))}
           </div>
@@ -245,10 +239,9 @@ export default function HomePage() {
               <p className="font-black">Have supporting files?</p>
               <p className="mt-2 text-sm leading-6 text-black/60">Paste a Drive, Dropbox, WeTransfer or OneDrive link—or send the files when we continue on WhatsApp.</p>
             </div>
-            <a href="https://www.pexels.com/photo/calculator-on-top-of-the-paper-7580854/" target="_blank" rel="noreferrer" className="relative mt-5 block aspect-[16/10] max-w-md overflow-hidden rounded-3xl border border-black/15">
+            <div className="relative mt-5 block aspect-[16/10] max-w-md overflow-hidden rounded-3xl border border-black/15">
               <Image src="/images/calculator-charts.jpg" alt="A calculator placed over printed charts and analytical reports" fill sizes="(min-width: 1024px) 32vw, 100vw" className="object-cover" />
-              <span className="absolute bottom-4 right-4 rounded-full bg-black/50 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur">Photo: Pexels</span>
-            </a>
+            </div>
           </div>
 
           <form onSubmit={submitProject} className="rounded-[2rem] border border-black/10 bg-white p-5 shadow-[0_30px_90px_rgba(16,35,33,.14)] md:p-9">
@@ -309,7 +302,6 @@ export default function HomePage() {
           <div>
             <p className="text-3xl font-black tracking-[-0.06em]">Elx<span className="text-[#F06449]">.</span>Studio</p>
             <p className="mt-3 text-sm text-white/50">© {year} Elx Holdings. Professional and technical project support.</p>
-            <p className="mt-1 text-xs text-white/35">Photography sourced from <a href="https://www.pexels.com" target="_blank" rel="noreferrer" className="underline underline-offset-2">Pexels</a>.</p>
           </div>
           <div className="flex flex-wrap gap-5 text-sm font-semibold text-white/65">
             <a href="/terms">Terms</a>
