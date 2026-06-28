@@ -95,7 +95,7 @@ export default function HomePage() {
 
   return (
     <main className="overflow-hidden bg-[#F5F2E8] text-[#102321]">
-      <header className="sticky top-0 z-50 border-b border-black/10 bg-[#F5F2E8]/95 backdrop-blur-xl">
+      <header className="sticky top-0 z-50 bg-[#F5F2E8]">
         <nav className="mx-auto flex h-20 max-w-[1440px] items-center justify-between px-5 md:px-10">
           <a href="#top" className="text-2xl font-black tracking-[-0.06em]">Elx<span className="text-[#F06449]">.</span>Studio</a>
           <div className="hidden items-center gap-8 text-sm font-semibold md:flex">
@@ -103,7 +103,7 @@ export default function HomePage() {
             <a href="#workflow" className="transition hover:opacity-60">How it works</a>
             <a href="#start" className="transition hover:opacity-60">Send a brief</a>
           </div>
-          <a href="#start" className="rounded-full bg-[#102321] px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5">Start a project <span aria-hidden="true">↗</span></a>
+          <a href="#start" className="bg-[#102321] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#F06449]">Start a project <span aria-hidden="true">↗</span></a>
         </nav>
       </header>
 
@@ -111,7 +111,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-[1440px] px-5 pb-8 pt-16 md:px-10 md:pb-12 md:pt-24">
           <div className="grid gap-10 lg:grid-cols-[1.15fr_.85fr] lg:items-end">
             <div>
-              <a href="#services" className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-[#DDF65C]">
+              <a href="#services" className="mb-8 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[.14em] text-[#DDF65C]">
                 Technical & professional project support <span aria-hidden="true">→</span>
               </a>
               <h1 className="max-w-5xl text-[clamp(4.6rem,11vw,10rem)] font-black leading-[.78] tracking-[-0.085em]">
@@ -121,36 +121,34 @@ export default function HomePage() {
             <div className="max-w-xl pb-2 lg:pb-5">
               <p className="text-xl leading-8 text-white/72 md:text-2xl md:leading-9">Bring us the difficult brief—the calculations, drawings, models, reports and details. We&apos;ll help turn it into clear, polished work you can use with confidence.</p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <a href="#start" className="rounded-full bg-[#DDF65C] px-7 py-4 text-center text-sm font-bold text-[#102321] transition hover:-translate-y-0.5">Send your brief</a>
-                <a href="#services" className="rounded-full border border-white/30 px-7 py-4 text-center text-sm font-bold transition hover:bg-white hover:text-[#102321]">Explore our expertise</a>
+                <a href="#start" className="bg-[#DDF65C] px-7 py-4 text-center text-sm font-bold text-[#102321] transition hover:bg-white">Send your brief</a>
+                <a href="#services" className="px-1 py-4 text-center text-sm font-bold underline decoration-white/35 underline-offset-8 transition hover:decoration-white">Explore our expertise</a>
               </div>
             </div>
           </div>
 
-          <div className="relative mt-14 overflow-hidden rounded-[1.75rem] bg-[#D9D5C9] p-3 md:mt-20 md:rounded-[2.5rem] md:p-5">
-            <div className="relative aspect-[16/8] min-h-[360px] overflow-hidden rounded-[1.25rem] md:rounded-[2rem]">
+          <div className="-mx-5 mt-14 md:-mx-10 md:mt-20">
+            <div className="relative aspect-[16/7] min-h-[340px] overflow-hidden">
               <Image src="/images/technical-render.jpg" alt="A geometric three-dimensional digital render" fill priority sizes="100vw" className="object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#073C3E]/70 via-transparent to-transparent" />
-              <div className="absolute left-4 top-4 rounded-full bg-[#F5F2E8] px-4 py-2 text-xs font-bold text-[#102321] md:left-7 md:top-7">Technical thinking. Beautifully finished.</div>
-              <div className="absolute inset-x-4 bottom-4 grid gap-2 sm:grid-cols-3 md:inset-x-7 md:bottom-7">
-                {['CAD + 3D', 'STEM + analysis', 'Reports + finance'].map((item) => (
-                  <div key={item} className="rounded-2xl border border-white/20 bg-black/25 px-5 py-4 font-bold backdrop-blur-xl">{item}</div>
-                ))}
-              </div>
+            </div>
+            <div className="grid bg-[#DDF65C] text-[#102321] sm:grid-cols-3">
+              {['CAD + 3D', 'STEM + analysis', 'Reports + finance'].map((item) => (
+                <div key={item} className="px-5 py-4 font-bold md:px-8">{item}</div>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      <section className="border-b border-black/10 bg-[#F5F2E8]">
-        <div className="mx-auto grid max-w-[1440px] grid-cols-2 md:grid-cols-4">
+      <section className="bg-[#F5F2E8]">
+        <div className="mx-auto grid max-w-[1440px] grid-cols-2 gap-y-8 px-5 py-12 md:grid-cols-4 md:px-10 md:py-16">
           {[
             ['7', 'service areas'],
             ['01', 'reference for every brief'],
             ['Direct', 'WhatsApp communication'],
             ['Flexible', 'delivery formats'],
           ].map(([value, label]) => (
-            <div key={label} className="border-b border-r border-black/10 p-6 last:border-r-0 md:border-b-0 md:p-9">
+            <div key={label}>
               <p className="text-3xl font-black tracking-[-0.05em] md:text-5xl">{value}</p>
               <p className="mt-2 max-w-[12rem] text-sm leading-5 text-black/55">{label}</p>
             </div>
@@ -177,29 +175,29 @@ export default function HomePage() {
 
           <div className="grid gap-5 md:grid-cols-2">
             {capabilities.map((item) => (
-              <article key={item.title} className={`${item.color} group overflow-hidden rounded-[2rem] border border-black/10`}>
+              <article key={item.title} className={`${item.color} group overflow-hidden`}>
                 <div className="flex min-h-[330px] flex-col justify-between p-7 md:p-10">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-black">{item.number}</span>
-                    <span className="flex h-11 w-11 items-center justify-center rounded-full border border-black/25 text-xl transition group-hover:rotate-45 group-hover:bg-[#102321] group-hover:text-white">↗</span>
+                    <span className="text-2xl transition group-hover:translate-x-1 group-hover:-translate-y-1">↗</span>
                   </div>
                   <div>
                     <h3 className="max-w-xl text-3xl font-black leading-[1] tracking-[-0.045em] md:text-5xl">{item.title}</h3>
                     <p className="mt-5 max-w-xl leading-7 text-black/65">{item.text}</p>
                   </div>
                 </div>
-                <div className="relative block aspect-[16/10] overflow-hidden border-t border-black/10">
+                <div className="relative block aspect-[16/10] overflow-hidden">
                   <Image src={item.image} alt={item.alt} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover transition duration-700 group-hover:scale-[1.035]" />
                 </div>
               </article>
             ))}
           </div>
 
-          <div className="mt-16 border-y border-black/10 py-10">
+          <div className="mt-16 pt-6">
             <p className="mb-6 text-sm font-bold uppercase tracking-[.18em] text-black/45">Also available</p>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-x-8 gap-y-3">
               {['Reports & proposals', 'Editing & formatting', 'Research support', 'Pitch decks', 'Company profiles', 'Resumes & presentations'].map((item) => (
-                <span key={item} className="rounded-full border border-black/20 px-5 py-3 text-sm font-bold">{item}</span>
+                <span key={item} className="text-sm font-bold">{item}</span>
               ))}
             </div>
           </div>
@@ -212,11 +210,11 @@ export default function HomePage() {
             <div className="lg:sticky lg:top-28 lg:self-start">
               <p className="text-sm font-bold uppercase tracking-[.18em] text-[#DDF65C]">How it works</p>
               <h2 className="mt-5 text-5xl font-black leading-[.9] tracking-[-0.065em] md:text-7xl">A clear path from brief to done.</h2>
-              <a href="#start" className="mt-8 inline-flex rounded-full bg-[#DDF65C] px-6 py-4 text-sm font-bold text-[#102321]">Start your project →</a>
+              <a href="#start" className="mt-8 inline-flex bg-[#DDF65C] px-6 py-4 text-sm font-bold text-[#102321]">Start your project →</a>
             </div>
-            <div className="border-t border-white/20">
+            <div className="border-t border-white/10">
               {workflow.map(([title, text], index) => (
-                <div key={title} className="grid gap-5 border-b border-white/20 py-8 md:grid-cols-[80px_1fr] md:py-10">
+                <div key={title} className="grid gap-5 border-b border-white/10 py-8 md:grid-cols-[80px_1fr] md:py-10">
                   <span className="text-sm font-bold text-[#DDF65C]">0{index + 1}</span>
                   <div>
                     <h3 className="text-3xl font-black tracking-[-0.04em] md:text-4xl">{title}</h3>
@@ -235,62 +233,62 @@ export default function HomePage() {
             <p className="text-sm font-bold uppercase tracking-[.18em]">Ready when you are</p>
             <h2 className="mt-5 text-6xl font-black leading-[.87] tracking-[-0.075em] md:text-8xl">Let&apos;s get to work.</h2>
             <p className="mt-7 max-w-md text-lg leading-8 text-black/65">Share the context, deadline and format you have in mind. We&apos;ll review the details and continue with you on WhatsApp.</p>
-            <div className="mt-10 max-w-md rounded-3xl border border-black/15 bg-white/45 p-6">
+            <div className="mt-10 max-w-md border-t border-black/20 pt-5">
               <p className="font-black">Have supporting files?</p>
               <p className="mt-2 text-sm leading-6 text-black/60">Paste a Drive, Dropbox, WeTransfer or OneDrive link—or send the files when we continue on WhatsApp.</p>
             </div>
-            <div className="relative mt-5 block aspect-[16/10] max-w-md overflow-hidden rounded-3xl border border-black/15">
+            <div className="relative mt-8 block aspect-[16/10] overflow-hidden">
               <Image src="/images/calculator-charts.jpg" alt="A calculator placed over printed charts and analytical reports" fill sizes="(min-width: 1024px) 32vw, 100vw" className="object-cover" />
             </div>
           </div>
 
-          <form onSubmit={submitProject} className="rounded-[2rem] border border-black/10 bg-white p-5 shadow-[0_30px_90px_rgba(16,35,33,.14)] md:p-9">
+          <form onSubmit={submitProject} className="bg-white p-5 md:p-10">
             <div className="grid gap-5 md:grid-cols-2">
               <label>
                 <span className="text-sm font-bold">Full name</span>
-                <input name="name" required className="mt-2 w-full rounded-xl border border-black/15 bg-[#F5F2E8] px-4 py-3.5 outline-none transition focus:border-[#073C3E]" placeholder="Your name" />
+                <input name="name" required className="mt-2 w-full border-0 border-b border-black/20 bg-transparent px-0 py-3.5 outline-none transition focus:border-[#073C3E] focus:ring-0" placeholder="Your name" />
               </label>
               <label>
                 <span className="text-sm font-bold">WhatsApp number</span>
-                <input name="whatsapp" required className="mt-2 w-full rounded-xl border border-black/15 bg-[#F5F2E8] px-4 py-3.5 outline-none transition focus:border-[#073C3E]" placeholder="+254..." />
+                <input name="whatsapp" required className="mt-2 w-full border-0 border-b border-black/20 bg-transparent px-0 py-3.5 outline-none transition focus:border-[#073C3E] focus:ring-0" placeholder="+254..." />
               </label>
               <label>
                 <span className="text-sm font-bold">Email <span className="font-normal text-black/45">(optional)</span></span>
-                <input name="email" type="email" className="mt-2 w-full rounded-xl border border-black/15 bg-[#F5F2E8] px-4 py-3.5 outline-none transition focus:border-[#073C3E]" placeholder="you@email.com" />
+                <input name="email" type="email" className="mt-2 w-full border-0 border-b border-black/20 bg-transparent px-0 py-3.5 outline-none transition focus:border-[#073C3E] focus:ring-0" placeholder="you@email.com" />
               </label>
               <label>
                 <span className="text-sm font-bold">What do you need?</span>
-                <select name="service" required className="mt-2 w-full rounded-xl border border-black/15 bg-[#F5F2E8] px-4 py-3.5 outline-none transition focus:border-[#073C3E]">
+                <select name="service" required className="mt-2 w-full border-0 border-b border-black/20 bg-transparent px-0 py-3.5 outline-none transition focus:border-[#073C3E] focus:ring-0">
                   <option value="">Select a service</option>
                   {services.map((service) => <option key={service}>{service}</option>)}
                 </select>
               </label>
               <label>
                 <span className="text-sm font-bold">When do you need it?</span>
-                <input name="deadline" required className="mt-2 w-full rounded-xl border border-black/15 bg-[#F5F2E8] px-4 py-3.5 outline-none transition focus:border-[#073C3E]" placeholder="Today, Friday, 24 hours..." />
+                <input name="deadline" required className="mt-2 w-full border-0 border-b border-black/20 bg-transparent px-0 py-3.5 outline-none transition focus:border-[#073C3E] focus:ring-0" placeholder="Today, Friday, 24 hours..." />
               </label>
               <label>
                 <span className="text-sm font-bold">Budget range <span className="font-normal text-black/45">(optional)</span></span>
-                <input name="budget" className="mt-2 w-full rounded-xl border border-black/15 bg-[#F5F2E8] px-4 py-3.5 outline-none transition focus:border-[#073C3E]" placeholder="$50–$200, flexible..." />
+                <input name="budget" className="mt-2 w-full border-0 border-b border-black/20 bg-transparent px-0 py-3.5 outline-none transition focus:border-[#073C3E] focus:ring-0" placeholder="$50–$200, flexible..." />
               </label>
               <label className="md:col-span-2">
                 <span className="text-sm font-bold">Supporting files <span className="font-normal text-black/45">(optional)</span></span>
-                <input name="filesLink" className="mt-2 w-full rounded-xl border border-black/15 bg-[#F5F2E8] px-4 py-3.5 outline-none transition focus:border-[#073C3E]" placeholder="Paste a Drive, Dropbox, WeTransfer or OneDrive link" />
+                <input name="filesLink" className="mt-2 w-full border-0 border-b border-black/20 bg-transparent px-0 py-3.5 outline-none transition focus:border-[#073C3E] focus:ring-0" placeholder="Paste a Drive, Dropbox, WeTransfer or OneDrive link" />
               </label>
               <label className="md:col-span-2">
                 <span className="text-sm font-bold">Tell us about the project</span>
-                <textarea name="brief" required rows={6} className="mt-2 w-full resize-none rounded-xl border border-black/15 bg-[#F5F2E8] px-4 py-3.5 outline-none transition focus:border-[#073C3E]" placeholder="Describe the goal, requirements, format, software, references and finished files you expect..." />
+                <textarea name="brief" required rows={6} className="mt-2 w-full resize-none border-0 border-b border-black/20 bg-transparent px-0 py-3.5 outline-none transition focus:border-[#073C3E] focus:ring-0" placeholder="Describe the goal, requirements, format, software, references and finished files you expect..." />
               </label>
             </div>
-            <button disabled={loading} className="mt-6 w-full rounded-full bg-[#102321] px-7 py-4 text-sm font-bold text-white transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60">
+            <button disabled={loading} className="mt-6 w-full bg-[#102321] px-7 py-4 text-sm font-bold text-white transition hover:bg-[#F06449] disabled:cursor-not-allowed disabled:opacity-60">
               {loading ? 'Sending your brief...' : 'Send my brief and continue on WhatsApp →'}
             </button>
-            {error && <p className="mt-4 rounded-2xl bg-red-50 p-4 text-sm text-red-700">{error}</p>}
+            {error && <p className="mt-4 bg-red-50 p-4 text-sm text-red-700">{error}</p>}
             {result && (
-              <div className="mt-5 rounded-2xl bg-[#E7F7E8] p-5 text-sm text-[#164F22]">
+              <div className="mt-5 bg-[#E7F7E8] p-5 text-sm text-[#164F22]">
                 <p className="font-bold">We have your brief. Reference: {result.orderId}</p>
                 <p className="mt-1">Continue on WhatsApp and we&apos;ll take it from here.</p>
-                <a href={result.whatsappUrl} target="_blank" rel="noreferrer" className="mt-4 inline-flex rounded-full bg-[#164F22] px-5 py-3 font-bold text-white">Continue on WhatsApp ↗</a>
+                <a href={result.whatsappUrl} target="_blank" rel="noreferrer" className="mt-4 inline-flex bg-[#164F22] px-5 py-3 font-bold text-white">Continue on WhatsApp ↗</a>
               </div>
             )}
           </form>
