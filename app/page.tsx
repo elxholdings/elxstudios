@@ -6,11 +6,12 @@ import { resolveLocale } from './locale';
 export const dynamic = 'force-dynamic';
 
 type PageProps = {
-  searchParams?: { lang?: string | string[] };
+  searchParams?: Promise<{ lang?: string | string[] }>;
 };
 
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
-  const locale = await resolveLocale(searchParams?.lang);
+  const query = await searchParams;
+  const locale = await resolveLocale(query?.lang);
   const dictionary = await getSiteTranslations(locale);
   const title = locale === 'zh' ? '做到精准' : dictionary['Get It Right'] || 'Get It Right';
   const description = locale === 'zh'
@@ -21,7 +22,8 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 }
 
 export default async function Page({ searchParams }: PageProps) {
-  const locale = await resolveLocale(searchParams?.lang);
+  const query = await searchParams;
+  const locale = await resolveLocale(query?.lang);
   const dictionary = await getSiteTranslations(locale);
   return <LandingPage locale={locale} dictionary={dictionary} />;
 }

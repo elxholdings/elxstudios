@@ -5,9 +5,10 @@ import ProjectWizard from './project-wizard';
 
 export const metadata: Metadata = { title: 'Start a Project', description: 'Create a structured Elx Studio project brief and request a manual quote.' };
 
-export default async function StartPage({ searchParams }: { searchParams?: { lang?: string | string[]; service?: string | string[] } }) {
-  const locale = await resolveLocale(searchParams?.lang);
-  const service = Array.isArray(searchParams?.service) ? searchParams?.service[0] : searchParams?.service;
+export default async function StartPage({ searchParams }: { searchParams?: Promise<{ lang?: string | string[]; service?: string | string[] }> }) {
+  const query = await searchParams;
+  const locale = await resolveLocale(query?.lang);
+  const service = Array.isArray(query?.service) ? query?.service[0] : query?.service;
   return (
     <SiteShell locale={locale}>
       <section className="px-5 py-14 md:px-10 md:py-20">

@@ -10,15 +10,18 @@ export function generateStaticParams() {
   return serviceCategories.map((service) => ({ slug: service.slug }));
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
-  const service = getServiceCategory(params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const route = await params;
+  const service = getServiceCategory(route.slug);
   return service ? { title: service.title, description: service.summary } : {};
 }
 
-export default async function ServiceDetailPage({ params, searchParams }: { params: { slug: string }; searchParams?: { lang?: string | string[] } }) {
-  const service = getServiceCategory(params.slug);
+export default async function ServiceDetailPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams?: Promise<{ lang?: string | string[] }> }) {
+  const route = await params;
+  const query = await searchParams;
+  const service = getServiceCategory(route.slug);
   if (!service) notFound();
-  const locale = await resolveLocale(searchParams?.lang);
+  const locale = await resolveLocale(query?.lang);
 
   return (
     <SiteShell locale={locale}>

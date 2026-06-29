@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getSupabaseAdminClient } from '../../lib/supabase/admin';
 
 type IntakePayload = {
   name?: string;
@@ -32,20 +33,10 @@ function createOrderId() {
 }
 
 async function saveToSupabase(record: Record<string, string>) {
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) return;
-
-  await fetch(`${url}/rest/v1/intake_requests`, {
-    method: 'POST',
-    headers: {
-      apikey: key,
-      Authorization: `Bearer ${key}`,
-      'Content-Type': 'application/json',
-      Prefer: 'return=minimal',
-    },
-    body: JSON.stringify(record),
-  });
+  const supabase = getSupabaseAdminClient();
+  if (!supabase) return;
+  const { error } = await supabase.from('intake_requests').insert(record);
+  if (error) throw error;
 }
 
 async function sendEmail(record: Record<string, string>) {

@@ -4,8 +4,9 @@ import { resolveLocale } from '../locale';
 
 export const dynamic = 'force-dynamic';
 
-export default async function PrivacyPage({ searchParams }: { searchParams?: { lang?: string | string[] } }) {
-  const locale = await resolveLocale(searchParams?.lang);
+export default async function PrivacyPage({ searchParams }: { searchParams?: Promise<{ lang?: string | string[] }> }) {
+  const query = await searchParams;
+  const locale = await resolveLocale(query?.lang);
   const zh = locale === 'zh';
   const dictionary = await getSiteTranslations(locale);
   const t = (value: string) => dictionary[value] || value;

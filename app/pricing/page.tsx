@@ -5,8 +5,9 @@ import { resolveLocale } from '../locale';
 
 export const metadata: Metadata = { title: 'Pricing', description: 'Understand how Elx Studio prepares transparent manual project quotes.' };
 
-export default async function PricingPage({ searchParams }: { searchParams?: { lang?: string | string[] } }) {
-  const locale = await resolveLocale(searchParams?.lang);
+export default async function PricingPage({ searchParams }: { searchParams?: Promise<{ lang?: string | string[] }> }) {
+  const query = await searchParams;
+  const locale = await resolveLocale(query?.lang);
   return (
     <SiteShell locale={locale}>
       <PageIntro eyebrow="Manual quotes first" title="Price the actual work—not a vague category." intro="Submitting a brief is free. We quote only after reviewing the deliverables, deadline, source material and technical complexity. You do not pay simply to ask." />

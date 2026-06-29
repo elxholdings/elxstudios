@@ -26,7 +26,7 @@ The file control records file names only. Actual files are not uploaded until pr
 
 - Email/password and Google authentication
 - Role-based client, admin, manager and expert permissions
-- Managed PostgreSQL database with migrations and backups
+- A live Supabase project linked to the prepared PostgreSQL migrations
 - Private object storage with signed links and virus scanning
 - Order messages, notifications and email delivery
 - Secure payment gateway, refunds and invoice records

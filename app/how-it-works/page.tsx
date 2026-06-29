@@ -14,8 +14,9 @@ const stages = [
   ['06', 'Delivery and revision', 'Receive the agreed files, review them and request an in-scope revision when needed.'],
 ] as const;
 
-export default async function HowItWorksPage({ searchParams }: { searchParams?: { lang?: string | string[] } }) {
-  const locale = await resolveLocale(searchParams?.lang);
+export default async function HowItWorksPage({ searchParams }: { searchParams?: Promise<{ lang?: string | string[] }> }) {
+  const query = await searchParams;
+  const locale = await resolveLocale(query?.lang);
   return (
     <SiteShell locale={locale}>
       <PageIntro eyebrow="From brief to delivery" title="A process you can follow." intro="Complex work becomes easier to manage when every handoff is explicit. This is the operating path Elx Studio is building into the platform." />

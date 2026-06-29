@@ -70,33 +70,26 @@ On Vercel, add the variable to Production, Preview and Development as needed. IP
 4. Deploy.
 5. Connect your domain.
 
-## Optional Supabase setup
+## Supabase database setup
 
-Create a Supabase project and run this SQL:
-
-```sql
-create table intake_requests (
-  id uuid primary key default gen_random_uuid(),
-  order_id text not null unique,
-  name text not null,
-  whatsapp text not null,
-  email text,
-  service text not null,
-  deadline text not null,
-  budget text,
-  files_link text,
-  brief text not null,
-  status text default 'new',
-  created_at timestamptz default now()
-);
-```
-
-Then add these variables in Vercel:
+The repository now includes a normalized platform schema, seed data, RLS policies and private Storage rules in `supabase/`.
 
 ```bash
-SUPABASE_URL=your_supabase_url
+npx supabase login
+npx supabase link --project-ref YOUR_PROJECT_REF
+npx supabase db push --dry-run
+npx supabase db push --include-seed
+```
+
+Then add the Project Settings → API values in Vercel:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=your_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 ```
+
+See `supabase/README.md` before promoting the first super administrator.
 
 ## Optional email alerts using Resend
 

@@ -10,8 +10,9 @@ export const metadata: Metadata = {
   description: 'Explore documentation, STEM, architecture, CAD, 3D, finance and professional project services from Elx Studio.',
 };
 
-export default async function ServicesPage({ searchParams }: { searchParams?: { lang?: string | string[] } }) {
-  const locale = await resolveLocale(searchParams?.lang);
+export default async function ServicesPage({ searchParams }: { searchParams?: Promise<{ lang?: string | string[] }> }) {
+  const query = await searchParams;
+  const locale = await resolveLocale(query?.lang);
 
   return (
     <SiteShell locale={locale}>

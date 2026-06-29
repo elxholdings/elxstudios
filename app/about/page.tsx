@@ -5,8 +5,9 @@ import { resolveLocale } from '../locale';
 
 export const metadata: Metadata = { title: 'About Elx Holdings', description: 'Learn how Elx Holdings and Elx Studio are structured to deliver accountable technical and professional services.' };
 
-export default async function AboutPage({ searchParams }: { searchParams?: { lang?: string | string[] } }) {
-  const locale = await resolveLocale(searchParams?.lang);
+export default async function AboutPage({ searchParams }: { searchParams?: Promise<{ lang?: string | string[] }> }) {
+  const query = await searchParams;
+  const locale = await resolveLocale(query?.lang);
   return (
     <SiteShell locale={locale}>
       <PageIntro eyebrow="Elx Holdings" title="A durable home for specialist companies." intro="Elx Holdings is the parent organization. Elx Studio is its first active platform—built to make professional and technical project support easier to scope, manage and deliver." />

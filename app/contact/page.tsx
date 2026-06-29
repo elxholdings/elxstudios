@@ -5,8 +5,9 @@ import { resolveLocale } from '../locale';
 
 export const metadata: Metadata = { title: 'Contact', description: 'Contact Elx Studio about a project, existing order, partnership or general question.' };
 
-export default async function ContactPage({ searchParams }: { searchParams?: { lang?: string | string[] } }) {
-  const locale = await resolveLocale(searchParams?.lang);
+export default async function ContactPage({ searchParams }: { searchParams?: Promise<{ lang?: string | string[] }> }) {
+  const query = await searchParams;
+  const locale = await resolveLocale(query?.lang);
   const number = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '254700000000').replace(/\D/g, '');
   return (
     <SiteShell locale={locale}>
