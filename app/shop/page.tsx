@@ -3,7 +3,7 @@ import { SiteShell } from '../components/site-shell';
 import { getPublishedProducts } from '../lib/site-content';
 import { resolveLocale } from '../locale';
 
-export const metadata: Metadata = { title: 'CAD & Architecture Plan Shop', description: 'Ready-to-customize CAD drawings, architecture plans and design packages from Elx Studio.' };
+export const metadata: Metadata = { title: 'CAD & Architecture Plan Shop', description: 'Ready-to-customize CAD drawings, architecture plans and design packages from Elx Studio.', alternates: { canonical: '/shop' }, openGraph: { title: 'CAD & Architecture Plan Shop | Elx Studio', description: 'Ready-to-customize CAD drawings, architecture plans and design packages.', url: '/shop', type: 'website' } };
 
 export default async function ShopPage({ searchParams }: { searchParams?: Promise<{ lang?: string | string[] }> }) {
   const query = await searchParams;

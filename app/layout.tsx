@@ -15,7 +15,6 @@ export const metadata: Metadata = {
   authors: [{ name: 'Elx Holdings' }],
   creator: 'Elx Holdings',
   publisher: 'Elx Holdings',
-  alternates: { canonical: '/' },
   openGraph: {
     type: 'website',
     siteName: 'Elx Studio',

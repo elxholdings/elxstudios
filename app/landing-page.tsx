@@ -22,6 +22,7 @@ const services = [
 const capabilities = [
   {
     number: '01',
+    icon: 'calculation',
     title: 'Work through complex calculations',
     text: 'Get structured support for mathematics, science, engineering, data and technical problem-solving.',
     image: '/images/math-formulas.jpg',
@@ -30,6 +31,7 @@ const capabilities = [
   },
   {
     number: '02',
+    icon: 'drawing',
     title: 'Develop precise drawings and plans',
     text: 'Move from an early idea to clear floor plans, CAD drawings, models and technical documentation.',
     image: '/images/blueprint-tools.jpg',
@@ -38,6 +40,7 @@ const capabilities = [
   },
   {
     number: '03',
+    icon: 'chart',
     title: 'Turn numbers into useful decisions',
     text: 'Build budgets, forecasts, reports and Excel models that make the story behind the figures easier to see.',
     image: '/images/analytics-dashboard.jpg',
@@ -46,6 +49,7 @@ const capabilities = [
   },
   {
     number: '04',
+    icon: 'model',
     title: 'Create polished visual outcomes',
     text: 'Present concepts with refined 3D models, renderings, diagrams, boards and presentation-ready visuals.',
     image: '/images/technical-render.jpg',
@@ -270,35 +274,24 @@ export default function LandingPage({ locale, dictionary = {}, languageOptions, 
         </div>
       </section>
 
-      <section id="services" className="bg-white px-5 py-24 md:px-10 md:py-32">
+      <section id="services" className="bg-white px-5 py-16 md:px-10 md:py-20">
         <div className="mx-auto max-w-[1440px]">
-          <div className="mb-14 max-w-4xl">
+          <div className="mb-10 max-w-4xl">
             <p className="text-sm font-bold uppercase tracking-[.18em] text-[#F06449]">{t(homepage.servicesEyebrow)}</p>
-            <h2 className="mt-5 text-5xl font-black leading-[.92] tracking-[-0.065em] md:text-8xl">{t(homepage.servicesTitle)}</h2>
+            <h2 className="mt-4 text-4xl font-black leading-[.94] tracking-[-0.06em] md:text-6xl">{t(homepage.servicesTitle)}</h2>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-2">
+          <div className="grid gap-px bg-black/10 sm:grid-cols-2 xl:grid-cols-4">
             {capabilities.map((item) => (
-              <article key={item.title} className={`${item.color} group overflow-hidden`}>
-                <div className="flex min-h-[330px] flex-col justify-between p-7 md:p-10">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-black">{item.number}</span>
-                    <span className="text-2xl transition group-hover:translate-x-1 group-hover:-translate-y-1">↗</span>
-                  </div>
-                  <div>
-                    <h3 className="max-w-xl text-3xl font-black leading-[1] tracking-[-0.045em] md:text-5xl">{t(item.title)}</h3>
-                    <p className="mt-5 max-w-xl leading-7 text-black/65">{t(item.text)}</p>
-                  </div>
-                </div>
-                <div className="relative block aspect-[16/10] overflow-hidden">
-                  <Image src={item.image} alt={t(item.alt)} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover transition duration-700 group-hover:scale-[1.035]" />
-                </div>
+              <article key={item.title} className="group flex min-h-[300px] flex-col bg-[#F5F2E8] p-6 md:p-7">
+                <div className="flex items-start justify-between"><CapabilityIcon type={item.icon} /><span className="text-xs font-black text-black/35">{item.number}</span></div>
+                <div className="mt-auto pt-10"><h3 className="text-2xl font-black leading-[1.02] tracking-[-0.04em] md:text-3xl">{t(item.title)}</h3><p className="mt-4 text-sm leading-6 text-black/55">{t(item.text)}</p></div>
               </article>
             ))}
           </div>
 
-          <div className="mt-16 pt-6">
-            <p className="mb-6 text-sm font-bold uppercase tracking-[.18em] text-black/45">{t('Also available')}</p>
+          <div className="mt-10 border-t border-black/10 pt-6">
+            <p className="mb-5 text-xs font-bold uppercase tracking-[.18em] text-black/45">{t('Also available')}</p>
             <div className="flex flex-wrap gap-x-8 gap-y-3">
               {['Reports & proposals', 'Editing & formatting', 'Research support', 'Pitch decks', 'Company profiles', 'Resumes & presentations'].map((item) => (
                 <span key={item} className="text-sm font-bold">{t(item)}</span>
@@ -456,4 +449,16 @@ function ServiceCarousel({ slides }: { slides: HomepageContent['carousel'] }) {
     </div>
     <div className="absolute bottom-5 right-5 z-20 flex gap-2 md:bottom-8 md:right-10">{slides.map((item, index) => <button key={item.id} type="button" aria-label={`Show ${item.title}`} onClick={() => setActive(index)} className={`h-1.5 transition-all ${index === active ? 'w-12 bg-[#DDF65C]' : 'w-6 bg-white/35'}`} />)}</div>
   </section>;
+}
+
+function CapabilityIcon({ type }: { type: string }) {
+  const common = { fill: 'none', stroke: 'currentColor', strokeWidth: 1.6, strokeLinecap: 'square' as const, strokeLinejoin: 'miter' as const };
+  return <span className="grid h-14 w-14 place-items-center bg-[#DDF65C] text-[#102321] transition group-hover:bg-[#102321] group-hover:text-[#DDF65C]">
+    <svg viewBox="0 0 48 48" aria-hidden="true" className="h-8 w-8" {...common}>
+      {type === 'calculation' && <><path d="M8 13h32M8 35h32M15 8v32M33 8v32" /><path d="m20 19 8 10m0-10-8 10" /></>}
+      {type === 'drawing' && <><path d="M8 38 20 10l20 28Z" /><path d="M14 32h20M20 10v28" /><path d="m29 15 7-7 4 4-7 7" /></>}
+      {type === 'chart' && <><path d="M8 39h32M11 34V23h7v11m5 0V14h7v20m5 0V8h5v26" /><path d="m10 18 10-7 8 4 11-9" /></>}
+      {type === 'model' && <><path d="m24 6 16 9v18l-16 9-16-9V15Z" /><path d="m8 15 16 9 16-9M24 24v18M16 11l16 9" /></>}
+    </svg>
+  </span>;
 }
