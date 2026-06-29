@@ -1,5 +1,6 @@
 import type { ResolvedLocale } from './locale';
 import LanguageSwitcher from './language-switcher';
+import { languageOptions } from './language-options';
 import { isRtlLocale } from './locale-config';
 
 type Section = {
@@ -24,7 +25,7 @@ export default function LegalPage({
     <main lang={locale === 'zh' ? 'zh-CN' : locale} dir={isRtlLocale(locale) ? 'rtl' : 'ltr'} className="mx-auto max-w-4xl px-6 py-16 leading-7 text-[#102321]">
       <nav className="mb-16 flex items-center justify-between text-sm font-bold">
         <a href={`/?lang=${locale}`}>← {backLabel}</a>
-        <LanguageSwitcher locale={locale} />
+        <LanguageSwitcher locale={locale} options={languageOptions} />
       </nav>
       <h1 className="text-5xl font-black leading-none tracking-[-0.05em] md:text-7xl">{title}</h1>
       <p className="mt-8 text-lg leading-8 text-black/65">{intro}</p>

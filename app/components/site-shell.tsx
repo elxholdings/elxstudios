@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import LanguageSwitcher from '../language-switcher';
+import { languageOptions } from '../language-options';
 import AuthNav from './auth-nav';
 
 const navItems = [
@@ -24,7 +25,7 @@ export function SiteHeader({ locale = 'en' }: { locale?: string }) {
           {navItems.map(([label, href]) => <Link key={href} href={withLocale(href)} className="whitespace-nowrap transition hover:opacity-55">{label}</Link>)}
         </div>
         <div className="flex items-center gap-3">
-          <LanguageSwitcher locale={locale} />
+          <LanguageSwitcher locale={locale} options={languageOptions} />
           <AuthNav locale={locale} />
           <Link href={withLocale('/start')} className="bg-[#102321] px-4 py-3 text-sm font-bold text-white transition hover:bg-[#F06449]">Start project</Link>
         </div>

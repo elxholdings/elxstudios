@@ -1,12 +1,14 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import LandingPage from './landing-page';
 import { getSiteTranslations } from './google-translate';
+import { languageOptions } from './language-options';
 import { resolveLocale } from './locale';
 
 export const dynamic = 'force-dynamic';
 
 type PageProps = {
-  searchParams?: Promise<{ lang?: string | string[] }>;
+  searchParams?: Promise<{ lang?: string | string[]; code?: string | string[] }>;
 };
 
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
@@ -23,7 +25,9 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 
 export default async function Page({ searchParams }: PageProps) {
   const query = await searchParams;
+  const code = Array.isArray(query?.code) ? query.code[0] : query?.code;
+  if (code) redirect(`/auth/callback?code=${encodeURIComponent(code)}&next=/dashboard`);
   const locale = await resolveLocale(query?.lang);
   const dictionary = await getSiteTranslations(locale);
-  return <LandingPage locale={locale} dictionary={dictionary} />;
+  return <LandingPage locale={locale} dictionary={dictionary} languageOptions={languageOptions} />;
 }

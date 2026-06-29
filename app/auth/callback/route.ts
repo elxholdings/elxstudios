@@ -13,20 +13,15 @@ export async function GET(request: Request) {
   if (code && supabase) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error && data.user) {
-      if (next.startsWith('/admin')) {
-        const providers = data.user.app_metadata.providers;
-        const hasGoogleIdentity = data.user.app_metadata.provider === 'google'
-          || (Array.isArray(providers) && providers.includes('google'))
-          || Boolean(data.user.identities?.some((identity) => identity.provider === 'google'));
-        const isAllowed = data.user.email?.trim().toLowerCase() === adminEmail
-          && hasGoogleIdentity
-          && Boolean(data.session?.provider_token);
+      const providers = data.user.app_metadata.providers;
+      const hasGoogleIdentity = data.user.app_metadata.provider === 'google'
+        || (Array.isArray(providers) && providers.includes('google'))
+        || Boolean(data.user.identities?.some((identity) => identity.provider === 'google'));
+      const isGoogleAdmin = data.user.email?.trim().toLowerCase() === adminEmail
+        && hasGoogleIdentity
+        && Boolean(data.session?.provider_token);
 
-        if (!isAllowed) {
-          await supabase.auth.signOut();
-          return NextResponse.redirect(new URL('/login?next=/admin&error=admin_access', url.origin));
-        }
-
+      if (isGoogleAdmin) {
         const admin = getSupabaseAdminClient();
         if (!admin) {
           await supabase.auth.signOut();
@@ -41,6 +36,12 @@ export async function GET(request: Request) {
           await supabase.auth.signOut();
           return NextResponse.redirect(new URL('/login?next=/admin&error=configuration', url.origin));
         }
+        return NextResponse.redirect(new URL('/admin', url.origin));
+      }
+
+      if (next.startsWith('/admin')) {
+        await supabase.auth.signOut();
+        return NextResponse.redirect(new URL('/login?next=/admin&error=admin_access', url.origin));
       }
       return NextResponse.redirect(new URL(next, url.origin));
     }

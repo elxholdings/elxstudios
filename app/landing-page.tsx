@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { FormEvent, useMemo, useState } from 'react';
 import type { TranslationDictionary } from './google-translate';
-import LanguageSwitcher from './language-switcher';
+import LanguageSwitcher, { type LanguageOption } from './language-switcher';
 import { isRtlLocale } from './locale-config';
 
 export type Locale = string;
@@ -165,7 +165,7 @@ type IntakeResponse = {
   message: string;
 };
 
-export default function LandingPage({ locale, dictionary = {} }: { locale: Locale; dictionary?: TranslationDictionary }) {
+export default function LandingPage({ locale, dictionary = {}, languageOptions }: { locale: Locale; dictionary?: TranslationDictionary; languageOptions: readonly LanguageOption[] }) {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<IntakeResponse | null>(null);
   const [error, setError] = useState('');
@@ -210,7 +210,7 @@ export default function LandingPage({ locale, dictionary = {} }: { locale: Local
             <a href="#start" className="transition hover:opacity-60">{t('Send a brief')}</a>
           </div>
           <div className="flex items-center gap-4">
-            <LanguageSwitcher locale={locale} />
+            <LanguageSwitcher locale={locale} options={languageOptions} />
             <a href={`/start?lang=${locale}`} className="hidden bg-[#102321] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#F06449] sm:block">{t('Start a project')} <span aria-hidden="true">↗</span></a>
           </div>
         </nav>
