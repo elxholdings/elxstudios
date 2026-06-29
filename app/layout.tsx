@@ -4,7 +4,7 @@ import { headers } from 'next/headers';
 import { isRtlLocale } from './locale-config';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://elxstudios.vercel.app'),
+  metadataBase: new URL('https://elxholdings.com'),
   title: {
     default: 'Elx Studio | Get It Right',
     template: '%s | Elx Studio',
@@ -47,7 +47,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               '@type': 'ProfessionalService',
               name: 'Elx Studio',
               parentOrganization: { '@type': 'Organization', name: 'Elx Holdings' },
-              url: 'https://elxstudios.vercel.app',
+              url: 'https://elxholdings.com',
               description: 'Technical and professional project support for documentation, STEM, architecture, CAD, 3D, finance and business work.',
               areaServed: 'Worldwide',
             }),

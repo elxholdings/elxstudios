@@ -55,8 +55,9 @@ The publishable/anon key is intended for browser use because Row Level Security 
 
 Configure Supabase Authentication URL settings:
 
-- Site URL: `https://elxstudios.vercel.app`
-- Redirect URL: `https://elxstudios.vercel.app/auth/callback`
+- Site URL: `https://elxholdings.com`
+- Redirect URL: `https://elxholdings.com/auth/callback`
+- Vercel fallback: `https://elxstudios.vercel.app/auth/callback`
 - Local redirect URL: `http://localhost:3000/auth/callback`
 
 See `supabase/README.md` for first-owner promotion.

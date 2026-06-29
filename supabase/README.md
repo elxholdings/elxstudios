@@ -38,9 +38,10 @@ on conflict do nothing;
 
 ## Authentication URLs
 
-In Authentication → URL Configuration, set the live Site URL to `https://elxstudios.vercel.app` and add these redirect URLs:
+In Authentication → URL Configuration, set the live Site URL to `https://elxholdings.com` and add these redirect URLs:
 
 ```text
+https://elxholdings.com/auth/callback
 https://elxstudios.vercel.app/auth/callback
 http://localhost:3000/auth/callback
 ```
