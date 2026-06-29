@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { logAdminAudit } from '../../../lib/admin-audit';
 import { getAuthContext, staffRoles } from '../../../lib/auth';
 import { getSupabaseAdminClient } from '../../../lib/supabase/admin';
 
@@ -20,5 +21,6 @@ export async function POST(request: Request) {
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   await admin.from('orders').update({ status: 'ready_for_delivery' }).eq('id', order.id);
   if (order.client_id) await admin.from('notifications').insert({ user_id: order.client_id, event_type: 'deliverable_ready', title: `Files ready for ${order.order_number}`, body: 'An approved deliverable is available in your secure workspace.', data: { order_id: order.id, deliverable_id: delivery.id } });
+  await logAdminAudit({ actorId: user.id, action: 'deliverable.published', entityType: 'deliverable', entityId: delivery.id, newData: { order_id: order.id, title, version }, request });
   return NextResponse.json({ ok: true, deliverableId: delivery.id });
 }

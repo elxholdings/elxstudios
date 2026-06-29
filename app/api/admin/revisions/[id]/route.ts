@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { logAdminAudit } from '../../../../lib/admin-audit';
 import { getAuthContext, staffRoles } from '../../../../lib/auth';
 import { getSupabaseAdminClient } from '../../../../lib/supabase/admin';
 
@@ -15,5 +16,6 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   const { data: order } = await admin.from('orders').select('client_id, order_number').eq('id', revision.order_id).single();
   if (order?.client_id) await admin.from('notifications').insert({ user_id: order.client_id, event_type: 'revision_decision', title: `Revision update for ${order.order_number}`, body: body.status === 'approved' ? 'The requested changes were approved and added to the work queue.' : 'The request needs a scope discussion before work begins.', data: { order_id: revision.order_id, revision_id: id } });
+  await logAdminAudit({ actorId: user.id, action: 'revision.decided', entityType: 'revision', entityId: id, newData: { status: body.status, is_in_scope: Boolean(body.isInScope) }, request });
   return NextResponse.json({ ok: true });
 }

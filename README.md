@@ -9,6 +9,7 @@ Elx Studio by Elx Holdings: a production-shaped, no-payment project delivery pla
 - Supabase registration, email confirmation, login, recovery and cookie sessions
 - Secure cloud client workspace with orders, quotes, files, messages and revisions
 - Role-protected operations portal with assignments, status control and manual quotes
+- Full admin control plane covering overview, orders, clients, team, services, finance, support, content, Meta, settings and system health
 - Private source uploads, approved deliverables and short-lived signed downloads
 - Policies, locale detection, SEO metadata, robots and sitemap
 - Meta development console for Facebook Pages, Instagram, Lead Ads, Marketing insights and WhatsApp Cloud API
@@ -26,6 +27,8 @@ See `DEVELOPMENT_STATUS.md` and `SPEC_GAP_AUDIT.md` for the exact boundary.
 ## Meta development setup
 
 The protected `/admin/meta` console includes OAuth asset discovery, encrypted token storage, signature-verified webhooks, Facebook/Instagram publishing, Lead Ads capture, insights, WhatsApp test messaging, action logs and a Meta data-deletion callback.
+
+The protected `/admin` area also includes guarded role management, project tasks, service pricing/visibility, multi-currency finance reporting, ticket replies, editable CMS records, non-secret workflow settings and a secret-free health/audit view. Financial automation stays read-only until a payment provider is connected.
 
 Required Vercel variables are documented in `.env.example`. Meta-issued App ID/App Secret and WhatsApp test credentials must be copied privately from the Meta Developer dashboard. Development mode works with app-role users and test assets; Advanced Access remains dependent on Meta App Review and Business Verification.
 

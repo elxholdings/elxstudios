@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { logAdminAudit } from '../../../lib/admin-audit';
 import { getAuthContext, staffRoles } from '../../../lib/auth';
 import { getSupabaseAdminClient } from '../../../lib/supabase/admin';
 
@@ -16,5 +17,6 @@ export async function POST(request: Request) {
   const { error } = await admin.from('order_messages').insert({ order_id: order.id, sender_id: user.id, recipient_id: order.client_id, body: message, scope: 'client' });
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   if (order.client_id) await admin.from('notifications').insert({ user_id: order.client_id, event_type: 'order_message', title: `New message on ${order.order_number}`, body: message.slice(0, 180), data: { order_id: order.id } });
+  await logAdminAudit({ actorId: user.id, action: 'order.message_sent', entityType: 'order', entityId: order.id, newData: { body_length: message.length }, request });
   return NextResponse.json({ ok: true });
 }

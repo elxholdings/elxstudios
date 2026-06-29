@@ -1,6 +1,4 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { SiteShell } from '../../components/site-shell';
 import { requireStaff } from '../../lib/auth';
 import { safeMetaConfig } from '../../lib/meta';
 import { getSupabaseAdminClient } from '../../lib/supabase/admin';
@@ -12,7 +10,7 @@ export default async function MetaAdminPage() {
   await requireStaff();
   const admin = getSupabaseAdminClient();
   const empty = { integrations: [] as MetaIntegration[], leads: [] as MetaLead[], events: [] as MetaWebhookEvent[], actions: [] as MetaAction[] };
-  if (!admin) return <SiteShell><main className="px-5 py-16"><p className="mx-auto max-w-3xl bg-red-50 p-6 font-bold text-red-700">Supabase service access is not configured.</p></main></SiteShell>;
+  if (!admin) return <p className="bg-red-50 p-6 font-bold text-red-700">Supabase service access is not configured.</p>;
   const [integrationsResult, leadsResult, eventsResult, actionsResult] = await Promise.all([
     admin.from('meta_integrations').select('id, product, external_account_id, display_name, status, scopes, token_expires_at, metadata, updated_at').order('updated_at', { ascending: false }),
     admin.from('meta_leads').select('id, leadgen_id, contact_name, contact_email, contact_phone, status, fields, created_time, created_at').order('created_at', { ascending: false }).limit(100),
@@ -25,5 +23,5 @@ export default async function MetaAdminPage() {
     events: (eventsResult.data || empty.events) as unknown as MetaWebhookEvent[],
     actions: (actionsResult.data || empty.actions) as unknown as MetaAction[],
   };
-  return <SiteShell><section className="px-5 py-8 md:px-10 md:py-12"><div className="mx-auto max-w-[1440px]"><Link href="/admin" className="mb-5 inline-block text-sm font-black">← Order operations</Link><MetaClient {...data} config={safeMetaConfig()} /></div></section></SiteShell>;
+  return <MetaClient {...data} config={safeMetaConfig()} />;
 }

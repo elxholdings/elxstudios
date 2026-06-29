@@ -13,10 +13,11 @@ export type AdminOrder = {
 export type TeamMember = { id: string; name: string; roles: string[] };
 export type AdminMessage = { id: string; order_id: string; sender_id: string; body: string; created_at: string };
 export type AdminRevision = { id: string; order_id: string; reason: string; comments: string; status: string; is_in_scope: boolean | null; created_at: string };
+export type AdminTask = { id: string; order_id: string; title: string; instructions: string | null; status: string; deadline: string | null; assignee: string | null; assignment_status: string | null };
 
 const statuses = ['submitted', 'awaiting_quote', 'quote_sent', 'awaiting_payment', 'paid', 'assigned', 'in_progress', 'quality_review', 'ready_for_delivery', 'delivered', 'revision_requested', 'completed', 'cancelled'];
 
-export default function AdminClient({ orders, team, userId, messages, revisions }: { orders: AdminOrder[]; team: TeamMember[]; userId: string; messages: AdminMessage[]; revisions: AdminRevision[] }) {
+export default function AdminClient({ orders, team, userId, messages, revisions, tasks }: { orders: AdminOrder[]; team: TeamMember[]; userId: string; messages: AdminMessage[]; revisions: AdminRevision[]; tasks: AdminTask[] }) {
   const router = useRouter();
   const [selectedId, setSelectedId] = useState(orders[0]?.id || '');
   const [search, setSearch] = useState('');
@@ -25,12 +26,14 @@ export default function AdminClient({ orders, team, userId, messages, revisions 
   const [error, setError] = useState('');
   const [quote, setQuote] = useState({ total: '', description: 'Professional project delivery', notes: '', currency: 'USD' });
   const [message, setMessage] = useState('');
+  const [task, setTask] = useState({ title: '', instructions: '', deadline: '', expertId: '' });
   const selected = orders.find((order) => order.id === selectedId);
   const filtered = useMemo(() => orders.filter((order) => `${order.order_number} ${order.project_title} ${order.status}`.toLowerCase().includes(search.toLowerCase())), [orders, search]);
   const managers = team.filter((member) => member.roles.some((role) => ['super_admin', 'admin', 'project_manager'].includes(role)));
   const experts = team.filter((member) => member.roles.includes('expert'));
   const selectedMessages = messages.filter((item) => item.order_id === selectedId);
   const selectedRevisions = revisions.filter((item) => item.order_id === selectedId);
+  const selectedTasks = tasks.filter((item) => item.order_id === selectedId);
 
   async function call(url: string, options: RequestInit, action: string) {
     setBusy(action); setError(''); setNotice('');
@@ -58,6 +61,12 @@ export default function AdminClient({ orders, team, userId, messages, revisions 
     if (!selected || !message.trim()) return;
     const ok = await call('/api/admin/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId: selected.id, body: message.trim() }) }, 'message');
     if (ok) setMessage('');
+  }
+
+  async function createTask(event: FormEvent) {
+    event.preventDefault(); if (!selected || !task.title.trim()) return;
+    const ok = await call('/api/admin/tasks', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId: selected.id, ...task }) }, 'task');
+    if (ok) setTask({ title: '', instructions: '', deadline: '', expertId: '' });
   }
 
   async function uploadDeliverable(file: File) {
@@ -98,6 +107,7 @@ export default function AdminClient({ orders, team, userId, messages, revisions 
           <form onSubmit={sendMessage} className="bg-white p-7"><p className="text-xs font-black uppercase tracking-[.14em] text-[#F06449]">Client conversation</p><h3 className="mt-2 text-3xl font-black">Order messages.</h3><div className="mt-5 max-h-72 space-y-2 overflow-y-auto">{selectedMessages.length === 0 ? <p className="bg-[#F5F2E8] p-4 text-sm text-black/45">No messages on this order.</p> : selectedMessages.map((item) => <div key={item.id} className={`p-4 text-sm ${item.sender_id === userId ? 'ml-6 bg-[#DDF65C]' : 'mr-6 bg-[#F5F2E8]'}`}><p className="text-[10px] font-black uppercase text-black/35">{item.sender_id === userId ? 'You' : 'Client'} / {new Date(item.created_at).toLocaleString()}</p><p className="mt-2 whitespace-pre-wrap leading-5">{item.body}</p></div>)}</div><textarea value={message} onChange={(event) => setMessage(event.target.value)} className="elx-field mt-4 min-h-24 resize-y" placeholder="A scoped update the client will see in their workspace…" required /><button disabled={busy === 'message'} className="mt-4 bg-[#102321] px-5 py-3 text-sm font-black text-white disabled:opacity-40">Send and notify →</button></form>
           <section className="bg-white p-7"><p className="text-xs font-black uppercase tracking-[.14em] text-[#F06449]">Revision queue</p><h3 className="mt-2 text-3xl font-black">Requested changes.</h3><div className="mt-5 space-y-3">{selectedRevisions.length === 0 ? <p className="bg-[#F5F2E8] p-4 text-sm text-black/45">No revision requests.</p> : selectedRevisions.map((item) => <div key={item.id} className="bg-[#F5F2E8] p-4"><div className="flex justify-between gap-4"><strong className="text-sm">{item.reason}</strong><span className="text-[10px] font-black uppercase">{item.status}</span></div><p className="mt-2 text-sm leading-5 text-black/55">{item.comments}</p>{item.status === 'requested' && <div className="mt-3 flex gap-2"><button type="button" onClick={() => void call(`/api/admin/revisions/${item.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'approved', isInScope: true }) }, `revision-${item.id}`)} className="bg-[#102321] px-3 py-2 text-xs font-black text-white">Approve</button><button type="button" onClick={() => void call(`/api/admin/revisions/${item.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'declined', isInScope: false }) }, `revision-${item.id}`)} className="bg-white px-3 py-2 text-xs font-black">Out of scope</button></div>}</div>)}</div></section>
         </div>
+        <section className="bg-white p-7"><p className="text-xs font-black uppercase tracking-[.14em] text-[#F06449]">Work plan</p><div className="mt-2 grid gap-6 lg:grid-cols-[1fr_.9fr]"><div><h3 className="text-3xl font-black">Tasks & assignments.</h3><div className="mt-5 grid gap-2">{selectedTasks.map((item) => <div key={item.id} className="grid gap-2 bg-[#F5F2E8] p-4 md:grid-cols-[1fr_160px_130px]"><span><strong className="block text-sm">{item.title}</strong><small className="text-black/40">{item.deadline ? `Due ${new Date(item.deadline).toLocaleString()}` : 'No deadline'}</small></span><span className="text-xs">{item.assignee || 'Unassigned'}</span><span className="text-xs font-black capitalize">{(item.assignment_status || item.status).replaceAll('_', ' ')}</span></div>)}{selectedTasks.length === 0 && <p className="bg-[#F5F2E8] p-4 text-sm text-black/40">No production tasks yet.</p>}</div></div><form onSubmit={createTask} className="bg-[#F5F2E8] p-5"><input className="elx-field" value={task.title} onChange={(event) => setTask({ ...task, title: event.target.value })} placeholder="Task title" required /><textarea className="elx-field mt-3 min-h-20" value={task.instructions} onChange={(event) => setTask({ ...task, instructions: event.target.value })} placeholder="Instructions and acceptance criteria" /><input className="elx-field mt-3" type="datetime-local" value={task.deadline} onChange={(event) => setTask({ ...task, deadline: event.target.value })} /><select className="elx-field mt-3" value={task.expertId} onChange={(event) => setTask({ ...task, expertId: event.target.value })}><option value="">Unassigned</option>{experts.map((member) => <option key={member.id} value={member.id}>{member.name}</option>)}</select><button disabled={busy === 'task'} className="mt-4 bg-[#102321] px-5 py-3 text-xs font-black text-white">Create task</button></form></div></section>
         {notice && <p className="bg-[#E8F3E7] p-4 text-sm font-bold text-[#164F22]">{notice}</p>}{error && <p className="bg-red-50 p-4 text-sm font-bold text-red-700">{error}</p>}
       </main>}
     </div>

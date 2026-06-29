@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { logAdminAudit } from '../../../lib/admin-audit';
 import { getAuthContext, staffRoles } from '../../../lib/auth';
 import { getSupabaseAdminClient } from '../../../lib/supabase/admin';
 
@@ -24,5 +25,6 @@ export async function POST(request: Request) {
   await admin.from('quote_items').insert({ quote_id: quote.id, description, quantity: 1, unit_price: total, total, sort_order: 0 });
   await admin.from('orders').update({ price: total, currency, quote_status: 'sent', status: 'quote_sent' }).eq('id', order.id);
   if (order.client_id) await admin.from('notifications').insert({ user_id: order.client_id, event_type: 'quote_sent', title: `Quote ready for ${order.order_number}`, body: `${currency} ${total.toLocaleString()} — open your workspace to review the scope.`, data: { order_id: order.id, quote_id: quote.id } });
+  await logAdminAudit({ actorId: user.id, action: 'quote.sent', entityType: 'quote', entityId: quote.id, newData: { order_id: order.id, version, total, currency }, request });
   return NextResponse.json({ ok: true, quoteId: quote.id });
 }

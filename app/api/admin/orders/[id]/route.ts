@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { logAdminAudit } from '../../../../lib/admin-audit';
 import { getAuthContext, staffRoles } from '../../../../lib/auth';
 import { getSupabaseAdminClient } from '../../../../lib/supabase/admin';
 
@@ -29,8 +30,10 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   if (Object.keys(updates).length === 0) return NextResponse.json({ error: 'No supported changes supplied.' }, { status: 400 });
   const admin = getSupabaseAdminClient();
   if (!admin) return NextResponse.json({ error: 'Server database access is not configured.' }, { status: 503 });
+  const { data: previous } = await admin.from('orders').select('status, assigned_manager_id, assigned_expert_id').eq('id', id).maybeSingle();
   const { data: order, error } = await admin.from('orders').update(updates).eq('id', id).select('client_id, order_number').single();
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   if (order.client_id) await admin.from('notifications').insert({ user_id: order.client_id, event_type: 'order_updated', title: `${order.order_number} was updated`, body: updates.status ? `Status: ${updates.status.replaceAll('_', ' ')}` : 'The project team was updated.', data: { order_id: id } });
+  await logAdminAudit({ actorId: user.id, action: 'order.updated', entityType: 'order', entityId: id, oldData: previous, newData: updates, request });
   return NextResponse.json({ ok: true });
 }

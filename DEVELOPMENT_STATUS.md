@@ -7,7 +7,7 @@
 - Cookie-backed sessions, protected client routes and role-protected staff routes
 - Cloud-synced orders connected to authenticated clients
 - Client order timeline, quote view, private files, signed downloads, messages and revisions
-- Staff operations portal for search, status changes, manager/expert assignment and manual quotes
+- Full staff operations suite for executive reporting, orders, clients, roles, team workload, service configuration, multi-currency finance, support, content, Meta, settings and system health
 - Staff-to-client notifications, revision decisions and approved final-file delivery
 - Row Level Security, private Storage buckets and server-side authorization for privileged actions
 - WhatsApp handoff, policy pages, SEO and locale detection
