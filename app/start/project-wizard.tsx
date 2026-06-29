@@ -5,7 +5,7 @@ import { FormEvent, useMemo, useState } from 'react';
 import { serviceCategories } from '../data/services';
 import { saveLocalOrder } from '../lib/local-orders';
 
-type IntakeResponse = { orderId: string; whatsappUrl: string };
+type IntakeResponse = { orderId: string; cloudOrderId: string | null; cloudOrder: boolean; whatsappUrl: string };
 
 type FormState = {
   category: string;
@@ -24,7 +24,7 @@ type FormState = {
 
 const steps = ['Service', 'Project brief', 'Delivery', 'Contact & review'];
 
-export default function ProjectWizard({ initialService = '', locale = 'en' }: { initialService?: string; locale?: string }) {
+export default function ProjectWizard({ initialService = '', locale = 'en', authenticated = false }: { initialService?: string; locale?: string; authenticated?: boolean }) {
   const validInitial = serviceCategories.some((service) => service.slug === initialService) ? initialService : '';
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<FormState>({ category: validInitial, subservice: '', title: '', brief: '', purpose: 'Professional', deadline: '', outputFormat: '', filesLink: '', name: '', email: '', whatsapp: '', integrityConfirmed: false });
@@ -66,6 +66,8 @@ export default function ProjectWizard({ initialService = '', locale = 'en' }: { 
           whatsapp: form.whatsapp,
           email: form.email,
           service: `${category?.title || form.category} — ${form.subservice}`,
+          categorySlug: form.category,
+          subservice: form.subservice,
           deadline: form.deadline,
           filesLink: form.filesLink,
           brief: form.brief,
@@ -80,7 +82,7 @@ export default function ProjectWizard({ initialService = '', locale = 'en' }: { 
       if (!response.ok) throw new Error('The request could not be submitted.');
       const data = (await response.json()) as IntakeResponse;
       const now = new Date().toISOString();
-      saveLocalOrder({
+      if (!data.cloudOrder) saveLocalOrder({
         id: data.orderId,
         title: form.title,
         category: category?.title || form.category,
@@ -108,7 +110,7 @@ export default function ProjectWizard({ initialService = '', locale = 'en' }: { 
       <section className="bg-white p-7 md:p-12">
         <p className="text-sm font-black uppercase tracking-[.16em] text-[#F06449]">Project received</p>
         <h2 className="mt-5 text-5xl font-black leading-none tracking-[-0.06em]">Your reference is<br />{result.orderId}</h2>
-        <p className="mt-6 max-w-xl leading-7 text-black/60">The brief is saved in this browser workspace. Continue on WhatsApp so the team can confirm the scope and prepare your manual quote.</p>
+        <p className="mt-6 max-w-xl leading-7 text-black/60">{result.cloudOrder ? 'The brief is saved securely in your client workspace.' : 'The brief was received as a guest request. Create an account before your next project for secure cloud tracking.'} Continue on WhatsApp if you want to add immediate context while the team prepares your manual quote.</p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <a href={result.whatsappUrl} target="_blank" rel="noreferrer" className="bg-[#164F22] px-6 py-4 text-center text-sm font-black text-white">Continue on WhatsApp ↗</a>
           <Link href={`/dashboard?lang=${locale}`} className="bg-[#102321] px-6 py-4 text-center text-sm font-black text-white">Open my workspace →</Link>
@@ -119,6 +121,7 @@ export default function ProjectWizard({ initialService = '', locale = 'en' }: { 
 
   return (
     <form onSubmit={submit} className="bg-white">
+      {!authenticated && <div className="bg-[#DDF65C] p-4 text-sm font-bold">Want this project saved online? <Link href="/login?next=/start" className="underline">Sign in</Link> or <Link href="/register?next=/start" className="underline">create an account</Link> before submitting.</div>}
       <div className="grid grid-cols-4 bg-[#102321] text-white">
         {steps.map((label, index) => (
           <button type="button" key={label} onClick={() => index < step && setStep(index)} className={`min-h-20 px-3 text-left text-xs font-black uppercase tracking-[.1em] ${index === step ? 'bg-[#DDF65C] text-[#102321]' : index < step ? 'text-white' : 'text-white/35'}`}>

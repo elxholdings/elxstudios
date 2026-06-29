@@ -1,78 +1,40 @@
 # Elx Studio MVP
 
-A same-day launch MVP for Elx Studio by Elx Holdings.
+Elx Studio by Elx Holdings: a production-shaped, no-payment project delivery platform.
 
-## What this MVP does
+## Included
 
-- Public landing page for Elx Studio
-- Service overview
-- Project intake form
-- Generates an Elx order ID
-- Redirects the client to WhatsApp with a prefilled onboarding message
-- Optional Supabase database storage
-- Optional Resend email alert to admin
-- Basic Terms, Privacy and Academic Integrity pages
-- Seven service departments with dedicated service pages
-- About, How It Works, Pricing and Contact pages
-- Four-step project brief and manual quote flow
-- Device-local client workspace and operations workflow preview
-- Refund and revision policies
-- SEO sitemap, robots rules, social metadata and structured data
+- Public marketing site and seven technical/professional service departments
+- Structured intake, Elx order references and WhatsApp handoff
+- Supabase registration, email confirmation, login, recovery and cookie sessions
+- Secure cloud client workspace with orders, quotes, files, messages and revisions
+- Role-protected operations portal with assignments, status control and manual quotes
+- Private source uploads, approved deliverables and short-lived signed downloads
+- Policies, locale detection, SEO metadata, robots and sitemap
 
-## What is intentionally not included yet
+## Intentionally deferred
 
-- Secure cloud-synced client accounts
-- Expert dashboard
-- Private cloud file uploads
-- Integrated payment checkout
-- Production revision and delivery records
-- Authenticated admin panel with audit logs
+- Integrated payments, refunds and invoicing
+- Google login and admin 2FA
+- Expert task/payout portal
+- Malware scanning, advanced monitoring and automatic WhatsApp/SMS
+- CAD/3D file previews
 
-The browser-local workspace and operations preview validate those workflows without pretending to provide secure persistence. See `DEVELOPMENT_STATUS.md` for the full boundary and build sequence.
+See `DEVELOPMENT_STATUS.md` and `SPEC_GAP_AUDIT.md` for the exact boundary.
 
-## Quick local setup
+## Local setup
 
 ```bash
 npm install
-cp .env.example .env.local
+copy .env.example .env.local
 npm run dev
 ```
 
-Open http://localhost:3000
+Open `http://localhost:3000`.
 
-## Required environment variable
+## Supabase
 
-Replace this with your business WhatsApp number:
-
-```bash
-NEXT_PUBLIC_WHATSAPP_NUMBER=254712345678
-```
-
-Do not include +, spaces, or dashes.
-
-## Automatic language translation
-
-The site detects the visitor's country and browser language, then selects a matching language. The picker follows Google Cloud Translation's full current NMT language catalog, including Russian and all major European languages. English and Simplified Chinese are built in. Other supported languages are translated with Google Cloud Translation and cached for 30 days.
-
-Enable the Cloud Translation API (Basic v2), create an API key restricted to Cloud Translation, and add:
-
-```bash
-GOOGLE_TRANSLATE_API_KEY=your_server_api_key
-```
-
-On Vercel, add the variable to Production, Preview and Development as needed. IP-country detection only runs after deployment; use `?lang=ru`, `?lang=fr`, or another supported code for local testing.
-
-## Deploy to Vercel today
-
-1. Push this folder to a GitHub repository.
-2. Go to Vercel and import the repository.
-3. Add the environment variable `NEXT_PUBLIC_WHATSAPP_NUMBER`.
-4. Deploy.
-5. Connect your domain.
-
-## Supabase database setup
-
-The repository now includes a normalized platform schema, seed data, RLS policies and private Storage rules in `supabase/`.
+The normalized schema, seed data, Row Level Security and private Storage policies are in `supabase/`.
 
 ```bash
 npx supabase login
@@ -81,32 +43,51 @@ npx supabase db push --dry-run
 npx supabase db push --include-seed
 ```
 
-Then add the Project Settings → API values in Vercel:
+Add these to local/Vercel environment settings:
 
-```bash
-NEXT_PUBLIC_SUPABASE_URL=your_project_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+```text
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
 ```
 
-See `supabase/README.md` before promoting the first super administrator.
+The publishable/anon key is intended for browser use because Row Level Security is enabled. The service-role secret must remain server-only.
 
-## Optional email alerts using Resend
+Configure Supabase Authentication URL settings:
 
-Add:
+- Site URL: `https://elxstudios.vercel.app`
+- Redirect URL: `https://elxstudios.vercel.app/auth/callback`
+- Local redirect URL: `http://localhost:3000/auth/callback`
 
-```bash
-RESEND_API_KEY=your_resend_key
-ELX_ADMIN_EMAIL=you@yourdomain.com
+See `supabase/README.md` for first-owner promotion.
+
+## Optional services
+
+WhatsApp redirect:
+
+```text
+NEXT_PUBLIC_WHATSAPP_NUMBER=254712345678
+```
+
+Google Cloud Translation for languages not bundled locally:
+
+```text
+GOOGLE_TRANSLATE_API_KEY=
+```
+
+Resend intake alerts:
+
+```text
+RESEND_API_KEY=
+ELX_ADMIN_EMAIL=
 RESEND_FROM_EMAIL=Elx Studio <onboarding@yourdomain.com>
 ```
 
-## Recommended same-day business process
+## Operating flow
 
-1. Client submits the form.
-2. Client is pushed to WhatsApp with the order ID.
-3. You review the brief.
-4. You quote manually.
-5. You collect payment by Stripe Payment Link, PayPal, bank transfer or mobile money.
-6. You deliver through WhatsApp, email or secure Drive link.
-7. Later, you upgrade to full dashboards and automated payments.
+1. A client registers, confirms their email and submits a project.
+2. The cloud order appears in the client workspace and protected staff portal.
+3. Staff reviews scope, assigns a manager/expert and sends a manual quote.
+4. Payment is coordinated manually until a gateway is added.
+5. Messages, source files and revision decisions stay on the order.
+6. Staff publishes an approved deliverable; the client downloads it through a signed link.

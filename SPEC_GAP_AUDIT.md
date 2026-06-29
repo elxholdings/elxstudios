@@ -1,76 +1,37 @@
 # Elx Studio specification gap audit
 
-## Built and live
+## Built
 
-- Public landing, About, Services, service details, How It Works, Pricing and Contact
-- Four-step project brief and manual quote request
-- Order-reference generation and WhatsApp handoff
-- Browser-local client workspace and operations workflow preview
-- Terms, Privacy, Academic Integrity, Refund and Revision policies
-- Responsive technical brand system, sitemap, metadata and structured data
-- Automatic locale detection framework with English and Simplified Chinese built in
+- Public site, service catalogue, intake wizard, policies, translation routing and SEO
+- Supabase email/password identity, verification callback, recovery and persistent sessions
+- Client, expert, manager, admin and super-admin role model with Row Level Security
+- Cloud orders, quote records, assignments, statuses and notifications
+- Protected client portal with order detail, files, messages, revisions and approved deliverables
+- Protected operations portal with order search, manual quoting, assignments, status control, messaging, revision decisions and delivery publishing
+- Private source/deliverable buckets with participant policies and one-minute signed downloads
+- Database foundation for payments, invoices, tasks, quality review, support, reviews, payouts, CMS and audits
 
-## Database foundation prepared in this repository
+## Remaining production gaps
 
-- Supabase Auth profile trigger
-- Companies and multi-company ownership
-- User roles for super admin, admin, project manager, expert and client
-- Service categories and services
-- Intake requests, orders, files, quotes, quote items, payments and invoices
-- Tasks, expert assignments, messages, revisions, deliverables and quality reviews
-- Reviews, notifications, support tickets, coupons and expert payouts
-- CMS pages, blog posts, portfolio items, settings and audit logs
-- Row Level Security and private Storage bucket policies
+### Identity and operations hardening
 
-The migration is prepared but is not a live database until a Supabase project is created, linked and migrated.
+- Google login, admin 2FA, login alerts and session/device management
+- Staff invitation and role-management UI (initial owner promotion is SQL-controlled)
+- Expert-specific task, workload, submission and payout portal
+- Quality-control checklist UI and independent delivery approval
 
-## Still not built
+### External services
 
-### Accounts and identity
+- Payment gateway/mobile money, invoices, refunds and reconciliation
+- Production SMTP and transactional templates
+- Malware scanning, retention jobs, backups, monitoring and error reporting
+- Automatic WhatsApp/SMS updates
 
-- Registration, login and logout screens
-- Email verification and password reset
-- Google login
-- Session-aware navigation and protected routes
-- Admin two-factor authentication, device history and login alerts
+### Product depth
 
-### Real client portal
+- File previews and annotations for office, CAD and 3D formats
+- Quote acceptance and payment-state automation
+- Support-ticket, reviews, CMS, blog and portfolio interfaces
+- Analytics, financial reports and central Elx Holdings portal
 
-- Cloud-synced orders across devices
-- Profile settings and notifications
-- Order messages and support tickets
-- Secure file upload, preview, version history and downloads
-- Quote acceptance, invoices and delivery approval
-- Revision submission and reviews connected to real accounts
-
-### Real operations and expert portals
-
-- Protected admin dashboard and role permissions in the UI
-- Order search, filters, quoting and assignment tools
-- Expert invitations, task acceptance, workload and earnings
-- Quality-control checklists and controlled final delivery
-- Refund, cancellation, dispute and payout workflows
-
-### External systems
-
-- Payment gateway and mobile money integration
-- Transactional email delivery
-- Malware scanning for client files
-- Signed download links and retention rules
-- Monitoring, error reporting, backups and uptime alerts
-- Production analytics and financial reporting
-
-### Content and growth
-
-- Blog/resource publishing interface
-- Portfolio and approved testimonial publishing
-- FAQ and remaining policy pages
-- Advanced CMS and translated content workflow
-
-### Later phases
-
-- Automated pricing, coupons and corporate accounts
-- SMS and WhatsApp automation
-- AI tools, plagiarism integrations, CAD previews and 3D viewers
-- Mobile application and public API
-- Additional Elx company portals and central holdings dashboard
+Payments remain intentionally deferred. The current workflow supports real client delivery with manual quotes and manual payment coordination.

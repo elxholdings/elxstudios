@@ -36,6 +36,17 @@ where lower(u.email) = lower('OWNER_EMAIL_HERE')
 on conflict do nothing;
 ```
 
+## Authentication URLs
+
+In Authentication → URL Configuration, set the live Site URL to `https://elxstudios.vercel.app` and add these redirect URLs:
+
+```text
+https://elxstudios.vercel.app/auth/callback
+http://localhost:3000/auth/callback
+```
+
+Configure a production SMTP provider before inviting many clients. Supabase's built-in email service is intended for initial testing and is heavily rate limited.
+
 ## Storage path convention
 
 Private order files and deliverables must use an order UUID as the first path segment:

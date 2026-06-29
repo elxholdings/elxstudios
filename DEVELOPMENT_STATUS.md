@@ -1,47 +1,32 @@
 # Elx Studio development status
 
-This document maps the platform specification to what is currently safe to use.
-
 ## Working now
 
-- Public landing page with technical imagery and responsive layout
-- Seven service departments and individual service pages
-- About, How It Works, Pricing and Contact pages
-- Four-step project brief and manual quote request flow
-- Elx order-reference generation and WhatsApp handoff
-- Device-local client workspace with project stages and file checklist
-- Device-local operations-board preview with status updates
-- Terms, Privacy, Academic Integrity, Refund and Revision policies
-- 198-language translation architecture; English and Simplified Chinese work without a paid provider
-- SEO metadata, structured data, robots file and sitemap
-- Optional Supabase lead storage and optional Resend email notifications
+- Public marketing site, seven service departments and structured project intake
+- Supabase email/password registration, confirmation, login, sign-out and password reset
+- Cookie-backed sessions, protected client routes and role-protected staff routes
+- Cloud-synced orders connected to authenticated clients
+- Client order timeline, quote view, private files, signed downloads, messages and revisions
+- Staff operations portal for search, status changes, manager/expert assignment and manual quotes
+- Staff-to-client notifications, revision decisions and approved final-file delivery
+- Row Level Security, private Storage buckets and server-side authorization for privileged actions
+- WhatsApp handoff, policy pages, SEO and locale detection
 
-## Prototype-only boundaries
+## Production setup still required
 
-The client workspace and operations board currently use browser local storage. They are useful for validating the product flow but they are not accounts, cannot sync between devices and must not be treated as secure cloud records.
+- Set Supabase Auth Site URL and allowed redirect URLs for the live and local domains
+- Register the owner account and promote it to `super_admin` using the documented bootstrap SQL
+- Configure production SMTP before inviting many users (Supabase's default mailer is rate limited)
+- Add malware scanning before accepting untrusted files at high volume
+- Add monitoring, backup checks, admin 2FA and audit-log reporting
 
-The file control records file names only. Actual files are not uploaded until private object storage, access rules and malware scanning are connected.
+## Intentionally deferred
 
-## Infrastructure still required for a production platform
+- Payments, refunds and invoices
+- Google/social login
+- Expert task and payout portal
+- Support-ticket UI and CMS publishing
+- Automated translation provider, transactional email/SMS and WhatsApp automation
+- File previews for CAD/3D formats
 
-- Email/password and Google authentication
-- Role-based client, admin, manager and expert permissions
-- A live Supabase project linked to the prepared PostgreSQL migrations
-- Private object storage with signed links and virus scanning
-- Order messages, notifications and email delivery
-- Secure payment gateway, refunds and invoice records
-- Production admin dashboard with audit logs and 2FA
-- Secure final-file delivery and revision history
-
-## Deferred to avoid cost now
-
-- Paid machine translation requests
-- Payment processing integration
-- Cloud file storage
-- Transactional email at scale
-- SMS and WhatsApp automation
-- Advanced analytics and monitoring
-
-## Recommended next connection
-
-Use a free Supabase project first for authentication and PostgreSQL persistence. After accounts and role rules are verified, connect private storage and replace the browser-local workspaces. Payment should come after order records and permissions are trustworthy.
+The current milestone is a usable no-payment operations platform. Manual quotes and payment coordination remain the safe operating model until a gateway is connected and tested.
