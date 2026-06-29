@@ -11,6 +11,7 @@
 - Staff-to-client notifications, revision decisions and approved final-file delivery
 - Row Level Security, private Storage buckets and server-side authorization for privileged actions
 - WhatsApp handoff, policy pages, SEO and locale detection
+- Meta integration foundation for Pages, Instagram, Lead Ads, Marketing insights and WhatsApp test messaging
 
 ## Production setup still required
 
@@ -26,7 +27,7 @@
 - Google/social login
 - Expert task and payout portal
 - Support-ticket UI and CMS publishing
-- Automated translation provider, transactional email/SMS and WhatsApp automation
+- Automated translation provider, transactional email/SMS and production WhatsApp automation
 - File previews for CAD/3D formats
 
 The current milestone is a usable no-payment operations platform. Manual quotes and payment coordination remain the safe operating model until a gateway is connected and tested.

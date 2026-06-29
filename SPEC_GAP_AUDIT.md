@@ -9,6 +9,7 @@
 - Protected client portal with order detail, files, messages, revisions and approved deliverables
 - Protected operations portal with order search, manual quoting, assignments, status control, messaging, revision decisions and delivery publishing
 - Private source/deliverable buckets with participant policies and one-minute signed downloads
+- Protected Meta operations console, encrypted credentials, signed webhooks, lead ingestion and outbound-action logs
 - Database foundation for payments, invoices, tasks, quality review, support, reviews, payouts, CMS and audits
 
 ## Remaining production gaps
@@ -26,6 +27,7 @@
 - Production SMTP and transactional templates
 - Malware scanning, retention jobs, backups, monitoring and error reporting
 - Automatic WhatsApp/SMS updates
+- Meta Advanced Access and production limits pending App Review/Business Verification
 
 ### Product depth
 

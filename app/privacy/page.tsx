@@ -24,6 +24,8 @@ export default async function PrivacyPage({ searchParams }: { searchParams?: Pro
         { heading: '联系方式', body: '如对隐私有任何疑问，请通过网站列出的官方业务沟通渠道联系 Elx Holdings。' },
       ] : [
         { heading: t('Data handling'), body: t('Client information should only be accessed by authorized Elx Holdings staff or approved project contributors. Client files and instructions should not be shared publicly.') },
+        { heading: t('Meta platform data'), body: t('When an authorized Elx administrator connects Facebook, Instagram, Lead Ads, Marketing API or WhatsApp, Elx Studio processes the account identifiers, access permissions, campaign insights, lead information and webhook events needed to provide those functions. Access credentials are encrypted and are not exposed to clients or browser code.') },
+        { heading: t('Deletion and disconnection'), body: t('A Meta user may disconnect the integration or use Meta’s data-deletion request flow. Elx Studio then revokes stored credentials and removes connected-account data unless limited operational records must be retained for security, legal or accounting purposes. Meta deletion confirmations are available at /meta-data-deletion.') },
         { heading: t('Contact'), body: t('For privacy questions, contact Elx Holdings through the official business communication channel listed on the website.') },
       ]}
     />

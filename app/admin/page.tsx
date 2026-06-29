@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { SiteShell } from '../components/site-shell';
 import { requireStaff } from '../lib/auth';
 import AdminClient, { type AdminMessage, type AdminOrder, type AdminRevision, type TeamMember } from './admin-client';
@@ -21,5 +22,5 @@ export default async function AdminPage() {
     member.roles.push(role.role as string);
     teamMap.set(role.user_id, member);
   }
-  return <SiteShell><section className="px-5 py-8 md:px-10 md:py-12"><div className="mx-auto max-w-[1440px]"><AdminClient orders={(orders || []) as unknown as AdminOrder[]} team={Array.from(teamMap.values())} userId={user.id} messages={(messages || []) as unknown as AdminMessage[]} revisions={(revisions || []) as unknown as AdminRevision[]} /></div></section></SiteShell>;
+  return <SiteShell><section className="px-5 py-8 md:px-10 md:py-12"><div className="mx-auto max-w-[1440px]"><div className="mb-5 flex justify-end"><Link href="/admin/meta" className="bg-[#073C3E] px-5 py-3 text-sm font-black text-white">Meta platform →</Link></div><AdminClient orders={(orders || []) as unknown as AdminOrder[]} team={Array.from(teamMap.values())} userId={user.id} messages={(messages || []) as unknown as AdminMessage[]} revisions={(revisions || []) as unknown as AdminRevision[]} /></div></section></SiteShell>;
 }
