@@ -281,9 +281,9 @@ export default function LandingPage({ locale, dictionary = {}, languageOptions, 
             <h2 className="mt-4 text-4xl font-black leading-[.94] tracking-[-0.06em] md:text-6xl">{t(homepage.servicesTitle)}</h2>
           </div>
 
-          <div className="grid gap-px bg-black/10 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid border-y border-black/10 sm:grid-cols-2 xl:grid-cols-4">
             {capabilities.map((item) => (
-              <article key={item.title} className="group flex min-h-[300px] flex-col bg-[#F5F2E8] p-6 md:p-7">
+              <article key={item.title} className="group flex min-h-[330px] flex-col border-black/10 p-7 sm:border-r sm:even:border-r-0 xl:border-r xl:last:border-r-0 xl:p-8">
                 <div className="flex items-start justify-between"><CapabilityIcon type={item.icon} /><span className="text-xs font-black text-black/35">{item.number}</span></div>
                 <div className="mt-auto pt-10"><h3 className="text-2xl font-black leading-[1.02] tracking-[-0.04em] md:text-3xl">{t(item.title)}</h3><p className="mt-4 text-sm leading-6 text-black/55">{t(item.text)}</p></div>
               </article>
@@ -453,8 +453,8 @@ function ServiceCarousel({ slides }: { slides: HomepageContent['carousel'] }) {
 
 function CapabilityIcon({ type }: { type: string }) {
   const common = { fill: 'none', stroke: 'currentColor', strokeWidth: 1.6, strokeLinecap: 'square' as const, strokeLinejoin: 'miter' as const };
-  return <span className="grid h-14 w-14 place-items-center bg-[#DDF65C] text-[#102321] transition group-hover:bg-[#102321] group-hover:text-[#DDF65C]">
-    <svg viewBox="0 0 48 48" aria-hidden="true" className="h-8 w-8" {...common}>
+  return <span className="grid h-24 w-24 place-items-center text-[#102321] transition duration-300 group-hover:text-[#F06449]">
+    <svg viewBox="0 0 48 48" aria-hidden="true" className="h-20 w-20" {...common}>
       {type === 'calculation' && <><path d="M8 13h32M8 35h32M15 8v32M33 8v32" /><path d="m20 19 8 10m0-10-8 10" /></>}
       {type === 'drawing' && <><path d="M8 38 20 10l20 28Z" /><path d="M14 32h20M20 10v28" /><path d="m29 15 7-7 4 4-7 7" /></>}
       {type === 'chart' && <><path d="M8 39h32M11 34V23h7v11m5 0V14h7v20m5 0V8h5v26" /><path d="m10 18 10-7 8 4 11-9" /></>}
