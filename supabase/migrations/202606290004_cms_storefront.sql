@@ -123,6 +123,8 @@ values (
     "introEyebrow": "Built around your brief",
     "introTitle": "Your project can be complex. The process shouldn't be.",
     "introBody": "No endless searching for different specialists. Start with one clear brief and move forward with the right support around the work.",
+    "introMediaUrl": "/images/architecture-drafting.jpg",
+    "introMediaType": "image",
     "servicesEyebrow": "Everything you need",
     "servicesTitle": "From first calculation to final presentation.",
     "workflowEyebrow": "How it works",

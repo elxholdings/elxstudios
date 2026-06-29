@@ -253,12 +253,19 @@ export default function LandingPage({ locale, dictionary = {}, languageOptions, 
         </div>
       </section>
 
-      <section className="bg-[#F5F2E8] px-5 py-24 md:px-10 md:py-36">
-        <div className="mx-auto grid max-w-[1440px] gap-12 lg:grid-cols-2">
-          <p className="text-sm font-bold uppercase tracking-[.18em] text-[#F06449]">{t(homepage.introEyebrow)}</p>
-          <div>
-            <h2 className="text-5xl font-black leading-[.94] tracking-[-0.065em] md:text-7xl">{t(homepage.introTitle)}</h2>
+      <section className="bg-[#F5F2E8] px-5 pb-20 pt-8 md:px-10 md:pb-28 md:pt-10">
+        <div className="mx-auto grid max-w-[1440px] overflow-hidden bg-[#102321] lg:grid-cols-[.9fr_1.1fr]">
+          <div className="relative min-h-[420px] overflow-hidden lg:min-h-[620px]">
+            {homepage.introMediaType === 'video'
+              ? <video src={homepage.introMediaUrl} autoPlay muted loop playsInline className="absolute inset-0 h-full w-full object-cover" />
+              : <img src={homepage.introMediaUrl} alt="Technical architecture and drafting work" className="absolute inset-0 h-full w-full object-cover" />}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#102321]/80 via-transparent to-transparent" />
+            <p className="absolute bottom-7 left-7 text-xs font-black uppercase tracking-[.18em] text-[#DDF65C] md:bottom-10 md:left-10">{t(homepage.introEyebrow)}</p>
+          </div>
+          <div className="flex flex-col justify-center bg-[#F5F2E8] p-8 md:p-14 lg:p-16">
+            <h2 className="text-5xl font-black leading-[.92] tracking-[-0.065em] md:text-7xl">{t(homepage.introTitle)}</h2>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-black/60">{t(homepage.introBody)}</p>
+            <div className="mt-10 grid grid-cols-2 gap-px bg-black/10"><div className="bg-[#F5F2E8] py-5 pr-5"><strong className="block text-2xl">One brief</strong><span className="mt-1 block text-xs text-black/45">A single accountable starting point</span></div><div className="bg-[#F5F2E8] p-5"><strong className="block text-2xl">Clear delivery</strong><span className="mt-1 block text-xs text-black/45">Defined files, timing and support</span></div></div>
           </div>
         </div>
       </section>

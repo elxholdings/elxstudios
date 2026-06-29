@@ -19,6 +19,8 @@ export type HomepageContent = {
   introEyebrow: string;
   introTitle: string;
   introBody: string;
+  introMediaUrl: string;
+  introMediaType: 'image' | 'video';
   servicesEyebrow: string;
   servicesTitle: string;
   workflowEyebrow: string;
