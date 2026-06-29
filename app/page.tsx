@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import LandingPage from './landing-page';
 import { getSiteTranslations } from './google-translate';
 import { languageOptions } from './language-options';
+import { getHomepageContent, getPublishedProducts } from './lib/site-content';
 import { resolveLocale } from './locale';
 
 export const dynamic = 'force-dynamic';
@@ -28,6 +29,10 @@ export default async function Page({ searchParams }: PageProps) {
   const code = Array.isArray(query?.code) ? query.code[0] : query?.code;
   if (code) redirect(`/auth/callback?code=${encodeURIComponent(code)}&next=/dashboard`);
   const locale = await resolveLocale(query?.lang);
-  const dictionary = await getSiteTranslations(locale);
-  return <LandingPage locale={locale} dictionary={dictionary} languageOptions={languageOptions} />;
+  const [dictionary, homepage, products] = await Promise.all([
+    getSiteTranslations(locale),
+    getHomepageContent(),
+    getPublishedProducts(3),
+  ]);
+  return <LandingPage locale={locale} dictionary={dictionary} languageOptions={languageOptions} homepage={homepage} products={products} />;
 }

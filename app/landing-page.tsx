@@ -1,10 +1,11 @@
 'use client';
 
 import Image from 'next/image';
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
 import type { TranslationDictionary } from './google-translate';
 import LanguageSwitcher, { type LanguageOption } from './language-switcher';
 import { isRtlLocale } from './locale-config';
+import type { DigitalProduct, HomepageContent } from './lib/content-types';
 
 export type Locale = string;
 
@@ -165,7 +166,7 @@ type IntakeResponse = {
   message: string;
 };
 
-export default function LandingPage({ locale, dictionary = {}, languageOptions }: { locale: Locale; dictionary?: TranslationDictionary; languageOptions: readonly LanguageOption[] }) {
+export default function LandingPage({ locale, dictionary = {}, languageOptions, homepage, products }: { locale: Locale; dictionary?: TranslationDictionary; languageOptions: readonly LanguageOption[]; homepage: HomepageContent; products: DigitalProduct[] }) {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<IntakeResponse | null>(null);
   const [error, setError] = useState('');
@@ -207,6 +208,7 @@ export default function LandingPage({ locale, dictionary = {}, languageOptions }
             <a href={`/services?lang=${locale}`} className="transition hover:opacity-60">{t('Expertise')}</a>
             <a href={`/how-it-works?lang=${locale}`} className="transition hover:opacity-60">{t('How it works')}</a>
             <a href={`/pricing?lang=${locale}`} className="transition hover:opacity-60">Pricing</a>
+            <a href={`/shop?lang=${locale}`} className="transition hover:opacity-60">Shop</a>
             <a href="#start" className="transition hover:opacity-60">{t('Send a brief')}</a>
           </div>
           <div className="flex items-center gap-4">
@@ -221,42 +223,28 @@ export default function LandingPage({ locale, dictionary = {}, languageOptions }
           <div className="grid gap-10 lg:grid-cols-[1.15fr_.85fr] lg:items-end">
             <div>
               <a href="#services" className="mb-8 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[.14em] text-[#DDF65C]">
-                {t('Technical & professional project support')} <span aria-hidden="true">→</span>
+                {t(homepage.heroEyebrow)} <span aria-hidden="true">→</span>
               </a>
               <h1 className="max-w-5xl text-[clamp(4.6rem,11vw,10rem)] font-black leading-[.78] tracking-[-0.085em]">
-                {t('Get it')}<br /><span className="text-[#DDF65C]">{t('right.')}</span>
+                {t(homepage.heroTitle)}<br /><span className="text-[#DDF65C]">{t(homepage.heroAccent)}</span>
               </h1>
             </div>
             <div className="max-w-xl pb-2 lg:pb-5">
-              <p className="text-xl leading-8 text-white/72 md:text-2xl md:leading-9">{t("Bring us the difficult brief—the calculations, drawings, models, reports and details. We'll help turn it into clear, polished work you can use with confidence.")}</p>
+              <p className="text-xl leading-8 text-white/72 md:text-2xl md:leading-9">{t(homepage.heroDescription)}</p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <a href={`/start?lang=${locale}`} className="bg-[#DDF65C] px-7 py-4 text-center text-sm font-bold text-[#102321] transition hover:bg-white">{t('Send your brief')}</a>
-                <a href={`/services?lang=${locale}`} className="px-1 py-4 text-center text-sm font-bold underline decoration-white/35 underline-offset-8 transition hover:decoration-white">{t('Explore our expertise')}</a>
+                <a href={`/start?lang=${locale}`} className="bg-[#DDF65C] px-7 py-4 text-center text-sm font-bold text-[#102321] transition hover:bg-white">{t(homepage.heroPrimaryLabel)}</a>
+                <a href={`/services?lang=${locale}`} className="px-1 py-4 text-center text-sm font-bold underline decoration-white/35 underline-offset-8 transition hover:decoration-white">{t(homepage.heroSecondaryLabel)}</a>
               </div>
             </div>
           </div>
 
-          <div className="-mx-5 mt-14 md:-mx-10 md:mt-20">
-            <div className="relative aspect-[16/7] min-h-[340px] overflow-hidden">
-              <Image src="/images/technical-render.jpg" alt={t('A geometric three-dimensional digital render')} fill priority sizes="100vw" className="object-cover" />
-            </div>
-            <div className="grid bg-[#DDF65C] text-[#102321] sm:grid-cols-3">
-              {['CAD + 3D', 'STEM + analysis', 'Reports + finance'].map((item) => (
-                <div key={item} className="px-5 py-4 font-bold md:px-8">{t(item)}</div>
-              ))}
-            </div>
-          </div>
+          <div className="-mx-5 mt-14 md:-mx-10 md:mt-20"><ServiceCarousel slides={homepage.carousel} /></div>
         </div>
       </section>
 
       <section className="bg-[#F5F2E8]">
         <div className="mx-auto grid max-w-[1440px] grid-cols-2 gap-y-8 px-5 py-12 md:grid-cols-4 md:px-10 md:py-16">
-          {[
-            ['7', 'service areas'],
-            ['01', 'reference for every brief'],
-            ['Direct', 'WhatsApp communication'],
-            ['Flexible', 'delivery formats'],
-          ].map(([value, label]) => (
+          {homepage.stats.map(({ value, label }) => (
             <div key={label}>
               <p className="text-3xl font-black tracking-[-0.05em] md:text-5xl">{t(value)}</p>
               <p className="mt-2 max-w-[12rem] text-sm leading-5 text-black/55">{t(label)}</p>
@@ -267,10 +255,10 @@ export default function LandingPage({ locale, dictionary = {}, languageOptions }
 
       <section className="bg-[#F5F2E8] px-5 py-24 md:px-10 md:py-36">
         <div className="mx-auto grid max-w-[1440px] gap-12 lg:grid-cols-2">
-          <p className="text-sm font-bold uppercase tracking-[.18em] text-[#F06449]">{t('Built around your brief')}</p>
+          <p className="text-sm font-bold uppercase tracking-[.18em] text-[#F06449]">{t(homepage.introEyebrow)}</p>
           <div>
-            <h2 className="text-5xl font-black leading-[.94] tracking-[-0.065em] md:text-7xl">{t("Your project can be complex. The process shouldn't be.")}</h2>
-            <p className="mt-7 max-w-2xl text-lg leading-8 text-black/60">{t('No endless searching for different specialists. No wondering what happens next. Start with one clear brief and move forward with the right support around the work.')}</p>
+            <h2 className="text-5xl font-black leading-[.94] tracking-[-0.065em] md:text-7xl">{t(homepage.introTitle)}</h2>
+            <p className="mt-7 max-w-2xl text-lg leading-8 text-black/60">{t(homepage.introBody)}</p>
           </div>
         </div>
       </section>
@@ -278,8 +266,8 @@ export default function LandingPage({ locale, dictionary = {}, languageOptions }
       <section id="services" className="bg-white px-5 py-24 md:px-10 md:py-32">
         <div className="mx-auto max-w-[1440px]">
           <div className="mb-14 max-w-4xl">
-            <p className="text-sm font-bold uppercase tracking-[.18em] text-[#F06449]">{t('Everything you need')}</p>
-            <h2 className="mt-5 text-5xl font-black leading-[.92] tracking-[-0.065em] md:text-8xl">{t('From first calculation to final presentation.')}</h2>
+            <p className="text-sm font-bold uppercase tracking-[.18em] text-[#F06449]">{t(homepage.servicesEyebrow)}</p>
+            <h2 className="mt-5 text-5xl font-black leading-[.92] tracking-[-0.065em] md:text-8xl">{t(homepage.servicesTitle)}</h2>
           </div>
 
           <div className="grid gap-5 md:grid-cols-2">
@@ -313,12 +301,22 @@ export default function LandingPage({ locale, dictionary = {}, languageOptions }
         </div>
       </section>
 
+      {products.length > 0 && <section className="bg-[#E7E1D2] px-5 py-24 md:px-10 md:py-32">
+        <div className="mx-auto max-w-[1440px]">
+          <div className="flex flex-col justify-between gap-7 md:flex-row md:items-end">
+            <div><p className="text-sm font-bold uppercase tracking-[.18em] text-[#F06449]">Digital plan shop</p><h2 className="mt-5 max-w-4xl text-5xl font-black leading-[.92] tracking-[-0.065em] md:text-7xl">Start with a professional plan. Adapt it to your project.</h2></div>
+            <a href="/shop" className="text-sm font-black underline underline-offset-8">Browse all plans →</a>
+          </div>
+          <div className="mt-14 grid gap-5 md:grid-cols-3">{products.map((product) => <a key={product.id} href={`/shop/${product.slug}`} className="group bg-white"><div className="aspect-[4/3] overflow-hidden bg-[#102321]">{product.cover_url && <img src={product.cover_url} alt={product.title} className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.035]" />}</div><div className="p-6"><p className="text-xs font-black uppercase tracking-[.14em] text-[#F06449]">{product.category}</p><h3 className="mt-3 text-2xl font-black tracking-[-.04em]">{product.title}</h3><p className="mt-3 text-sm leading-6 text-black/55">{product.summary}</p><p className="mt-6 text-lg font-black">{new Intl.NumberFormat('en', { style: 'currency', currency: product.currency }).format(product.price)}</p></div></a>)}</div>
+        </div>
+      </section>}
+
       <section id="workflow" className="bg-[#073C3E] px-5 py-24 text-white md:px-10 md:py-32">
         <div className="mx-auto max-w-[1440px]">
           <div className="grid gap-12 lg:grid-cols-[.8fr_1.2fr]">
             <div className="lg:sticky lg:top-28 lg:self-start">
-              <p className="text-sm font-bold uppercase tracking-[.18em] text-[#DDF65C]">{t('How it works')}</p>
-              <h2 className="mt-5 text-5xl font-black leading-[.9] tracking-[-0.065em] md:text-7xl">{t('A clear path from brief to done.')}</h2>
+              <p className="text-sm font-bold uppercase tracking-[.18em] text-[#DDF65C]">{t(homepage.workflowEyebrow)}</p>
+              <h2 className="mt-5 text-5xl font-black leading-[.9] tracking-[-0.065em] md:text-7xl">{t(homepage.workflowTitle)}</h2>
               <a href={`/start?lang=${locale}`} className="mt-8 inline-flex bg-[#DDF65C] px-6 py-4 text-sm font-bold text-[#102321]">{t('Start your project →')}</a>
             </div>
             <div className="border-t border-white/10">
@@ -339,9 +337,9 @@ export default function LandingPage({ locale, dictionary = {}, languageOptions }
       <section id="start" className="bg-[#DDF65C] px-5 py-24 md:px-10 md:py-32">
         <div className="mx-auto grid max-w-[1440px] gap-12 lg:grid-cols-[.8fr_1.2fr]">
           <div>
-            <p className="text-sm font-bold uppercase tracking-[.18em]">{t('Ready when you are')}</p>
-            <h2 className="mt-5 text-6xl font-black leading-[.87] tracking-[-0.075em] md:text-8xl">{t("Let's get to work.")}</h2>
-            <p className="mt-7 max-w-md text-lg leading-8 text-black/65">{t("Share the context, deadline and format you have in mind. We'll review the details and continue with you on WhatsApp.")}</p>
+            <p className="text-sm font-bold uppercase tracking-[.18em]">{t(homepage.ctaEyebrow)}</p>
+            <h2 className="mt-5 text-6xl font-black leading-[.87] tracking-[-0.075em] md:text-8xl">{t(homepage.ctaTitle)}</h2>
+            <p className="mt-7 max-w-md text-lg leading-8 text-black/65">{t(homepage.ctaBody)}</p>
             <div className="mt-10 max-w-md border-t border-black/20 pt-5">
               <p className="font-black">{t('Have supporting files?')}</p>
               <p className="mt-2 text-sm leading-6 text-black/60">{t('Paste a Drive, Dropbox, WeTransfer or OneDrive link—or send the files when we continue on WhatsApp.')}</p>
@@ -412,7 +410,7 @@ export default function LandingPage({ locale, dictionary = {}, languageOptions }
         <div className="mx-auto flex max-w-[1440px] flex-col gap-8 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="text-3xl font-black tracking-[-0.06em]">Elx<span className="text-[#F06449]">.</span>Studio</p>
-            <p className="mt-3 text-sm text-white/50">© {year} Elx Holdings. {t('Professional and technical project support.')}</p>
+            <p className="mt-3 text-sm text-white/50">© {year} Elx Holdings. {t(homepage.footerTagline)}</p>
           </div>
           <div className="flex flex-wrap gap-5 text-sm font-semibold text-white/65">
             <a href={`/terms?lang=${locale}`}>{t('Terms')}</a>
@@ -426,4 +424,29 @@ export default function LandingPage({ locale, dictionary = {}, languageOptions }
       </footer>
     </main>
   );
+}
+
+function ServiceCarousel({ slides }: { slides: HomepageContent['carousel'] }) {
+  const [active, setActive] = useState(0);
+  useEffect(() => {
+    if (slides.length < 2) return;
+    const timer = window.setInterval(() => setActive((current) => (current + 1) % slides.length), 6500);
+    return () => window.clearInterval(timer);
+  }, [slides.length]);
+
+  if (!slides.length) return null;
+  const slide = slides[Math.min(active, slides.length - 1)];
+  return <section className="relative min-h-[520px] overflow-hidden bg-[#081817] md:min-h-[650px]">
+    <div className="absolute inset-0">{slide.mediaType === 'video'
+      ? <video key={slide.mediaUrl} src={slide.mediaUrl} autoPlay muted loop playsInline className="h-full w-full object-cover" />
+      : <div key={slide.mediaUrl} className="h-full w-full bg-cover bg-center transition-all duration-700" style={{ backgroundImage: `url(${slide.mediaUrl})` }} />}</div>
+    <div className="absolute inset-0 bg-gradient-to-r from-[#061817]/95 via-[#061817]/65 to-transparent" />
+    <div className="relative z-10 flex min-h-[520px] max-w-[1440px] flex-col justify-end px-5 pb-12 pt-24 text-white md:min-h-[650px] md:px-10 md:pb-16">
+      <p className="text-xs font-black uppercase tracking-[.18em] text-[#DDF65C]">{slide.eyebrow}</p>
+      <h2 className="mt-5 max-w-4xl text-5xl font-black leading-[.9] tracking-[-.065em] md:text-8xl">{slide.title}</h2>
+      <p className="mt-6 max-w-xl text-lg leading-8 text-white/70">{slide.text}</p>
+      <a href={slide.link || '/services'} className="mt-7 inline-flex w-fit border-b border-white/50 pb-2 text-sm font-black">Explore service →</a>
+    </div>
+    <div className="absolute bottom-5 right-5 z-20 flex gap-2 md:bottom-8 md:right-10">{slides.map((item, index) => <button key={item.id} type="button" aria-label={`Show ${item.title}`} onClick={() => setActive(index)} className={`h-1.5 transition-all ${index === active ? 'w-12 bg-[#DDF65C]' : 'w-6 bg-white/35'}`} />)}</div>
+  </section>;
 }

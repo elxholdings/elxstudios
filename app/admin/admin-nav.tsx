@@ -12,9 +12,12 @@ const sections = [
   ['Finance', '/admin/finance', '06'],
   ['Support', '/admin/support', '07'],
   ['Content', '/admin/content', '08'],
-  ['Meta', '/admin/meta', '09'],
-  ['Settings', '/admin/settings', '10'],
-  ['System', '/admin/system', '11'],
+  ['Site editor', '/admin/editor', '09'],
+  ['Media', '/admin/media', '10'],
+  ['Shop', '/admin/shop', '11'],
+  ['Meta', '/admin/meta', '12'],
+  ['Settings', '/admin/settings', '13'],
+  ['System', '/admin/system', '14'],
 ] as const;
 
 export default function AdminNav() {
