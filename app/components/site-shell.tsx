@@ -65,12 +65,12 @@ export function SiteFooter({ locale = 'en' }: { locale?: string }) {
   );
 }
 
-export function SiteShell({ locale = 'en', children }: { locale?: string; children: ReactNode }) {
+export function SiteShell({ locale = 'en', children, showFooter = true }: { locale?: string; children: ReactNode; showFooter?: boolean }) {
   return (
     <div className="min-h-screen bg-[#F5F2E8] text-[#102321]">
       <SiteHeader locale={locale} />
       {children}
-      <SiteFooter locale={locale} />
+      {showFooter && <SiteFooter locale={locale} />}
     </div>
   );
 }

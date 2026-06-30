@@ -120,25 +120,25 @@ export default function ProjectWizard({ initialService = '', locale = 'en', auth
   }
 
   return (
-    <form onSubmit={submit} className="bg-white">
-      {!authenticated && <div className="bg-[#DDF65C] p-4 text-sm font-bold">Want this project saved online? <Link href="/login?next=/start" className="underline">Sign in</Link> or <Link href="/register?next=/start" className="underline">create an account</Link> before submitting.</div>}
+    <form onSubmit={submit} className="bg-white shadow-sm">
+      {!authenticated && <div className="bg-[#DDF65C] px-5 py-3 text-xs font-bold">Want this project saved online? <Link href="/login?next=/start" className="underline">Sign in</Link> or <Link href="/register?next=/start" className="underline">create an account</Link> before submitting.</div>}
       <div className="grid grid-cols-4 bg-[#102321] text-white">
         {steps.map((label, index) => (
-          <button type="button" key={label} onClick={() => index < step && setStep(index)} className={`min-h-20 px-3 text-left text-xs font-black uppercase tracking-[.1em] ${index === step ? 'bg-[#DDF65C] text-[#102321]' : index < step ? 'text-white' : 'text-white/35'}`}>
+          <button type="button" key={label} onClick={() => index < step && setStep(index)} className={`min-h-16 px-4 text-left text-[11px] font-black uppercase tracking-[.1em] ${index === step ? 'bg-[#DDF65C] text-[#102321]' : index < step ? 'text-white' : 'text-white/35'}`}>
             <span className="block text-[10px] opacity-55">0{index + 1}</span>{label}
           </button>
         ))}
       </div>
 
-      <div className="p-6 md:p-10">
+      <div className="p-5 md:p-7">
         {step === 0 && (
           <div>
             <StepTitle number="01" title="What kind of support do you need?" text="Choose the closest department and service. The team can refine the category after reviewing your brief." />
-            <div className="mt-8 grid gap-3 sm:grid-cols-2">
+            <div className="mt-5 grid gap-2 sm:grid-cols-2">
               {serviceCategories.map((service) => (
-                <button type="button" key={service.slug} onClick={() => setForm((current) => ({ ...current, category: service.slug, subservice: '' }))} className={`p-5 text-left ${form.category === service.slug ? 'bg-[#DDF65C]' : 'bg-[#F5F2E8]'}`}>
-                  <span className="text-xs font-black uppercase tracking-[.12em] text-black/45">{service.eyebrow}</span>
-                  <span className="mt-2 block text-lg font-black">{service.title}</span>
+                <button type="button" key={service.slug} onClick={() => setForm((current) => ({ ...current, category: service.slug, subservice: '' }))} className={`px-4 py-3 text-left ${form.category === service.slug ? 'bg-[#DDF65C]' : 'bg-[#F5F2E8]'}`}>
+                  <span className="text-[10px] font-black uppercase tracking-[.12em] text-black/45">{service.eyebrow}</span>
+                  <span className="mt-1 block text-base font-black">{service.title}</span>
                 </button>
               ))}
             </div>
@@ -182,9 +182,9 @@ export default function ProjectWizard({ initialService = '', locale = 'en', auth
         )}
 
         {error && <p className="mt-6 bg-red-50 p-4 text-sm font-bold text-red-700">{error}</p>}
-        <div className="mt-9 flex items-center justify-between gap-4 border-t border-black/10 pt-6">
+        <div className="mt-6 flex items-center justify-between gap-4 border-t border-black/10 pt-4">
           <button type="button" disabled={step === 0 || loading} onClick={() => setStep((current) => Math.max(0, current - 1))} className="px-2 py-3 text-sm font-black disabled:opacity-25">← Back</button>
-          {step < steps.length - 1 ? <button type="button" disabled={!canContinue()} onClick={() => setStep((current) => current + 1)} className="bg-[#102321] px-6 py-4 text-sm font-black text-white disabled:cursor-not-allowed disabled:opacity-30">Continue →</button> : <button disabled={!canContinue() || loading} className="bg-[#102321] px-6 py-4 text-sm font-black text-white disabled:cursor-not-allowed disabled:opacity-30">{loading ? 'Submitting…' : 'Submit for manual quote →'}</button>}
+          {step < steps.length - 1 ? <button type="button" disabled={!canContinue()} onClick={() => setStep((current) => current + 1)} className="bg-[#102321] px-6 py-3 text-sm font-black text-white disabled:cursor-not-allowed disabled:opacity-30">Continue →</button> : <button disabled={!canContinue() || loading} className="bg-[#102321] px-6 py-3 text-sm font-black text-white disabled:cursor-not-allowed disabled:opacity-30">{loading ? 'Submitting…' : 'Submit for manual quote →'}</button>}
         </div>
       </div>
     </form>
@@ -192,9 +192,9 @@ export default function ProjectWizard({ initialService = '', locale = 'en', auth
 }
 
 function StepTitle({ number, title, text }: { number: string; title: string; text: string }) {
-  return <div><p className="text-xs font-black uppercase tracking-[.16em] text-[#F06449]">Step {number}</p><h2 className="mt-3 text-4xl font-black leading-none tracking-[-0.05em] md:text-5xl">{title}</h2><p className="mt-4 max-w-2xl leading-7 text-black/55">{text}</p></div>;
+  return <div><p className="text-[10px] font-black uppercase tracking-[.16em] text-[#F06449]">Step {number}</p><h2 className="mt-2 text-3xl font-black leading-none tracking-[-0.05em] md:text-4xl">{title}</h2><p className="mt-3 max-w-2xl text-sm leading-6 text-black/55">{text}</p></div>;
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return <label className="mt-6 block"><span className="mb-2 block text-sm font-black">{label}</span>{children}</label>;
+  return <label className="mt-5 block"><span className="mb-2 block text-sm font-black">{label}</span>{children}</label>;
 }
