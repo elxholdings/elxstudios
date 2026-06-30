@@ -24,6 +24,16 @@ type FormState = {
 
 const steps = ['Service', 'Project brief', 'Delivery', 'Contact & review'];
 
+const serviceExamples: Record<string, { title: string; instructions: string }> = {
+  'writing-documentation': { title: 'e.g. Technical report editing and formatting', instructions: 'Document type, intended audience, word count, required structure, reference style, source material and the finished format you need...' },
+  'stem-technical': { title: 'e.g. Engineering calculation and analysis', instructions: 'Problem statement, equations or source data, assumptions, required method, units, diagrams and how the final answer should be presented...' },
+  'architecture-design': { title: 'e.g. Three-bedroom floor plan revision', instructions: 'Site or room dimensions, required spaces, design direction, building constraints, reference plans, drawing scale and final sheets or source files needed...' },
+  'cad-drafting': { title: 'e.g. Convert marked-up drawings to AutoCAD', instructions: 'Source drawing condition, dimensions, required layers and standards, annotation style, software version, sheet sizes and DWG, DXF or PDF outputs...' },
+  '3d-modeling-rendering': { title: 'e.g. Exterior architectural rendering package', instructions: 'Dimensions or model files, materials, lighting and mood, reference images, camera views, required resolution and model or render formats...' },
+  'finance-accounting': { title: 'e.g. Twelve-month cash-flow forecast model', instructions: 'Source records, reporting period, assumptions, required formulas, currencies, charts, scenarios and the decisions the finished workbook should support...' },
+  'business-professional': { title: 'e.g. Investor pitch deck for a growing business', instructions: 'Audience, objective, company background, available research, required sections, brand references, slide count and editable delivery format...' },
+};
+
 export default function ProjectWizard({ initialService = '', locale = 'en', authenticated = false }: { initialService?: string; locale?: string; authenticated?: boolean }) {
   const validInitial = serviceCategories.some((service) => service.slug === initialService) ? initialService : '';
   const [step, setStep] = useState(0);
@@ -35,6 +45,7 @@ export default function ProjectWizard({ initialService = '', locale = 'en', auth
   const [result, setResult] = useState<IntakeResponse | null>(null);
 
   const category = useMemo(() => serviceCategories.find((service) => service.slug === form.category), [form.category]);
+  const examples = serviceExamples[form.category] || { title: 'e.g. Describe the specific outcome you need', instructions: 'Goal, source material, requirements, references, standards and what a successful final file should contain...' };
 
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((current) => ({ ...current, [key]: value }));
@@ -149,9 +160,9 @@ export default function ProjectWizard({ initialService = '', locale = 'en', auth
         {step === 1 && (
           <div>
             <StepTitle number="02" title="Describe the outcome." text="Explain what the finished work must help you do. Specific context produces a more accurate quote." />
-            <Field label="Project title"><input className="elx-field" value={form.title} onChange={(event) => update('title', event.target.value)} placeholder="e.g. Three-bedroom floor plan revision" /></Field>
+            <Field label="Project title"><input className="elx-field" value={form.title} onChange={(event) => update('title', event.target.value)} placeholder={examples.title} /></Field>
             <Field label="Purpose"><div className="grid grid-cols-2 gap-2">{['Professional', 'Academic support'].map((purpose) => <button type="button" key={purpose} onClick={() => update('purpose', purpose)} className={`p-4 text-left text-sm font-black ${form.purpose === purpose ? 'bg-[#DDF65C]' : 'bg-[#F5F2E8]'}`}>{purpose}</button>)}</div></Field>
-            <Field label="Instructions"><textarea className="elx-field min-h-44 resize-y" value={form.brief} onChange={(event) => update('brief', event.target.value)} placeholder="Goal, dimensions or data, software, references, standards and what a successful final file should contain..." /></Field>
+            <Field label="Instructions"><textarea className="elx-field min-h-44 resize-y" value={form.brief} onChange={(event) => update('brief', event.target.value)} placeholder={examples.instructions} /></Field>
           </div>
         )}
 
