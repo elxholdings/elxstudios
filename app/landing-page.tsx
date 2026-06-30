@@ -204,7 +204,7 @@ export default function LandingPage({ locale, dictionary = {}, languageOptions, 
   }
 
   return (
-    <main lang={locale === 'zh' ? 'zh-CN' : locale} dir={isRtlLocale(locale) ? 'rtl' : 'ltr'} className="overflow-hidden bg-[#F5F2E8] text-[#102321]">
+    <main lang={locale === 'zh' ? 'zh-CN' : locale} dir={isRtlLocale(locale) ? 'rtl' : 'ltr'} className="landing-shell overflow-hidden bg-[#F5F2E8] text-[#102321]">
       <header className="sticky top-0 z-50 bg-[#F5F2E8]">
         <nav className="mx-auto flex h-20 max-w-[1440px] items-center justify-between px-5 md:px-10">
           <a href={`/?lang=${locale}`} className="text-2xl font-black tracking-[-0.06em]">Elx<span className="text-[#F06449]">.</span>Studio</a>
@@ -222,8 +222,8 @@ export default function LandingPage({ locale, dictionary = {}, languageOptions, 
         </nav>
       </header>
 
-      <section id="top" className="bg-[#073C3E] text-white">
-        <div className="mx-auto max-w-[1440px] px-5 pb-8 pt-16 md:px-10 md:pb-12 md:pt-24">
+      <section id="top" className="flex min-h-[calc(100svh-80px)] items-center bg-[#073C3E] text-white">
+        <div className="mx-auto w-full max-w-[1440px] px-5 py-12 md:px-10 md:py-16">
           <div className="grid gap-10 lg:grid-cols-[1.15fr_.85fr] lg:items-end">
             <div>
               <a href="#services" className="mb-8 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[.14em] text-[#DDF65C]">
@@ -242,9 +242,10 @@ export default function LandingPage({ locale, dictionary = {}, languageOptions, 
             </div>
           </div>
 
-          <div className="-mx-5 mt-14 md:-mx-10 md:mt-20"><ServiceCarousel slides={homepage.carousel} /></div>
         </div>
       </section>
+
+      <section className="bg-[#073C3E]"><ServiceCarousel slides={homepage.carousel} /></section>
 
       <section className="bg-[#F5F2E8]">
         <div className="mx-auto grid max-w-[1440px] grid-cols-2 gap-y-8 px-5 py-12 md:grid-cols-4 md:px-10 md:py-16">
@@ -436,12 +437,12 @@ function ServiceCarousel({ slides }: { slides: HomepageContent['carousel'] }) {
 
   if (!slides.length) return null;
   const slide = slides[Math.min(active, slides.length - 1)];
-  return <section className="relative min-h-[520px] overflow-hidden bg-[#081817] md:min-h-[650px]">
+  return <section className="relative min-h-[calc(100svh-80px)] overflow-hidden bg-[#081817]">
     <div className="absolute inset-0">{slide.mediaType === 'video'
       ? <video key={slide.mediaUrl} src={slide.mediaUrl} autoPlay muted loop playsInline className="h-full w-full object-cover" />
       : <div key={slide.mediaUrl} className="h-full w-full bg-cover bg-center transition-all duration-700" style={{ backgroundImage: `url(${slide.mediaUrl})` }} />}</div>
     <div className="absolute inset-0 bg-gradient-to-r from-[#061817]/95 via-[#061817]/65 to-transparent" />
-    <div className="relative z-10 flex min-h-[520px] max-w-[1440px] flex-col justify-end px-5 pb-12 pt-24 text-white md:min-h-[650px] md:px-10 md:pb-16">
+    <div className="relative z-10 flex min-h-[calc(100svh-80px)] max-w-[1440px] flex-col justify-end px-5 pb-12 pt-24 text-white md:px-10 md:pb-16">
       <p className="text-xs font-black uppercase tracking-[.18em] text-[#DDF65C]">{slide.eyebrow}</p>
       <h2 className="mt-5 max-w-4xl text-5xl font-black leading-[.9] tracking-[-.065em] md:text-8xl">{slide.title}</h2>
       <p className="mt-6 max-w-xl text-lg leading-8 text-white/70">{slide.text}</p>

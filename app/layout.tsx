@@ -2,6 +2,7 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { isRtlLocale } from './locale-config';
+import ScrollPill from './components/scroll-pill';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://elxholdings.com'),
@@ -53,6 +54,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           }}
         />
         {children}
+        <ScrollPill />
       </body>
     </html>
   );
