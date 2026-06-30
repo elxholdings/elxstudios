@@ -1,22 +1,13 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
+import type { ProductPackage } from '../../lib/content-types';
 
-export default function PurchaseRequestForm({ productId, productTitle }: { productId: string; productTitle: string }) {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [done, setDone] = useState(false);
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault(); setLoading(true); setError('');
-    const form = event.currentTarget;
-    const body = Object.fromEntries(new FormData(form).entries());
-    const response = await fetch('/api/shop/requests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...body, productId }) });
-    const payload = await response.json().catch(() => ({})) as { error?: string };
-    if (!response.ok) setError(payload.error || 'The request could not be sent.'); else { setDone(true); form.reset(); }
-    setLoading(false);
-  }
+export default function PurchaseRequestForm({ productId, productTitle, packages, currency }: { productId: string; productTitle: string; packages: ProductPackage[]; currency: string }) {
+  const [loading, setLoading] = useState(false); const [error, setError] = useState(''); const [done, setDone] = useState(false); const [packageId, setPackageId] = useState(packages[0]?.id || 'base');
+  const selected = packages.find((item) => item.id === packageId) || packages[0];
+  async function submit(event: FormEvent<HTMLFormElement>) { event.preventDefault(); setLoading(true); setError(''); const form = event.currentTarget; const body = Object.fromEntries(new FormData(form).entries()); const response = await fetch('/api/shop/requests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...body, productId, packageId: selected?.id, packageLabel: selected?.label, quotedPrice: selected?.price, currency }) }); const payload = await response.json().catch(() => ({})) as { error?: string }; if (!response.ok) setError(payload.error || 'The request could not be sent.'); else { setDone(true); form.reset(); } setLoading(false); }
   if (done) return <div className="bg-white p-8"><p className="text-xs font-black uppercase tracking-[.16em] text-[#F06449]">Request received</p><h3 className="mt-4 text-3xl font-black">We will confirm {productTitle} with you.</h3><p className="mt-4 text-sm leading-6 text-black/55">Watch your email or WhatsApp for file and payment details.</p></div>;
-  return <form onSubmit={submit} className="bg-white p-7 md:p-10"><div className="grid gap-5 md:grid-cols-2"><Field label="Full name"><input name="name" className="elx-field" required /></Field><Field label="Email"><input name="email" type="email" className="elx-field" required /></Field><Field label="WhatsApp"><input name="whatsapp" className="elx-field" placeholder="+254..." required /></Field><Field label="Customization or format notes"><input name="notes" className="elx-field" /></Field></div><input name="company" className="hidden" tabIndex={-1} autoComplete="off" />{error && <p className="mt-5 bg-red-50 p-4 text-sm font-bold text-red-700">{error}</p>}<button disabled={loading} className="mt-7 bg-[#102321] px-7 py-4 text-sm font-black text-white disabled:opacity-40">{loading ? 'Sending...' : 'Send purchase request →'}</button></form>;
+  return <form onSubmit={submit} className="bg-white p-6 md:p-10"><fieldset><legend className="text-xs font-black uppercase tracking-[.14em] text-black/45">Choose your plan package</legend><div className="mt-4 grid gap-px bg-black/10">{packages.map((item) => <label key={item.id} className={`grid cursor-pointer grid-cols-[auto_1fr_auto] gap-4 p-5 ${packageId === item.id ? 'bg-[#DDF65C]' : 'bg-[#F8F7F2]'}`}><input type="radio" name="packageChoice" value={item.id} checked={packageId === item.id} onChange={() => setPackageId(item.id)} /><span><strong className="block">{item.label}</strong><small className="mt-1 block text-black/50">{item.fileTypes} · {item.description}</small></span><strong>{new Intl.NumberFormat('en', { style: 'currency', currency, maximumFractionDigits: 0 }).format(item.price)}</strong></label>)}</div></fieldset><div className="mt-7 grid gap-5 md:grid-cols-2"><Field label="Full name"><input name="name" className="elx-field" required /></Field><Field label="Email"><input name="email" type="email" className="elx-field" required /></Field><Field label="WhatsApp"><input name="whatsapp" className="elx-field" placeholder="+254..." required /></Field><Field label="Country / project location"><input name="location" className="elx-field" /></Field></div><Field label="Customization, plot or format notes"><textarea name="notes" className="elx-field min-h-24" placeholder="Tell us what must change, preferred software and the project location." /></Field><input name="company" className="hidden" tabIndex={-1} autoComplete="off" />{error && <p className="mt-5 bg-red-50 p-4 text-sm font-bold text-red-700">{error}</p>}<button disabled={loading} className="mt-7 w-full bg-[#102321] px-7 py-4 text-sm font-black text-white disabled:opacity-40">{loading ? 'Sending...' : `Request ${selected?.label || 'this plan'} →`}</button><p className="mt-4 text-center text-xs text-black/40">No payment is collected on this page. We confirm the files first.</p></form>;
 }
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) { return <label className="block text-sm font-black">{label}{children}</label>; }
+function Field({ label, children }: { label: string; children: React.ReactNode }) { return <label className="mt-5 block text-sm font-black">{label}{children}</label>; }

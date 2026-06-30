@@ -70,6 +70,9 @@ img, video, svg { max-width: 100%; }
   .elx-field {
     @apply w-full border-0 border-b border-black/20 bg-transparent px-0 py-3.5 outline-none transition focus:border-[#073C3E] focus:ring-0;
   }
+  .filter-label { @apply block text-[9px] font-black uppercase tracking-[.14em] text-black/40; }
+  .filter-field { @apply mt-1 w-full border-0 bg-transparent py-1 text-sm font-black outline-none; }
+  .admin-dark-field { @apply mt-2 w-full border-0 border-b border-white/20 bg-transparent py-3 text-sm text-white outline-none placeholder:text-white/35; }
 }
 
 .noise {

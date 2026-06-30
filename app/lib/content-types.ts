@@ -47,10 +47,38 @@ export type DigitalProduct = {
   preview_video_url: string | null;
   included_files: string[];
   specifications: Array<{ label: string; value: string }>;
+  sku: string;
+  style: string;
+  bedrooms: number;
+  bathrooms: number;
+  floors: number;
+  width_m: number | null;
+  depth_m: number | null;
+  area_sqm: number | null;
+  plot_width_m: number | null;
+  plot_depth_m: number | null;
+  garage_spaces: number;
+  rooms: string[];
+  drawings: string[];
+  tags: string[];
+  regular_price: number | null;
+  customizable: boolean;
+  instant_delivery: boolean;
+  best_seller: boolean;
+  package_options: ProductPackage[];
+  faqs: Array<{ question: string; answer: string }>;
   status: string;
   featured: boolean;
   sort_order: number;
   updated_at?: string;
+};
+
+export type ProductPackage = {
+  id: string;
+  label: string;
+  price: number;
+  fileTypes: string;
+  description: string;
 };
 
 export type MediaAsset = {
