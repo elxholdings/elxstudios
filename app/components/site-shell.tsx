@@ -37,20 +37,20 @@ export function SiteHeader({ locale = 'en' }: { locale?: string }) {
 export function SiteFooter({ locale = 'en' }: { locale?: string }) {
   const withLocale = (href: string) => `${href}?lang=${encodeURIComponent(locale)}`;
   return (
-    <footer className="bg-[#102321] px-5 py-14 text-white md:px-10">
-      <div className="mx-auto grid max-w-[1440px] gap-12 md:grid-cols-[1.4fr_1fr_1fr]">
+    <footer className="bg-[#102321] px-5 py-8 text-white md:px-10">
+      <div className="mx-auto grid max-w-[1440px] gap-7 md:grid-cols-[1.35fr_.8fr_1.2fr] md:items-start">
         <div>
-          <p className="text-3xl font-black tracking-[-0.06em]">Elx<span className="text-[#F06449]">.</span>Studio</p>
-          <p className="mt-4 max-w-md text-sm leading-6 text-white/55">Professional and technical project support from Elx Holdings. One brief, a clear scope and accountable delivery.</p>
+          <p className="text-2xl font-black tracking-[-0.06em]">Elx<span className="text-[#F06449]">.</span>Studio</p>
+          <p className="mt-2 max-w-md text-xs leading-5 text-white/50">Professional and technical project support. One brief, a clear scope and accountable delivery.</p>
         </div>
-        <div className="grid gap-3 text-sm text-white/65">
-          <p className="mb-1 font-black uppercase tracking-[.14em] text-white">Explore</p>
+        <div className="grid grid-cols-3 gap-3 text-xs text-white/60 md:grid-cols-1 md:gap-2">
+          <p className="col-span-full mb-1 text-[9px] font-black uppercase tracking-[.14em] text-white">Explore</p>
           <Link href={withLocale('/services')}>Services</Link>
           <Link href={withLocale('/pricing')}>Pricing</Link>
           <Link href={withLocale('/contact')}>Contact</Link>
         </div>
-        <div className="grid gap-3 text-sm text-white/65">
-          <p className="mb-1 font-black uppercase tracking-[.14em] text-white">Policies</p>
+        <div className="grid grid-cols-2 gap-x-5 gap-y-2 text-xs text-white/60 md:grid-cols-3">
+          <p className="col-span-full mb-1 text-[9px] font-black uppercase tracking-[.14em] text-white">Policies</p>
           <Link href={withLocale('/terms')}>Terms</Link>
           <Link href={withLocale('/privacy')}>Privacy</Link>
           <Link href={withLocale('/academic-integrity')}>Academic integrity</Link>
@@ -58,7 +58,7 @@ export function SiteFooter({ locale = 'en' }: { locale?: string }) {
           <Link href={withLocale('/revision-policy')}>Revision policy</Link>
         </div>
       </div>
-      <div className="mx-auto mt-12 max-w-[1440px] border-t border-white/10 pt-6 text-xs text-white/40">© {new Date().getFullYear()} Elx Holdings. All rights reserved.</div>
+      <div className="mx-auto mt-6 max-w-[1440px] border-t border-white/10 pt-4 text-[10px] text-white/35">© {new Date().getFullYear()} Elx Holdings. All rights reserved.</div>
     </footer>
   );
 }
