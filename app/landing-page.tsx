@@ -6,6 +6,7 @@ import type { TranslationDictionary } from './google-translate';
 import LanguageSwitcher, { type LanguageOption } from './language-switcher';
 import { isRtlLocale } from './locale-config';
 import type { DigitalProduct, HomepageContent } from './lib/content-types';
+import WelcomePresentation from './welcome-presentation';
 
 export type Locale = string;
 
@@ -209,7 +210,7 @@ export default function LandingPage({ locale, dictionary = {}, languageOptions, 
         <nav className="mx-auto flex h-20 max-w-[1440px] items-center justify-between px-5 md:px-10">
           <a href={`/?lang=${locale}`} className="text-2xl font-black tracking-[-0.06em]">Elx<span className="text-[#F06449]">.</span>Studio</a>
           <div className="hidden items-center gap-8 text-sm font-semibold md:flex">
-            <a href={`/services?lang=${locale}`} className="transition hover:opacity-60">{t('Expertise')}</a>
+            <a href={`/services?lang=${locale}`} className="transition hover:opacity-60">{t('How it works')}</a>
             <a href={`/pricing?lang=${locale}`} className="transition hover:opacity-60">Pricing</a>
             <a href={`/shop?lang=${locale}`} className="transition hover:opacity-60">Shop</a>
             <a href="#start" className="transition hover:opacity-60">{t('Send a brief')}</a>
@@ -220,6 +221,8 @@ export default function LandingPage({ locale, dictionary = {}, languageOptions, 
           </div>
         </nav>
       </header>
+
+      <WelcomePresentation locale={locale} />
 
       <section id="top" className="flex min-h-[calc(100svh-80px)] items-center bg-[#073C3E] text-white">
         <div className="mx-auto w-full max-w-[1440px] px-5 py-12 md:px-10 md:py-16">

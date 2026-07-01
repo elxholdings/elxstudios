@@ -126,21 +126,22 @@ export async function POST(request: Request) {
 
     const record = {
       order_id: createOrderId(),
-      name: clean(body.name),
-      whatsapp: clean(body.whatsapp),
+      name: clean(body.name) || 'Not provided',
+      whatsapp: clean(body.whatsapp) || 'Not provided',
       email: clean(body.email),
-      service: clean(body.service),
-      deadline: clean(body.deadline),
+      service: clean(body.service) || 'General project request',
+      deadline: clean(body.deadline) || 'Flexible / not specified',
       budget: clean(body.budget),
       files_link: clean(body.filesLink),
-      brief: clean(structuredBrief),
+      brief: clean(structuredBrief) || 'Details to follow during scope review.',
       status: 'new',
       created_at: new Date().toISOString(),
     };
 
     const integrityConfirmed = body.integrityConfirmed === true || body.integrityConfirmed === 'true';
-    if (!record.name || !record.whatsapp || !record.service || !record.deadline || !record.brief || !integrityConfirmed) {
-      return NextResponse.json({ error: 'Missing required fields.' }, { status: 400 });
+    const hasContact = clean(body.whatsapp) || clean(body.email);
+    if (!hasContact || !integrityConfirmed) {
+      return NextResponse.json({ error: 'Add either WhatsApp or email and accept the integrity policy.' }, { status: 400 });
     }
 
     const intakeId = await saveIntake(record, user?.id);
@@ -152,7 +153,7 @@ export async function POST(request: Request) {
         orderNumber: record.order_id,
         categorySlug: clean(body.categorySlug),
         subservice: clean(body.subservice),
-        title: clean(body.title) || 'Untitled project',
+        title: clean(body.title) || clean(body.subservice) || 'New project request',
         brief: clean(body.brief),
         purpose: clean(body.purpose),
         deadline: clean(body.deadline),

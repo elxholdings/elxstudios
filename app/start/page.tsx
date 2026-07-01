@@ -11,6 +11,7 @@ export default async function StartPage({ searchParams }: { searchParams?: Promi
   const locale = await resolveLocale(query?.lang);
   const service = Array.isArray(query?.service) ? query?.service[0] : query?.service;
   const { user } = await getAuthContext();
+  const whatsappNumber = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '254700000000').replace(/\D/g, '');
   return (
     <SiteShell locale={locale} showFooter={false}>
       <section className="flex min-h-[calc(100svh-116px)] items-center px-5 py-6 md:px-10 lg:py-5">
@@ -18,12 +19,15 @@ export default async function StartPage({ searchParams }: { searchParams?: Promi
           <div className="pt-2 lg:sticky lg:top-32 lg:self-start">
             <p className="text-xs font-black uppercase tracking-[.18em] text-[#F06449]">Project intake</p>
             <h1 className="mt-4 text-5xl font-black leading-[.86] tracking-[-0.075em] md:text-6xl xl:text-7xl">Build a clear brief.</h1>
-            <p className="mt-5 max-w-md text-base leading-7 text-black/60">Submitting is free. The team reviews your requirements before confirming deliverables, timing or price.</p>
+            <p className="mt-5 max-w-md text-base leading-7 text-black/60">Submitting is free. Add only the details that matter; the team reviews what you share before confirming deliverables, timing or price.</p>
             <div className="mt-6 max-w-md border-t border-black/15 pt-4 text-xs leading-5 text-black/55">No payment is collected on this page.<br />Files are not uploaded without secure storage.<br />Academic-use confirmation is required.</div>
           </div>
           <ProjectWizard initialService={service} locale={locale} authenticated={Boolean(user)} />
         </div>
       </section>
+      <a href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Hello Elx Studio, I would like help choosing a service for my project.')}`} target="_blank" rel="noreferrer" aria-label="Chat with Elx Studio on WhatsApp" className="fixed bottom-5 right-5 z-50 grid h-14 w-14 place-items-center bg-[#1FA855] text-white shadow-xl transition hover:-translate-y-1 hover:bg-[#178A45]">
+        <svg viewBox="0 0 32 32" aria-hidden="true" className="h-8 w-8 fill-current"><path d="M16 4a11.3 11.3 0 0 0-9.8 17l-1.5 5.4 5.6-1.5A11.3 11.3 0 1 0 16 4Zm0 20.5c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.3.9.9-3.2-.2-.4a9.1 9.1 0 1 1 8 4.3Zm5-6.8c-.3-.1-1.6-.8-1.9-.9-.2-.1-.4-.1-.6.2-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-1.6-.8-2.7-1.5-3.8-3.3-.3-.5.3-.5.8-1.7.1-.2 0-.4 0-.5l-.9-2.1c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.3 5.2 4.6 1.9.8 2.6.9 3.6.8.6-.1 1.6-.7 1.8-1.3.2-.6.2-1.2.2-1.3-.2-.3-.4-.4-1-.6Z" /></svg>
+      </a>
     </SiteShell>
   );
 }

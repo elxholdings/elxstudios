@@ -43,6 +43,7 @@ export default function ProjectWizard({ initialService = '', locale = 'en', auth
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState<IntakeResponse | null>(null);
+  const [openCategory, setOpenCategory] = useState(validInitial);
 
   const category = useMemo(() => serviceCategories.find((service) => service.slug === form.category), [form.category]);
   const examples = serviceExamples[form.category] || { title: 'e.g. Describe the specific outcome you need', instructions: 'Goal, source material, requirements, references, standards and what a successful final file should contain...' };
@@ -56,10 +57,14 @@ export default function ProjectWizard({ initialService = '', locale = 'en', auth
   }
 
   function canContinue() {
-    if (step === 0) return Boolean(form.category && form.subservice);
-    if (step === 1) return Boolean(form.title.trim() && form.brief.trim() && form.purpose);
-    if (step === 2) return Boolean(form.deadline && form.outputFormat);
-    return Boolean(form.name.trim() && form.whatsapp.trim() && form.integrityConfirmed);
+    if (step < 3) return true;
+    return Boolean((form.whatsapp.trim() || form.email.trim()) && form.integrityConfirmed);
+  }
+
+  function chooseSubservice(categorySlug: string, subservice: string, proceed = true) {
+    setForm((current) => ({ ...current, category: categorySlug, subservice }));
+    setOpenCategory(categorySlug);
+    if (proceed) setStep(1);
   }
 
   async function submit(event: FormEvent) {
@@ -76,7 +81,7 @@ export default function ProjectWizard({ initialService = '', locale = 'en', auth
           name: form.name,
           whatsapp: form.whatsapp,
           email: form.email,
-          service: `${category?.title || form.category} — ${form.subservice}`,
+          service: [category?.title || form.category, form.subservice].filter(Boolean).join(' — '),
           categorySlug: form.category,
           subservice: form.subservice,
           deadline: form.deadline,
@@ -95,13 +100,13 @@ export default function ProjectWizard({ initialService = '', locale = 'en', auth
       const now = new Date().toISOString();
       if (!data.cloudOrder) saveLocalOrder({
         id: data.orderId,
-        title: form.title,
-        category: category?.title || form.category,
-        subservice: form.subservice,
+        title: form.title || form.subservice || 'New project request',
+        category: category?.title || form.category || 'General project request',
+        subservice: form.subservice || 'Scope to be confirmed',
         purpose: form.purpose,
-        deadline: form.deadline,
-        outputFormat: form.outputFormat,
-        brief: form.brief,
+        deadline: form.deadline || 'Flexible / not specified',
+        outputFormat: form.outputFormat || 'To be confirmed',
+        brief: form.brief || 'Details to follow',
         files: fileNames,
         status: 'Submitted',
         paymentStatus: 'Awaiting quote',
@@ -110,7 +115,7 @@ export default function ProjectWizard({ initialService = '', locale = 'en', auth
       });
       setResult(data);
     } catch {
-      setError('We could not submit this brief. Check the required fields and try again.');
+      setError('We could not submit this brief. Add either WhatsApp or email, accept the integrity policy, and try again.');
     } finally {
       setLoading(false);
     }
@@ -144,31 +149,37 @@ export default function ProjectWizard({ initialService = '', locale = 'en', auth
       <div className="p-5 md:p-7">
         {step === 0 && (
           <div>
-            <StepTitle number="01" title="What kind of support do you need?" text="Choose the closest department and service. The team can refine the category after reviewing your brief." />
+            <StepTitle number="01" title="What kind of support do you need?" text="Hover over a department to see its services. Select one to continue, double-click a department for its first option, or skip this step." />
             <div className="mt-5 grid gap-2 sm:grid-cols-2">
               {serviceCategories.map((service) => (
-                <button type="button" key={service.slug} onClick={() => setForm((current) => ({ ...current, category: service.slug, subservice: '' }))} className={`px-4 py-3 text-left ${form.category === service.slug ? 'bg-[#DDF65C]' : 'bg-[#F5F2E8]'}`}>
-                  <span className="text-[10px] font-black uppercase tracking-[.12em] text-black/45">{service.eyebrow}</span>
-                  <span className="mt-1 block text-base font-black">{service.title}</span>
-                </button>
+                <div key={service.slug} onMouseEnter={() => setOpenCategory(service.slug)} onMouseLeave={() => form.category !== service.slug && setOpenCategory('')} className={`group relative min-h-[74px] ${form.category === service.slug ? 'bg-[#DDF65C]' : 'bg-[#F5F2E8]'}`}>
+                  <button type="button" onClick={() => { setForm((current) => ({ ...current, category: service.slug, subservice: '' })); setOpenCategory(service.slug); }} onDoubleClick={() => chooseSubservice(service.slug, service.subservices[0])} className="w-full px-4 py-3 text-left">
+                    <span className="text-[10px] font-black uppercase tracking-[.12em] text-black/45">{service.eyebrow}</span>
+                    <span className="mt-1 block pr-6 text-base font-black">{service.title}</span>
+                    <span className="absolute right-4 top-5 text-sm font-black">+</span>
+                  </button>
+                  <div className={`${openCategory === service.slug ? 'grid' : 'hidden'} absolute left-0 right-0 top-full z-30 grid-cols-2 gap-px bg-[#102321] p-px shadow-xl group-hover:grid`}>
+                    {service.subservices.map((item) => <button key={item} type="button" onClick={() => chooseSubservice(service.slug, item)} className="bg-white px-3 py-2 text-left text-[11px] font-bold leading-4 transition hover:bg-[#DDF65C]">{item}</button>)}
+                  </div>
+                </div>
               ))}
             </div>
-            {category && <Field label="Specific service"><select value={form.subservice} onChange={(event) => update('subservice', event.target.value)} className="elx-field"><option value="">Select one</option>{category.subservices.map((item) => <option key={item}>{item}</option>)}</select></Field>}
+            {category && <p className="mt-4 text-xs text-black/55"><strong>Selected:</strong> {category.title}{form.subservice ? ` / ${form.subservice}` : ' / choose a service above or continue without one'}</p>}
           </div>
         )}
 
         {step === 1 && (
           <div>
-            <StepTitle number="02" title="Describe the outcome." text="Explain what the finished work must help you do. Specific context produces a more accurate quote." />
-            <Field label="Project title"><input className="elx-field" value={form.title} onChange={(event) => update('title', event.target.value)} placeholder={examples.title} /></Field>
+            <StepTitle number="02" title="Describe the outcome." text="Add only what is useful. Every field on this step is optional; more context simply helps us quote more accurately." />
+            <Field label="Project title (optional)"><input className="elx-field" value={form.title} onChange={(event) => update('title', event.target.value)} placeholder={examples.title} /></Field>
             <Field label="Purpose"><div className="grid grid-cols-2 gap-2">{['Professional', 'Academic support'].map((purpose) => <button type="button" key={purpose} onClick={() => update('purpose', purpose)} className={`p-4 text-left text-sm font-black ${form.purpose === purpose ? 'bg-[#DDF65C]' : 'bg-[#F5F2E8]'}`}>{purpose}</button>)}</div></Field>
-            <Field label="Instructions"><textarea className="elx-field min-h-44 resize-y" value={form.brief} onChange={(event) => update('brief', event.target.value)} placeholder={examples.instructions} /></Field>
+            <Field label="Instructions (optional)"><textarea className="elx-field min-h-36 resize-y" value={form.brief} onChange={(event) => update('brief', event.target.value)} placeholder={examples.instructions} /></Field>
           </div>
         )}
 
         {step === 2 && (
           <div>
-            <StepTitle number="03" title="Set the delivery requirements." text="Deadlines and editable-file needs affect scheduling and scope. No price is charged at this stage." />
+            <StepTitle number="03" title="Set the delivery requirements." text="Everything here is optional. Add what matters to your project and leave the rest for our scope conversation." />
             <div className="grid gap-5 md:grid-cols-2">
               <Field label="Deadline"><input type="datetime-local" className="elx-field" value={form.deadline} onChange={(event) => update('deadline', event.target.value)} /></Field>
               <Field label="Primary output format"><select className="elx-field" value={form.outputFormat} onChange={(event) => update('outputFormat', event.target.value)}><option value="">Select format</option>{['PDF', 'DOCX', 'PPTX', 'XLSX / CSV', 'DWG / DXF', 'RVT / SKP', 'OBJ / FBX / STL', 'JPG / PNG', 'Other / multiple formats'].map((item) => <option key={item}>{item}</option>)}</select></Field>
@@ -181,13 +192,13 @@ export default function ProjectWizard({ initialService = '', locale = 'en', auth
 
         {step === 3 && (
           <div>
-            <StepTitle number="04" title="Review and send the brief." text="Your contact details are used to return the quote and coordinate the project." />
+            <StepTitle number="04" title="Review and send the brief." text="Use either WhatsApp or email so we can return the quote. The other project fields may remain blank." />
             <div className="grid gap-5 md:grid-cols-2">
-              <Field label="Full name"><input className="elx-field" value={form.name} onChange={(event) => update('name', event.target.value)} /></Field>
-              <Field label="WhatsApp number"><input className="elx-field" value={form.whatsapp} onChange={(event) => update('whatsapp', event.target.value)} placeholder="+254..." /></Field>
+              <Field label="Full name (optional)"><input className="elx-field" value={form.name} onChange={(event) => update('name', event.target.value)} /></Field>
+              <Field label="WhatsApp number"><input className="elx-field" value={form.whatsapp} onChange={(event) => update('whatsapp', event.target.value)} placeholder="+254... or use email below" /></Field>
             </div>
-            <Field label="Email (optional)"><input type="email" className="elx-field" value={form.email} onChange={(event) => update('email', event.target.value)} /></Field>
-            <div className="mt-7 bg-[#F5F2E8] p-5 text-sm leading-6"><p className="font-black">Brief summary</p><p className="mt-2 text-black/60">{category?.title} / {form.subservice}<br />{form.title}<br />Due {form.deadline ? new Date(form.deadline).toLocaleString() : '—'} / {form.outputFormat}</p></div>
+            <Field label="Email"><input type="email" className="elx-field" value={form.email} onChange={(event) => update('email', event.target.value)} placeholder="Required only when WhatsApp is blank" /></Field>
+            <div className="mt-7 bg-[#F5F2E8] p-5 text-sm leading-6"><p className="font-black">Brief summary</p><p className="mt-2 text-black/60">{category?.title || 'General request'} / {form.subservice || 'Scope to be confirmed'}<br />{form.title || 'Untitled project'}<br />Due {form.deadline ? new Date(form.deadline).toLocaleString() : 'Flexible'} / {form.outputFormat || 'Format to be confirmed'}</p></div>
             <label className="mt-5 flex items-start gap-3 bg-[#FFF4E8] p-5 text-sm leading-6"><input type="checkbox" className="mt-1" checked={form.integrityConfirmed} onChange={(event) => update('integrityConfirmed', event.target.checked)} /><span>I confirm that I will use the work responsibly, follow applicable institutional or professional rules, and accept the <Link href="/academic-integrity" className="font-black underline">Academic Integrity Policy</Link>.</span></label>
           </div>
         )}
@@ -195,7 +206,7 @@ export default function ProjectWizard({ initialService = '', locale = 'en', auth
         {error && <p className="mt-6 bg-red-50 p-4 text-sm font-bold text-red-700">{error}</p>}
         <div className="mt-6 flex items-center justify-between gap-4 border-t border-black/10 pt-4">
           <button type="button" disabled={step === 0 || loading} onClick={() => setStep((current) => Math.max(0, current - 1))} className="px-2 py-3 text-sm font-black disabled:opacity-25">← Back</button>
-          {step < steps.length - 1 ? <button type="button" disabled={!canContinue()} onClick={() => setStep((current) => current + 1)} className="bg-[#102321] px-6 py-3 text-sm font-black text-white disabled:cursor-not-allowed disabled:opacity-30">Continue →</button> : <button disabled={!canContinue() || loading} className="bg-[#102321] px-6 py-3 text-sm font-black text-white disabled:cursor-not-allowed disabled:opacity-30">{loading ? 'Submitting…' : 'Submit for manual quote →'}</button>}
+          {step < steps.length - 1 ? <button type="button" onClick={() => setStep((current) => current + 1)} className="bg-[#102321] px-6 py-3 text-sm font-black text-white">{step === 0 && !form.category ? 'Skip for now →' : 'Continue →'}</button> : <button disabled={!canContinue() || loading} className="bg-[#102321] px-6 py-3 text-sm font-black text-white disabled:cursor-not-allowed disabled:opacity-30">{loading ? 'Submitting…' : 'Submit for manual quote →'}</button>}
         </div>
       </div>
     </form>

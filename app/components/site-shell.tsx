@@ -5,7 +5,7 @@ import { languageOptions } from '../language-options';
 import AuthNav from './auth-nav';
 
 const navItems = [
-  ['Services', '/services'],
+  ['How it works', '/services'],
   ['Pricing', '/pricing'],
   ['Shop', '/shop'],
   ['About', '/about'],
