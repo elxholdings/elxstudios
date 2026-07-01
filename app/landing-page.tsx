@@ -210,7 +210,6 @@ export default function LandingPage({ locale, dictionary = {}, languageOptions, 
           <a href={`/?lang=${locale}`} className="text-2xl font-black tracking-[-0.06em]">Elx<span className="text-[#F06449]">.</span>Studio</a>
           <div className="hidden items-center gap-8 text-sm font-semibold md:flex">
             <a href={`/services?lang=${locale}`} className="transition hover:opacity-60">{t('Expertise')}</a>
-            <a href={`/how-it-works?lang=${locale}`} className="transition hover:opacity-60">{t('How it works')}</a>
             <a href={`/pricing?lang=${locale}`} className="transition hover:opacity-60">Pricing</a>
             <a href={`/shop?lang=${locale}`} className="transition hover:opacity-60">Shop</a>
             <a href="#start" className="transition hover:opacity-60">{t('Send a brief')}</a>

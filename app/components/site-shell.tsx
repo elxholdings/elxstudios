@@ -6,7 +6,6 @@ import AuthNav from './auth-nav';
 
 const navItems = [
   ['Services', '/services'],
-  ['How it works', '/how-it-works'],
   ['Pricing', '/pricing'],
   ['Shop', '/shop'],
   ['About', '/about'],
@@ -47,7 +46,6 @@ export function SiteFooter({ locale = 'en' }: { locale?: string }) {
         <div className="grid gap-3 text-sm text-white/65">
           <p className="mb-1 font-black uppercase tracking-[.14em] text-white">Explore</p>
           <Link href={withLocale('/services')}>Services</Link>
-          <Link href={withLocale('/how-it-works')}>How it works</Link>
           <Link href={withLocale('/pricing')}>Pricing</Link>
           <Link href={withLocale('/contact')}>Contact</Link>
         </div>
