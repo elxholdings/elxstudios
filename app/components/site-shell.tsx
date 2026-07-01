@@ -63,10 +63,10 @@ export function SiteFooter({ locale = 'en' }: { locale?: string }) {
   );
 }
 
-export function SiteShell({ locale = 'en', children, showFooter = true }: { locale?: string; children: ReactNode; showFooter?: boolean }) {
+export function SiteShell({ locale = 'en', children, showFooter = true, showHeader = true }: { locale?: string; children: ReactNode; showFooter?: boolean; showHeader?: boolean }) {
   return (
     <div className="site-shell min-h-screen bg-[#F5F2E8] text-[#102321]">
-      <SiteHeader locale={locale} />
+      {showHeader && <SiteHeader locale={locale} />}
       {children}
       {showFooter && <SiteFooter locale={locale} />}
     </div>

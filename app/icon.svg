@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" fill="#102321"/>
+  <text x="8" y="43" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="900" letter-spacing="-2">Elx</text>
+  <circle cx="52" cy="43" r="4.5" fill="#F06449"/>
+</svg>

@@ -65,6 +65,7 @@ img, video, svg { max-width: 100%; }
 
 @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
   html { scroll-snap-type: y mandatory; scroll-padding-top: 108px; }
+  html:has(.shop-presentation) { scroll-padding-top: 0; }
   .desktop-screen,
   .site-shell > section,
   .site-shell > footer,
@@ -78,6 +79,12 @@ img, video, svg { max-width: 100%; }
   /* Nested layout sections are columns/panels, not independent scroll destinations. */
   .desktop-screen > section,
   .desktop-screen section section { scroll-snap-align: none; scroll-margin: 0; }
+  .shop-presentation > section {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    scroll-margin-top: 0;
+  }
+  .site-shell:has(.shop-presentation) > footer { scroll-margin-top: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -91,6 +98,8 @@ img, video, svg { max-width: 100%; }
   }
   .filter-label { @apply block text-[9px] font-black uppercase tracking-[.14em] text-black/40; }
   .filter-field { @apply mt-1 w-full border-0 bg-transparent py-1 text-sm font-black outline-none; }
+  .shop-filter-label { @apply block text-[8px] font-black uppercase tracking-[.14em] text-black/35; }
+  .shop-filter-field { @apply mt-1 w-full border-0 bg-transparent p-0 text-xs font-black leading-none outline-none; }
   .admin-dark-field { @apply mt-2 w-full border-0 border-b border-white/20 bg-transparent py-3 text-sm text-white outline-none placeholder:text-white/35; }
 }
 

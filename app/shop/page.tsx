@@ -8,8 +8,29 @@ export const metadata: Metadata = { title: 'House Plans & Architectural Models',
 
 export default async function ShopPage({ searchParams }: { searchParams?: Promise<{ lang?: string | string[] }> }) {
   const query = await searchParams; const locale = await resolveLocale(query?.lang); const products = await getPublishedProducts();
-  return <SiteShell locale={locale}><main className="snap-sections">
-    <section className="bg-[#073C3E] px-5 py-16 text-white md:px-10 md:py-20"><div className="mx-auto grid max-w-[1440px] gap-10 lg:grid-cols-[1.15fr_.85fr] lg:items-end"><div><p className="text-xs font-black uppercase tracking-[.18em] text-[#DDF65C]">Elx Studio / Architectural plan shop</p><h1 className="mt-5 max-w-5xl text-6xl font-black leading-[.86] tracking-[-.075em] md:text-8xl">A better starting point for your build.</h1></div><div><p className="max-w-xl text-lg leading-8 text-white/65">Explore original house concepts by bedrooms, floors, area and home type. Choose a PDF set, editable CAD package or request plan customization.</p><div className="mt-7 grid grid-cols-3 border-y border-white/15 py-4 text-xs font-black uppercase tracking-[.1em]"><span>Original plans</span><span>CAD options</span><span>Adaptable</span></div></div></div></section>
-    <section className="bg-[#F8F7F2] px-5 py-14 md:px-10 md:py-20"><div className="mx-auto max-w-[1440px]">{products.length ? <ShopCatalog products={products} /> : <div className="bg-white p-10"><h2 className="text-3xl font-black">The first plan collection is being prepared.</h2><p className="mt-3 text-black/50">Check back shortly or send a custom architecture brief.</p></div>}</div></section>
+  return <SiteShell locale={locale} showHeader={false}><main className="shop-presentation snap-sections bg-[#F8F7F2]">
+    <section className="shop-slide relative flex min-h-[100svh] flex-col overflow-hidden bg-[#073C3E] px-5 text-white md:px-10">
+      <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between border-b border-white/10 py-5 text-xs font-black uppercase tracking-[.14em]">
+        <a href={`/?lang=${encodeURIComponent(locale)}`} className="text-lg normal-case tracking-[-.06em] text-white">Elx<span className="text-[#F06449]">.</span></a>
+        <span className="hidden text-white/45 sm:inline">Architectural plan shop</span>
+        <a href="#plans" className="border border-white/20 px-4 py-2 text-[#DDF65C] transition hover:bg-white hover:text-[#073C3E]">See plans ↓</a>
+      </div>
+      <div className="mx-auto grid w-full max-w-[1440px] flex-1 gap-8 py-10 lg:grid-cols-[1.08fr_.92fr] lg:items-center lg:py-8">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[.18em] text-[#DDF65C]">Elx Studio / House plans</p>
+          <h1 className="mt-5 max-w-4xl text-6xl font-black leading-[.82] tracking-[-.08em] md:text-8xl xl:text-9xl">Choose the plan. Then make it yours.</h1>
+        </div>
+        <div className="max-w-2xl lg:justify-self-end">
+          <p className="text-xl font-black leading-8 md:text-2xl">Original architectural models, drawing sets and editable CAD packages for residential projects.</p>
+          <p className="mt-5 leading-7 text-white/60">Start with a clean concept, compare bedrooms, area and file formats, then request the exact package before payment.</p>
+          <div className="mt-8 grid grid-cols-3 border-y border-white/15 py-4 text-[10px] font-black uppercase tracking-[.12em] text-white/70">
+            <span>{products.length || 'New'} plans</span>
+            <span>PDF + CAD</span>
+            <span>Customizable</span>
+          </div>
+        </div>
+      </div>
+    </section>
+    {products.length ? <ShopCatalog products={products} /> : <section className="shop-slide flex min-h-[100svh] items-center bg-[#F8F7F2] px-5 md:px-10"><div className="mx-auto max-w-[900px] bg-white p-10"><h2 className="text-3xl font-black">The first plan collection is being prepared.</h2><p className="mt-3 text-black/50">Check back shortly or send a custom architecture brief.</p></div></section>}
   </main></SiteShell>;
 }

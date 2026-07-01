@@ -12,6 +12,11 @@ export const metadata: Metadata = {
   },
   description: 'Technical and professional project support for calculations, STEM, architecture, CAD, 3D rendering, writing, finance and business work.',
   applicationName: 'Elx Studio',
+  icons: {
+    icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
+    shortcut: ['/icon.svg'],
+    apple: [{ url: '/icon.svg', type: 'image/svg+xml' }],
+  },
   keywords: ['technical project support', 'CAD drafting', '3D rendering', 'STEM support', 'professional documentation', 'financial modeling'],
   authors: [{ name: 'Elx Holdings' }],
   creator: 'Elx Holdings',
