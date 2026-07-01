@@ -117,27 +117,30 @@ export default function AuthForm({ mode, next = '/dashboard', initialError = '' 
     : copy[mode];
 
   return (
-    <div className="mx-auto grid max-w-[1180px] bg-white lg:grid-cols-[.78fr_1.22fr]">
-      <aside className="bg-[#073C3E] p-8 text-white md:p-12">
+    <div className="mx-auto grid w-full max-w-[1050px] bg-white lg:grid-cols-[.68fr_1.32fr]">
+      <aside className="flex flex-col justify-between bg-[#073C3E] p-7 text-white md:p-9">
         <p className="text-xs font-black uppercase tracking-[.18em] text-[#DDF65C]">Elx Studio / Secure access</p>
-        <p className="mt-10 text-4xl font-black leading-[.96] tracking-[-.055em]">Projects, files and conversations stay tied to one verified account.</p>
-        <p className="mt-6 text-sm leading-6 text-white/55">Private storage and row-level access controls keep client work separate. Elx staff only see projects needed for delivery.</p>
+        <div><p className="mt-8 text-3xl font-black leading-[.96] tracking-[-.055em]">One account.<br />Every project in sight.</p>
+        <p className="mt-4 text-xs leading-5 text-white/55">Your briefs, files, messages and delivery status stay together in one secure workspace.</p></div>
+        <div className="mt-7 grid grid-cols-3 border-y border-white/15 py-3 text-center text-[8px] font-black uppercase tracking-[.1em] text-white/45"><span>Private</span><span>Verified</span><span>Organized</span></div>
       </aside>
-      <form onSubmit={submit} className="p-7 md:p-12 lg:p-16">
+      <form onSubmit={submit} className="p-7 md:p-9 lg:p-10">
         <p className="text-xs font-black uppercase tracking-[.18em] text-[#F06449]">{item.eyebrow}</p>
-        <h1 className="mt-4 max-w-xl text-5xl font-black leading-[.94] tracking-[-.06em] md:text-6xl">{item.title}</h1>
-        {adminLogin && <p className="mt-7 border-l-2 border-[#DDF65C] pl-4 text-sm font-bold text-black/60">Only <span className="text-black">{adminEmail}</span> can open this control panel.</p>}
-        {!adminLogin && mode === 'register' && <Field label="Full name"><input className="elx-field" autoComplete="name" value={fullName} onChange={(event) => setFullName(event.target.value)} required /></Field>}
-        {!adminLogin && mode !== 'reset' && <Field label="Email"><input className="elx-field" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required /></Field>}
-        {!adminLogin && mode !== 'forgot' && <Field label={mode === 'reset' ? 'New password' : 'Password'}><input className="elx-field" type="password" minLength={8} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} value={password} onChange={(event) => setPassword(event.target.value)} required /></Field>}
-        {!adminLogin && (mode === 'register' || mode === 'reset') && <Field label="Confirm password"><input className="elx-field" type="password" minLength={8} autoComplete="new-password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} required /></Field>}
-        {error && <p className="mt-6 bg-red-50 p-4 text-sm font-bold text-red-700">{error}</p>}
-        {message && <p className="mt-6 bg-[#E8F3E7] p-4 text-sm font-bold text-[#164F22]">{message}</p>}
+        <h1 className="mt-3 max-w-xl text-4xl font-black leading-[.94] tracking-[-.055em] md:text-5xl">{item.title}</h1>
+        {adminLogin && <p className="mt-5 border-l-2 border-[#DDF65C] pl-4 text-xs font-bold text-black/60">Only <span className="text-black">{adminEmail}</span> can open this control panel.</p>}
+        {!adminLogin && <div className={`mt-3 grid gap-x-6 ${mode === 'register' || mode === 'login' || mode === 'reset' ? 'md:grid-cols-2' : ''}`}>
+          {mode === 'register' && <Field label="Full name"><input className="elx-field" autoComplete="name" value={fullName} onChange={(event) => setFullName(event.target.value)} required /></Field>}
+          {mode !== 'reset' && <Field label="Email"><input className="elx-field" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required /></Field>}
+          {mode !== 'forgot' && <Field label={mode === 'reset' ? 'New password' : 'Password'}><input className="elx-field" type="password" minLength={8} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} value={password} onChange={(event) => setPassword(event.target.value)} required /></Field>}
+          {(mode === 'register' || mode === 'reset') && <Field label="Confirm password"><input className="elx-field" type="password" minLength={8} autoComplete="new-password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} required /></Field>}
+        </div>}
+        {error && <p className="mt-4 bg-red-50 p-3 text-xs font-bold text-red-700">{error}</p>}
+        {message && <p className="mt-4 bg-[#E8F3E7] p-3 text-xs font-bold text-[#164F22]">{message}</p>}
         {adminLogin
-          ? <button type="button" onClick={signInWithGoogle} disabled={loading} className="mt-8 flex items-center gap-3 border border-black/20 bg-white px-6 py-4 text-sm font-black text-black disabled:opacity-40"><span aria-hidden className="text-lg font-black text-[#4285F4]">G</span>{loading ? 'Opening Google...' : 'Continue with Google'}</button>
-          : <button disabled={loading} className="mt-8 bg-[#102321] px-6 py-4 text-sm font-black text-white disabled:opacity-40">{loading ? 'Working...' : `${item.button} ->`}</button>}
-        {!adminLogin && mode === 'login' && <div className="mt-5"><button type="button" onClick={signInWithGoogle} disabled={loading} className="flex items-center gap-3 border border-black/20 bg-white px-5 py-3 text-sm font-black text-black disabled:opacity-40"><span aria-hidden className="text-lg font-black text-[#4285F4]">G</span>Continue with Google</button></div>}
-        {!adminLogin && <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-sm font-bold text-black/50">
+          ? <button type="button" onClick={signInWithGoogle} disabled={loading} className="mt-6 flex items-center gap-3 border border-black/20 bg-white px-5 py-3 text-sm font-black text-black disabled:opacity-40"><span aria-hidden className="text-lg font-black text-[#4285F4]">G</span>{loading ? 'Opening Google...' : 'Continue with Google'}</button>
+          : <button disabled={loading} className="mt-6 bg-[#102321] px-6 py-3 text-sm font-black text-white disabled:opacity-40">{loading ? 'Working...' : `${item.button} →`}</button>}
+        {!adminLogin && mode === 'login' && <button type="button" onClick={signInWithGoogle} disabled={loading} className="ml-3 mt-6 inline-flex items-center gap-3 border border-black/20 bg-white px-5 py-2.5 text-sm font-black text-black disabled:opacity-40"><span aria-hidden className="text-lg font-black text-[#4285F4]">G</span>Google</button>}
+        {!adminLogin && <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-xs font-bold text-black/50">
           {mode !== 'login' && <Link href="/login">Already have an account?</Link>}
           {mode === 'login' && <><Link href="/register">Create an account</Link><Link href="/forgot-password">Forgot password?</Link></>}
         </div>}
@@ -147,5 +150,5 @@ export default function AuthForm({ mode, next = '/dashboard', initialError = '' 
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return <label className="mt-7 block"><span className="text-sm font-black">{label}</span>{children}</label>;
+  return <label className="mt-4 block"><span className="text-xs font-black">{label}</span>{children}</label>;
 }
