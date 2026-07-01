@@ -64,9 +64,20 @@ img, video, svg { max-width: 100%; }
 .elx-scroll-pill.is-active { opacity: .82; }
 
 @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
-  html { scroll-snap-type: y proximity; }
-  .site-shell > section, .site-shell main > section { scroll-snap-align: start; scroll-margin-top: 116px; }
-  .landing-shell > section { scroll-snap-align: start; scroll-margin-top: 80px; }
+  html { scroll-snap-type: y mandatory; scroll-padding-top: 108px; }
+  .desktop-screen,
+  .site-shell > section,
+  .site-shell > footer,
+  .landing-shell > section,
+  .landing-shell > footer,
+  .snap-sections > section {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    scroll-margin-top: 108px;
+  }
+  /* Nested layout sections are columns/panels, not independent scroll destinations. */
+  .desktop-screen > section,
+  .desktop-screen section section { scroll-snap-align: none; scroll-margin: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {

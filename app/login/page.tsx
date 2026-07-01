@@ -16,5 +16,5 @@ export default async function LoginPage({ searchParams }: { searchParams?: Promi
   const locale = await resolveLocale(query?.lang);
   const next = Array.isArray(query?.next) ? query?.next[0] : query?.next;
   const errorKey = Array.isArray(query?.error) ? query?.error[0] : query?.error;
-  return <SiteShell locale={locale}><main className="flex items-center px-5 py-8 md:px-10 lg:h-[calc(100svh-108px)] lg:min-h-[560px] lg:py-6"><AuthForm mode="login" next={next?.startsWith('/') ? next : '/dashboard'} initialError={errorKey ? errors[errorKey] || 'Sign-in could not be completed.' : ''} /></main></SiteShell>;
+  return <SiteShell locale={locale}><main className="desktop-screen flex items-center px-5 py-8 md:px-10 lg:h-[calc(100svh-108px)] lg:min-h-[560px] lg:py-6"><AuthForm mode="login" next={next?.startsWith('/') ? next : '/dashboard'} initialError={errorKey ? errors[errorKey] || 'Sign-in could not be completed.' : ''} /></main></SiteShell>;
 }
