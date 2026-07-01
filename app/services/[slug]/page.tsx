@@ -1,84 +1,17 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { SiteShell } from '../../components/site-shell';
 import { getServiceCategory, serviceCategories } from '../../data/services';
 import { resolveLocale } from '../../locale';
 
-export function generateStaticParams() {
-  return serviceCategories.map((service) => ({ slug: service.slug }));
-}
-
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const route = await params;
-  const service = getServiceCategory(route.slug);
-  return service ? { title: service.title, description: service.summary } : {};
-}
+export function generateStaticParams() { return serviceCategories.map((service) => ({ slug: service.slug })); }
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> { const route = await params; const service = getServiceCategory(route.slug); return service ? { title: service.title, description: service.summary } : {}; }
 
 export default async function ServiceDetailPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams?: Promise<{ lang?: string | string[] }> }) {
-  const route = await params;
-  const query = await searchParams;
-  const service = getServiceCategory(route.slug);
-  if (!service) notFound();
-  const locale = await resolveLocale(query?.lang);
-
-  return (
-    <SiteShell locale={locale}>
-      <section className="bg-[#073C3E] text-white">
-        <div className="mx-auto grid max-w-[1440px] lg:grid-cols-2">
-          <div className="flex min-h-[560px] flex-col justify-between px-5 py-16 md:px-10 md:py-24">
-            <p className="text-sm font-black uppercase tracking-[.18em] text-[#DDF65C]">{service.eyebrow} / Elx Studio</p>
-            <div>
-              <h1 className="text-6xl font-black leading-[.86] tracking-[-0.075em] md:text-8xl">{service.title}</h1>
-              <p className="mt-8 max-w-xl text-xl leading-8 text-white/65">{service.summary}</p>
-              <Link href={`/start?service=${service.slug}&lang=${locale}`} className="mt-9 inline-flex bg-[#DDF65C] px-6 py-4 text-sm font-black text-[#102321]">Request a quote →</Link>
-            </div>
-          </div>
-          <div className="relative min-h-[420px] lg:min-h-full">
-            <Image src={service.image} alt={`${service.title} technical work`} fill priority sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
-          </div>
-        </div>
-      </section>
-
-      <section className="px-5 py-20 md:px-10 md:py-28">
-        <div className="mx-auto grid max-w-[1440px] gap-14 lg:grid-cols-[.75fr_1.25fr]">
-          <div>
-            <p className="text-xs font-black uppercase tracking-[.16em] text-[#F06449]">Who this is for</p>
-            <p className="mt-5 text-2xl font-bold leading-9">{service.whoFor}</p>
-            <div className="mt-10 bg-white p-7">
-              <p className="text-xs font-black uppercase tracking-[.16em] text-black/40">Typical turnaround</p>
-              <p className="mt-3 font-bold">{service.turnaround}</p>
-              <p className="mt-6 text-xs font-black uppercase tracking-[.16em] text-black/40">Pricing</p>
-              <p className="mt-3 font-bold">Manual quote after brief review.</p>
-            </div>
-          </div>
-          <div className="grid gap-10 md:grid-cols-2">
-            <InfoList title="Services" items={service.subservices} />
-            <InfoList title="Expected deliverables" items={service.deliverables} />
-            <InfoList title="Supported formats" items={service.formats} />
-            <InfoList title="What to submit" items={['Clear project goal', 'Deadline and required format', 'Source files or references', 'Dimensions, data or instructions where applicable']} />
-          </div>
-        </div>
-      </section>
-
-      <section style={{ backgroundColor: service.accent }} className="px-5 py-20 md:px-10">
-        <div className="mx-auto flex max-w-[1440px] flex-col gap-8 md:flex-row md:items-end md:justify-between">
-          <h2 className="max-w-4xl text-5xl font-black leading-[.92] tracking-[-0.06em] md:text-7xl">Have a brief that does not fit neatly into one category?</h2>
-          <Link href={`/start?lang=${locale}`} className="shrink-0 bg-[#102321] px-6 py-4 text-sm font-black text-white">Share the full brief →</Link>
-        </div>
-      </section>
-    </SiteShell>
-  );
+  const route = await params; const query = await searchParams; const service = getServiceCategory(route.slug); if (!service) notFound(); const locale = await resolveLocale(query?.lang);
+  return <SiteShell locale={locale}><main className="bg-[#F8F7F2] lg:h-[calc(100svh-108px)] lg:min-h-[620px]"><div className="lg:grid lg:h-full lg:grid-cols-[.72fr_1.28fr]"><section className="flex bg-[#073C3E] px-6 py-12 text-white md:px-10 lg:h-full lg:min-h-0 lg:px-[clamp(2.5rem,5vw,6rem)] lg:py-[clamp(2.5rem,6vh,5rem)]"><div className="flex w-full flex-col justify-between"><div><Link href={`/services?lang=${locale}`} className="text-[10px] font-black uppercase tracking-[.14em] text-white/45">← All services</Link><p className="mt-8 text-xs font-black uppercase tracking-[.18em] text-[#DDF65C]">{service.eyebrow} / Elx Studio</p><h1 className="mt-4 text-5xl font-black leading-[.86] tracking-[-.07em] xl:text-7xl">{service.title}</h1><p className="mt-6 max-w-xl text-base leading-7 text-white/65">{service.summary}</p></div><div className="mt-10"><p className="text-[9px] font-black uppercase tracking-[.15em] text-[#DDF65C]">Who this is for</p><p className="mt-3 max-w-lg text-lg font-bold leading-7">{service.whoFor}</p><div className="mt-6 grid grid-cols-2 border-y border-white/15 py-4 text-xs"><div><span className="block text-[8px] font-black uppercase tracking-[.12em] text-white/35">Turnaround</span><strong className="mt-1 block">{service.turnaround}</strong></div><div className="border-l border-white/15 pl-4"><span className="block text-[8px] font-black uppercase tracking-[.12em] text-white/35">Pricing</span><strong className="mt-1 block">Manual quote after review</strong></div></div><Link href={`/start?service=${service.slug}&lang=${locale}`} className="mt-6 inline-flex bg-[#DDF65C] px-6 py-4 text-sm font-black text-[#102321]">Request a quote →</Link></div></div></section>
+      <section className="flex flex-col px-5 py-10 md:px-10 lg:min-h-0 lg:px-[clamp(2.5rem,5vw,6rem)] lg:py-[clamp(2rem,5vh,4rem)]"><div className="mb-6 flex items-end justify-between"><div><p className="text-xs font-black uppercase tracking-[.16em] text-[#F06449]">At one glance</p><h2 className="mt-2 text-4xl font-black tracking-[-.05em]">Scope and handoff.</h2></div><span className="hidden text-[9px] font-black uppercase tracking-[.13em] text-black/35 xl:block">No hidden steps</span></div><div className="grid flex-1 gap-x-10 gap-y-6 md:grid-cols-2 lg:min-h-0"><InfoList title="Services" items={service.subservices} /><InfoList title="Expected deliverables" items={service.deliverables} /><InfoList title="Supported formats" items={service.formats} /><InfoList title="What to submit" items={['Clear project goal', 'Deadline and required format', 'Source files or references', 'Dimensions, data or instructions where applicable']} /></div><div className="mt-6 flex items-center justify-between border-t border-black/15 pt-5"><p className="max-w-lg text-xs leading-5 text-black/45">If the brief crosses departments, submit it once. We will route the work internally.</p><Link href={`/start?lang=${locale}`} className="shrink-0 text-xs font-black underline decoration-4 decoration-[#DDF65C] underline-offset-4">Share the full brief →</Link></div></section></div></main></SiteShell>;
 }
 
-function InfoList({ title, items }: { title: string; items: string[] }) {
-  return (
-    <section className="border-t border-black/15 pt-5">
-      <h2 className="text-2xl font-black tracking-[-0.035em]">{title}</h2>
-      <ul className="mt-5 grid gap-3 text-black/65">
-        {items.map((item) => <li key={item} className="flex gap-3"><span className="font-black text-[#F06449]">+</span><span>{item}</span></li>)}
-      </ul>
-    </section>
-  );
-}
+function InfoList({ title, items }: { title: string; items: string[] }) { return <section className="border-t border-black/15 pt-4"><h3 className="text-xl font-black tracking-[-0.035em]">{title}</h3><ul className="mt-3 grid gap-2 text-xs leading-5 text-black/60">{items.map((item) => <li key={item} className="flex gap-2"><span className="font-black text-[#F06449]">+</span><span>{item}</span></li>)}</ul></section>; }
