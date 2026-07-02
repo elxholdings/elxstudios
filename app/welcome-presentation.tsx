@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 const INTRO_KEY = 'elx-guided-intro-v3';
@@ -21,16 +20,18 @@ export default function WelcomePresentation({ locale = 'en' }: { locale?: string
   const [checked, setChecked] = useState(false);
   const [started, setStarted] = useState(false);
   const [playing, setPlaying] = useState(false);
-  const [finished, setFinished] = useState(false);
   const [time, setTime] = useState(0);
+  const destination = `/start?lang=${encodeURIComponent(locale)}`;
+  const workspaceDestination = `/dashboard?lang=${encodeURIComponent(locale)}`;
 
   useEffect(() => {
-    setVisible(window.localStorage.getItem(INTRO_KEY) !== 'seen');
+    if (window.localStorage.getItem(INTRO_KEY) === 'seen') {
+      window.location.replace(workspaceDestination);
+      return;
+    }
+    setVisible(true);
     setChecked(true);
-    const replay = () => { setVisible(true); setStarted(false); setFinished(false); setTime(0); if (audioRef.current) audioRef.current.currentTime = 0; };
-    window.addEventListener('elx-replay-intro', replay);
-    return () => window.removeEventListener('elx-replay-intro', replay);
-  }, []);
+  }, [workspaceDestination]);
 
   useEffect(() => {
     if (!playing) return;
@@ -43,16 +44,15 @@ export default function WelcomePresentation({ locale = 'en' }: { locale?: string
   const scene = scenes[active === -1 ? scenes.length - 1 : active];
   const sceneProgress = Math.max(0, Math.min(1, (time - scene.start) / (scene.end - scene.start)));
 
-  function rememberAndClose() {
+  function continueToIntake() {
     window.localStorage.setItem(INTRO_KEY, 'seen');
     audioRef.current?.pause();
     setPlaying(false);
-    setVisible(false);
+    window.location.assign(destination);
   }
 
   async function begin() {
     setStarted(true);
-    setFinished(false);
     if (!audioRef.current) return;
     await audioRef.current.play();
     setPlaying(true);
@@ -70,7 +70,6 @@ export default function WelcomePresentation({ locale = 'en' }: { locale?: string
     audioRef.current.currentTime = scenes[index].start;
     setTime(scenes[index].start);
     setStarted(true);
-    setFinished(false);
     await audioRef.current.play();
     setPlaying(true);
   }
@@ -79,16 +78,16 @@ export default function WelcomePresentation({ locale = 'en' }: { locale?: string
   if (!visible) return null;
   return (
     <div className="fixed inset-0 z-[2000] overflow-hidden bg-[#061b1a] text-white" role="dialog" aria-label="Welcome to Elx Studio">
-      <audio ref={audioRef} src="/audio/elx-welcome.mp3" preload="auto" onEnded={() => { setPlaying(false); setFinished(true); setTime(duration); }} />
+      <audio ref={audioRef} src="/audio/elx-welcome.mp3" preload="auto" onEnded={() => { setPlaying(false); setTime(duration); continueToIntake(); }} />
       <div className="absolute inset-0 process-grid opacity-25" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_35%,rgba(221,246,92,.12),transparent_28%),linear-gradient(120deg,#061b1a_0%,#082a28_55%,#061b1a_100%)]" />
 
-      {!started ? <IntroGate onBegin={begin} onSkip={rememberAndClose} locale={locale} /> : (
+      {!started ? <IntroGate onBegin={begin} onSkip={continueToIntake} /> : (
         <div className="relative z-10 mx-auto flex h-full max-w-[1600px] flex-col px-5 py-5 md:px-10 md:py-7">
           <div className="flex items-center justify-between gap-5">
             <p className="text-xl font-black tracking-[-.06em]">Elx<span className="text-[#F06449]">.</span>Studio</p>
             <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[.16em] text-white/50"><span>Guided orientation</span><span className="hidden h-px w-10 bg-white/20 sm:block" /><span>{formatTime(time)} / 01:21</span></div>
-            <button type="button" onClick={rememberAndClose} className="border-b border-white/30 pb-1 text-xs font-black">Skip</button>
+            <button type="button" onClick={continueToIntake} className="border-b border-white/30 pb-1 text-xs font-black">Skip to project intake</button>
           </div>
 
           <div className="grid min-h-0 flex-1 grid-rows-[auto_1fr] items-center gap-3 py-3 lg:grid-cols-[.75fr_1.25fr] lg:grid-rows-none lg:gap-6 lg:py-5">
@@ -113,13 +112,12 @@ export default function WelcomePresentation({ locale = 'en' }: { locale?: string
         </div>
       )}
 
-      {finished && <div className="absolute inset-0 z-30 grid place-items-center bg-[#061b1a]/95 px-5 text-center"><div><p className="text-xs font-black uppercase tracking-[.2em] text-[#DDF65C]">Orientation complete</p><h2 className="mt-4 text-5xl font-black tracking-[-.065em] md:text-7xl">Ready when you are.</h2><p className="mx-auto mt-5 max-w-xl text-white/60">Explore the studio or go directly to a flexible project brief.</p><div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row"><button type="button" onClick={rememberAndClose} className="bg-[#DDF65C] px-7 py-4 text-sm font-black text-[#102321]">Enter Elx Studio</button><Link href={`/start?lang=${locale}`} onClick={() => window.localStorage.setItem(INTRO_KEY, 'seen')} className="border border-white/30 px-7 py-4 text-sm font-black">Start a project</Link></div></div></div>}
     </div>
   );
 }
 
-function IntroGate({ onBegin, onSkip, locale }: { onBegin: () => void; onSkip: () => void; locale: string }) {
-  return <div className="relative z-10 mx-auto grid h-full max-w-[1500px] items-center gap-8 px-5 md:px-10 lg:grid-cols-[1fr_.85fr]"><div><p className="text-xs font-black uppercase tracking-[.2em] text-[#DDF65C]">Welcome to Elx Studio</p><h1 className="mt-5 max-w-4xl text-[clamp(3rem,8vw,9rem)] font-black leading-[.78] tracking-[-.085em]">Let us show you<br /><span className="text-[#DDF65C]">how it works.</span></h1><p className="mt-6 max-w-xl text-sm leading-6 text-white/60 md:mt-7 md:text-xl md:leading-8">An 81-second guided introduction with synchronized voice, diagrams and project-flow illustrations.</p><div className="mt-7 flex flex-col gap-3 sm:flex-row"><button type="button" onClick={onBegin} className="bg-[#DDF65C] px-7 py-4 text-sm font-black text-[#102321]">Begin with sound ▶</button><button type="button" onClick={onSkip} className="border border-white/30 px-7 py-4 text-sm font-black">Skip introduction</button></div><Link href={`/start?lang=${locale}`} onClick={() => window.localStorage.setItem(INTRO_KEY, 'seen')} className="mt-5 inline-block text-xs font-black text-white/45 underline underline-offset-4">I already know what I need →</Link></div><div className="hidden lg:block"><GateGraphic /></div></div>;
+function IntroGate({ onBegin, onSkip }: { onBegin: () => void; onSkip: () => void }) {
+  return <div className="relative z-10 mx-auto grid h-full max-w-[1500px] items-center gap-8 px-5 md:px-10 lg:grid-cols-[1fr_.85fr]"><div><p className="text-xs font-black uppercase tracking-[.2em] text-[#DDF65C]">Welcome to Elx Studio</p><h1 className="mt-5 max-w-4xl text-[clamp(3rem,8vw,9rem)] font-black leading-[.78] tracking-[-.085em]">Let us show you<br /><span className="text-[#DDF65C]">how it works.</span></h1><p className="mt-6 max-w-xl text-sm leading-6 text-white/60 md:mt-7 md:text-xl md:leading-8">An 81-second guided introduction with synchronized voice, diagrams and project-flow illustrations.</p><div className="mt-7 flex flex-col gap-3 sm:flex-row"><button type="button" onClick={onBegin} className="bg-[#DDF65C] px-7 py-4 text-sm font-black text-[#102321]">Begin with sound ▶</button><button type="button" onClick={onSkip} className="border border-white/30 px-7 py-4 text-sm font-black">Skip to project intake</button></div><button type="button" onClick={onSkip} className="mt-5 inline-block text-xs font-black text-white/45 underline underline-offset-4">I already know what I need →</button></div><div className="hidden lg:block"><GateGraphic /></div></div>;
 }
 
 function SynchronizedVisual({ scene, progress }: { scene: number; progress: number }) {
