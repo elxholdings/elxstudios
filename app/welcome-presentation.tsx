@@ -1,59 +1,145 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import Link from 'next/link';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
+const INTRO_KEY = 'elx-guided-intro-v3';
+const duration = 80.88;
 const scenes = [
-  { label: 'Welcome', title: 'Serious work.\nCalm support.', body: 'Science, technology, engineering, finance, business and professional project support.', image: '/images/technical-render.jpg' },
-  { label: 'Choose', title: 'Start with the\nclosest service.', body: 'Pick a department, then choose the specific work you need. We can refine the scope with you.', image: '/images/blueprint-tools.jpg' },
-  { label: 'Brief', title: 'Tell us what\nyou know.', body: 'Add only the details that matter. Leave irrelevant fields blank and continue.', image: '/images/math-formulas.jpg' },
-  { label: 'Build', title: 'One quote.\nVisible progress.', body: 'We confirm scope and price, assign the right specialist, and keep the work accountable.', image: '/images/analytics-dashboard.jpg' },
-  { label: 'Deliver', title: 'Review. Refine.\nReceive.', body: 'Get the agreed files, support and revisions without losing the thread of the project.', image: '/images/document-workspace.jpg' },
-];
+  { start: 0, end: 13, label: 'Welcome', title: 'Complex work belongs here.', copy: 'Elx Studio supports science, technology, engineering, finance, business, professionals and students.' },
+  { start: 13, end: 29, label: 'Capabilities', title: 'One platform. Seven departments.', copy: 'Calculations, drawings, models, reports and presentations move through one accountable system.' },
+  { start: 29, end: 45, label: 'Your brief', title: 'Tell us what matters.', copy: 'Choose a service and add the useful clues. Anything irrelevant can stay blank.' },
+  { start: 45, end: 56, label: 'Scope & quote', title: 'Know the plan before you pay.', copy: 'We clarify deliverables, timing and assumptions, then send a manual quote.' },
+  { start: 56, end: 70, label: 'Production', title: 'The work stays visible.', copy: 'A reference connects the specialist, messages, files, progress and revisions.' },
+  { start: 70, end: duration, label: 'Delivery', title: 'Clear work. Ready to use.', copy: 'Review the result, receive the agreed files, and keep the support included in your scope.' },
+] as const;
 
 export default function WelcomePresentation({ locale = 'en' }: { locale?: string }) {
   const audioRef = useRef<HTMLAudioElement>(null);
-  const [active, setActive] = useState(0);
+  const frameRef = useRef<number>();
+  const [visible, setVisible] = useState(false);
+  const [checked, setChecked] = useState(false);
+  const [started, setStarted] = useState(false);
   const [playing, setPlaying] = useState(false);
+  const [finished, setFinished] = useState(false);
+  const [time, setTime] = useState(0);
 
-  async function toggleNarration() {
+  useEffect(() => {
+    setVisible(window.localStorage.getItem(INTRO_KEY) !== 'seen');
+    setChecked(true);
+    const replay = () => { setVisible(true); setStarted(false); setFinished(false); setTime(0); if (audioRef.current) audioRef.current.currentTime = 0; };
+    window.addEventListener('elx-replay-intro', replay);
+    return () => window.removeEventListener('elx-replay-intro', replay);
+  }, []);
+
+  useEffect(() => {
+    if (!playing) return;
+    const tick = () => { if (audioRef.current) setTime(audioRef.current.currentTime); frameRef.current = window.requestAnimationFrame(tick); };
+    frameRef.current = window.requestAnimationFrame(tick);
+    return () => { if (frameRef.current) window.cancelAnimationFrame(frameRef.current); };
+  }, [playing]);
+
+  const active = useMemo(() => Math.max(0, scenes.findIndex((scene) => time >= scene.start && time < scene.end)), [time]);
+  const scene = scenes[active === -1 ? scenes.length - 1 : active];
+  const sceneProgress = Math.max(0, Math.min(1, (time - scene.start) / (scene.end - scene.start)));
+
+  function rememberAndClose() {
+    window.localStorage.setItem(INTRO_KEY, 'seen');
+    audioRef.current?.pause();
+    setPlaying(false);
+    setVisible(false);
+  }
+
+  async function begin() {
+    setStarted(true);
+    setFinished(false);
+    if (!audioRef.current) return;
+    await audioRef.current.play();
+    setPlaying(true);
+  }
+
+  async function toggle() {
     const audio = audioRef.current;
     if (!audio) return;
-    if (audio.paused) { await audio.play(); setPlaying(true); }
+    if (audio.paused) { await audio.play(); setStarted(true); setPlaying(true); }
     else { audio.pause(); setPlaying(false); }
   }
 
-  function syncScene() {
-    const audio = audioRef.current;
-    if (!audio || !Number.isFinite(audio.duration) || audio.duration === 0) return;
-    setActive(Math.min(scenes.length - 1, Math.floor((audio.currentTime / audio.duration) * scenes.length)));
+  async function goTo(index: number) {
+    if (!audioRef.current) return;
+    audioRef.current.currentTime = scenes[index].start;
+    setTime(scenes[index].start);
+    setStarted(true);
+    setFinished(false);
+    await audioRef.current.play();
+    setPlaying(true);
   }
 
-  const scene = scenes[active];
+  if (!checked) return <div className="fixed inset-0 z-[2000] bg-[#061b1a]" aria-hidden="true" />;
+  if (!visible) return null;
   return (
-    <section id="welcome" className="welcome-presentation relative flex min-h-[calc(100svh-80px)] overflow-hidden bg-[#071d1c] text-white">
-      <audio ref={audioRef} src="/audio/elx-welcome.mp3" preload="metadata" onTimeUpdate={syncScene} onEnded={() => setPlaying(false)} />
-      <div className="absolute inset-0">
-        {scenes.map((item, index) => <div key={item.label} className={`absolute inset-0 bg-cover bg-center transition duration-1000 ${index === active ? 'scale-100 opacity-55' : 'scale-[1.035] opacity-0'}`} style={{ backgroundImage: `url(${item.image})` }} />)}
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(4,26,25,.98)_0%,rgba(4,26,25,.88)_45%,rgba(4,26,25,.3)_100%)]" />
-        <div className="noise" />
-      </div>
-      <div className="relative z-10 mx-auto grid w-full max-w-[1440px] items-end gap-8 px-5 py-10 md:px-10 lg:grid-cols-[1fr_.7fr] lg:py-12">
-        <div>
-          <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[.18em] text-[#DDF65C]"><span>Elx Studio orientation</span><span className="h-px w-12 bg-[#DDF65C]" /><span>0{active + 1} / 05</span></div>
-          <p className="mt-8 text-xs font-black uppercase tracking-[.18em] text-white/55">{scene.label}</p>
-          <h1 className="mt-3 whitespace-pre-line text-[clamp(3.8rem,8vw,8.5rem)] font-black leading-[.79] tracking-[-.08em]">{scene.title}</h1>
-          <p className="mt-6 max-w-xl text-base leading-7 text-white/70 md:text-xl md:leading-8">{scene.body}</p>
-        </div>
-        <div className="lg:justify-self-end lg:w-full lg:max-w-md">
-          <div className="grid grid-cols-5 gap-1">{scenes.map((item, index) => <button key={item.label} type="button" aria-label={`Show ${item.label}`} onClick={() => setActive(index)} className={`h-1 transition ${index === active ? 'bg-[#DDF65C]' : 'bg-white/25'}`} />)}</div>
-          <button type="button" onClick={toggleNarration} className="mt-6 flex w-full items-center justify-between border-y border-white/20 py-4 text-left text-sm font-black"><span>{playing ? 'Pause Ryan' : 'Listen to Ryan'}</span><span className="grid h-8 w-8 place-items-center bg-[#DDF65C] text-[#102321]">{playing ? 'Ⅱ' : '▶'}</span></button>
-          <div className="mt-6 grid gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-            <a href="#top" className="bg-[#DDF65C] px-5 py-4 text-center text-sm font-black text-[#102321]">Read part 2 →</a>
-            <a href={`/start?lang=${locale}`} className="border border-white/40 px-5 py-4 text-center text-sm font-black text-white">Skip to project brief</a>
+    <div className="fixed inset-0 z-[2000] overflow-hidden bg-[#061b1a] text-white" role="dialog" aria-label="Welcome to Elx Studio">
+      <audio ref={audioRef} src="/audio/elx-welcome.mp3" preload="auto" onEnded={() => { setPlaying(false); setFinished(true); setTime(duration); }} />
+      <div className="absolute inset-0 process-grid opacity-25" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_35%,rgba(221,246,92,.12),transparent_28%),linear-gradient(120deg,#061b1a_0%,#082a28_55%,#061b1a_100%)]" />
+
+      {!started ? <IntroGate onBegin={begin} onSkip={rememberAndClose} locale={locale} /> : (
+        <div className="relative z-10 mx-auto flex h-full max-w-[1600px] flex-col px-5 py-5 md:px-10 md:py-7">
+          <div className="flex items-center justify-between gap-5">
+            <p className="text-xl font-black tracking-[-.06em]">Elx<span className="text-[#F06449]">.</span>Studio</p>
+            <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[.16em] text-white/50"><span>Guided orientation</span><span className="hidden h-px w-10 bg-white/20 sm:block" /><span>{formatTime(time)} / 01:21</span></div>
+            <button type="button" onClick={rememberAndClose} className="border-b border-white/30 pb-1 text-xs font-black">Skip</button>
           </div>
-          <p className="mt-4 text-[10px] leading-4 text-white/40">The presentation moves with the narration. You can also select any chapter above. <a href="/audio/elx-welcome-transcript.txt" target="_blank" className="underline underline-offset-2">Read transcript</a>.</p>
+
+          <div className="grid min-h-0 flex-1 grid-rows-[auto_1fr] items-center gap-3 py-3 lg:grid-cols-[.75fr_1.25fr] lg:grid-rows-none lg:gap-6 lg:py-5">
+            <div className="relative z-10">
+              <p className="text-[10px] font-black uppercase tracking-[.2em] text-[#DDF65C]">0{active + 1} / {scene.label}</p>
+              <h1 key={scene.title} className="intro-copy-in mt-3 max-w-2xl text-[clamp(2.35rem,5.8vw,6.8rem)] font-black leading-[.82] tracking-[-.075em]">{scene.title}</h1>
+              <p key={scene.copy} className="intro-copy-in mt-3 max-w-xl text-xs leading-5 text-white/60 md:mt-5 md:text-lg md:leading-8">{scene.copy}</p>
+              <div className="mt-4 flex items-center gap-3 md:mt-7">
+                <button type="button" onClick={toggle} className="grid h-11 w-11 place-items-center bg-[#DDF65C] font-black text-[#102321]">{playing ? 'Ⅱ' : '▶'}</button>
+                <div><p className="text-xs font-black">Ryan / Elx Studio guide</p><p className="mt-1 text-[10px] text-white/40">Voice and illustration are synchronized</p></div>
+              </div>
+            </div>
+
+            <div className="relative min-h-[230px] self-stretch md:min-h-[320px] lg:min-h-0">
+              <SynchronizedVisual scene={active} progress={sceneProgress} />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-6 gap-1">
+            {scenes.map((item, index) => <button type="button" key={item.label} onClick={() => goTo(index)} className="group text-left"><span className="mb-2 hidden text-[8px] font-black uppercase tracking-[.12em] text-white/35 md:block">{item.label}</span><span className="block h-1 overflow-hidden bg-white/15"><span className="block h-full bg-[#DDF65C] transition-[width] duration-100" style={{ width: index < active ? '100%' : index === active ? `${sceneProgress * 100}%` : '0%' }} /></span></button>)}
+          </div>
         </div>
-      </div>
-    </section>
+      )}
+
+      {finished && <div className="absolute inset-0 z-30 grid place-items-center bg-[#061b1a]/95 px-5 text-center"><div><p className="text-xs font-black uppercase tracking-[.2em] text-[#DDF65C]">Orientation complete</p><h2 className="mt-4 text-5xl font-black tracking-[-.065em] md:text-7xl">Ready when you are.</h2><p className="mx-auto mt-5 max-w-xl text-white/60">Explore the studio or go directly to a flexible project brief.</p><div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row"><button type="button" onClick={rememberAndClose} className="bg-[#DDF65C] px-7 py-4 text-sm font-black text-[#102321]">Enter Elx Studio</button><Link href={`/start?lang=${locale}`} onClick={() => window.localStorage.setItem(INTRO_KEY, 'seen')} className="border border-white/30 px-7 py-4 text-sm font-black">Start a project</Link></div></div></div>}
+    </div>
   );
 }
+
+function IntroGate({ onBegin, onSkip, locale }: { onBegin: () => void; onSkip: () => void; locale: string }) {
+  return <div className="relative z-10 mx-auto grid h-full max-w-[1500px] items-center gap-8 px-5 md:px-10 lg:grid-cols-[1fr_.85fr]"><div><p className="text-xs font-black uppercase tracking-[.2em] text-[#DDF65C]">Welcome to Elx Studio</p><h1 className="mt-5 max-w-4xl text-[clamp(3rem,8vw,9rem)] font-black leading-[.78] tracking-[-.085em]">Let us show you<br /><span className="text-[#DDF65C]">how it works.</span></h1><p className="mt-6 max-w-xl text-sm leading-6 text-white/60 md:mt-7 md:text-xl md:leading-8">An 81-second guided introduction with synchronized voice, diagrams and project-flow illustrations.</p><div className="mt-7 flex flex-col gap-3 sm:flex-row"><button type="button" onClick={onBegin} className="bg-[#DDF65C] px-7 py-4 text-sm font-black text-[#102321]">Begin with sound ▶</button><button type="button" onClick={onSkip} className="border border-white/30 px-7 py-4 text-sm font-black">Skip introduction</button></div><Link href={`/start?lang=${locale}`} onClick={() => window.localStorage.setItem(INTRO_KEY, 'seen')} className="mt-5 inline-block text-xs font-black text-white/45 underline underline-offset-4">I already know what I need →</Link></div><div className="hidden lg:block"><GateGraphic /></div></div>;
+}
+
+function SynchronizedVisual({ scene, progress }: { scene: number; progress: number }) {
+  return <div className="absolute inset-0 grid place-items-center">{scene === 0 && <NetworkVisual p={progress} />}{scene === 1 && <CapabilitiesVisual p={progress} />}{scene === 2 && <BriefVisual p={progress} />}{scene === 3 && <QuoteVisual p={progress} />}{scene === 4 && <WorkspaceVisual p={progress} />}{scene === 5 && <DeliveryVisual p={progress} />}</div>;
+}
+
+function VisualFrame({ children, label }: { children: React.ReactNode; label: string }) { return <div className="relative aspect-[16/10] w-full max-w-[820px] overflow-hidden border border-white/15 bg-[#082725]/90 p-5 shadow-2xl md:p-8"><div className="mb-4 flex items-center justify-between text-[8px] font-black uppercase tracking-[.18em] text-white/35"><span>Elx system / live illustration</span><span>{label}</span></div>{children}</div>; }
+
+function NetworkVisual({ p }: { p: number }) { const nodes = [['STEM',12,22],['CAD',76,18],['FINANCE',82,70],['BUSINESS',18,76],['3D',50,8],['WRITING',48,88]]; return <VisualFrame label="Connected support"><svg viewBox="0 0 100 72" className="h-[calc(100%-20px)] w-full"><g stroke="rgba(255,255,255,.18)" strokeWidth=".35">{nodes.map(([name,x,y]) => <line key={String(name)} x1="50" y1="38" x2={Number(x)} y2={Number(y)} strokeDasharray="50" strokeDashoffset={50 - p * 50} />)}</g><circle cx="50" cy="38" r={7 + p * 3} fill="#DDF65C" /><text x="50" y="39" textAnchor="middle" dominantBaseline="middle" fill="#102321" fontSize="4" fontWeight="900">ELX</text>{nodes.map(([name,x,y],i) => <g key={String(name)} style={{ opacity: Math.max(0, Math.min(1, p * 2.2 - i * .12)), transform: `translateY(${(1-p)*3}px)`, transformOrigin: `${x}px ${y}px` }}><circle cx={Number(x)} cy={Number(y)} r="5" fill="#0e3d3a" stroke="#DDF65C" strokeWidth=".5"/><text x={Number(x)} y={Number(y)} textAnchor="middle" dominantBaseline="middle" fill="white" fontSize="2.3" fontWeight="800">{name}</text></g>)}</svg></VisualFrame>; }
+
+function CapabilitiesVisual({ p }: { p: number }) { const items=['Documentation','STEM','Architecture','CAD','3D rendering','Finance','Business']; return <VisualFrame label="Seven departments"><div className="grid h-[calc(100%-20px)] grid-cols-[1fr_1.2fr] gap-6"><div className="flex flex-col justify-center gap-2">{items.map((item,i)=><div key={item} className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[.08em]" style={{ opacity: Math.max(.18, Math.min(1,p*2-i*.12)) }}><span className="w-5 text-[#DDF65C]">0{i+1}</span><span>{item}</span></div>)}</div><div className="flex items-end gap-2 border-b border-l border-white/20 p-3">{[62,88,54,96,76,68,83].map((height,i)=><div key={i} className="relative flex-1 bg-[#DDF65C]" style={{ height:`${height*Math.max(0,Math.min(1,p*1.8-i*.08))}%` }}><span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[7px] font-black text-white">{height}</span></div>)}</div></div></VisualFrame>; }
+
+function BriefVisual({ p }: { p: number }) { const fields=['Department','Specific service','Goal or problem','Deadline','Required format']; return <VisualFrame label="Flexible brief"><div className="grid h-[calc(100%-20px)] grid-cols-[1.2fr_.8fr] gap-5"><div className="bg-white p-5 text-[#102321]"><p className="text-[9px] font-black uppercase tracking-[.14em] text-[#F06449]">Project brief</p><div className="mt-4 grid gap-3">{fields.map((field,i)=><div key={field} className="border-b border-black/20 pb-2" style={{ opacity: Math.max(.2,Math.min(1,p*2-i*.16)) }}><span className="text-[8px] font-black uppercase text-black/40">{field}</span><span className="ml-3 text-[10px] font-bold">{i<2?'Selected':'Optional'}</span></div>)}</div></div><div className="flex flex-col justify-between bg-[#DDF65C] p-5 text-[#102321]"><div><p className="text-[9px] font-black uppercase">Only useful details</p><p className="mt-3 text-2xl font-black leading-none">Skip what does not apply.</p></div><div className="h-2 bg-black/15"><div className="h-full bg-[#102321]" style={{width:`${20+p*80}%`}} /></div></div></div></VisualFrame>; }
+
+function QuoteVisual({ p }: { p: number }) { return <VisualFrame label="Manual scope"><div className="grid h-[calc(100%-20px)] grid-cols-[1fr_.85fr] gap-5"><div className="relative flex items-center justify-between">{['BRIEF','REVIEW','QUOTE'].map((item,i)=><div key={item} className={`relative z-10 grid h-16 w-16 place-items-center border text-[8px] font-black ${p>(i*.28)?'border-[#DDF65C] bg-[#DDF65C] text-[#102321]':'border-white/20 bg-[#082725]'}`}>{item}</div>)}<div className="absolute left-8 right-8 top-1/2 h-px bg-white/20"><div className="h-full bg-[#DDF65C]" style={{width:`${p*100}%`}} /></div></div><div className="flex flex-col justify-between bg-white p-5 text-[#102321]"><div><p className="text-[8px] font-black uppercase text-[#F06449]">Scope summary</p><p className="mt-2 text-xl font-black">Clear before commitment.</p></div>{['Deliverables','Timing','Price'].map((item,i)=><div key={item} className="flex justify-between border-t border-black/10 py-2 text-[9px] font-bold"><span>{item}</span><span style={{opacity:Math.max(0,Math.min(1,p*2-i*.2))}}>CONFIRMED ✓</span></div>)}</div></div></VisualFrame>; }
+
+function WorkspaceVisual({ p }: { p: number }) { const cols=[['MESSAGES',3],['TASKS',5],['FILES',4]]; return <VisualFrame label="Visible production"><div className="grid h-[calc(100%-20px)] grid-cols-3 gap-3">{cols.map(([label,count],i)=><div key={label} className="bg-white/5 p-3"><p className="text-[8px] font-black tracking-[.12em] text-[#DDF65C]">{label}</p><div className="mt-4 grid gap-2">{Array.from({length:Number(count)}).map((_,j)=><div key={j} className="h-7 border border-white/10 bg-white/10" style={{opacity:Math.max(.12,Math.min(1,p*2-j*.15-i*.1)),transform:`translateY(${Math.max(0,1-p)*8}px)`}} />)}</div></div>)}</div><div className="absolute bottom-8 left-8 right-8 h-1 bg-white/15"><div className="h-full bg-[#DDF65C]" style={{width:`${p*100}%`}} /></div></VisualFrame>; }
+
+function DeliveryVisual({ p }: { p: number }) { return <VisualFrame label="Delivery package"><div className="relative grid h-[calc(100%-20px)] place-items-center"><div className="relative h-48 w-64">{['SOURCE','REVIEW','FINAL'].map((label,i)=><div key={label} className="absolute left-1/2 top-1/2 grid h-36 w-52 place-items-center border border-[#102321] bg-white text-[#102321] shadow-xl transition" style={{transform:`translate(-50%,-50%) translate(${(i-1)*Math.max(0,p)*52}px, ${(i-1)*Math.max(0,p)*14}px) rotate(${(i-1)*Math.max(0,p)*4}deg)`,zIndex:i}}><span className="text-xs font-black">{label} FILE</span></div>)}</div><svg viewBox="0 0 44 44" className="absolute bottom-1 right-1 h-20 w-20"><circle cx="22" cy="22" r="18" fill="#DDF65C"/><path d="m13 22 6 6 13-15" fill="none" stroke="#102321" strokeWidth="3" strokeDasharray="32" strokeDashoffset={32-p*32}/></svg></div></VisualFrame>; }
+
+function GateGraphic() { return <div className="relative mx-auto aspect-square max-w-[520px]"><div className="absolute inset-[12%] animate-[spin_28s_linear_infinite] rounded-full border border-[#DDF65C]/40"/><div className="absolute inset-[25%] animate-[spin_18s_linear_infinite_reverse] rounded-full border border-white/20"/><div className="absolute inset-[38%] grid place-items-center rounded-full bg-[#DDF65C] text-5xl font-black text-[#102321]">Elx.</div>{['Σ','CAD','3D','ƒ(x)','₿','DOC'].map((item,i)=><div key={item} className="absolute grid h-14 w-14 place-items-center border border-white/25 bg-[#082725] text-xs font-black" style={{left:`${50+42*Math.cos(i*Math.PI/3)}%`,top:`${50+42*Math.sin(i*Math.PI/3)}%`,transform:'translate(-50%,-50%)'}}>{item}</div>)}</div>; }
+
+function formatTime(value: number) { const seconds=Math.max(0,Math.floor(value)); return `${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`; }
