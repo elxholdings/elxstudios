@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { FormEvent, useState } from 'react';
 import { getSupabaseBrowserClient } from '../lib/supabase/client';
+import GoogleLogo from './google-logo';
 
 type Mode = 'login' | 'register' | 'forgot' | 'reset';
 
@@ -113,13 +114,13 @@ export default function AuthForm({ mode, next = '/dashboard', initialError = '' 
   }
 
   const item = adminLogin
-    ? { eyebrow: 'Administrator access', title: 'Sign in with the Elx Holdings Google account.', button: 'Continue with Google' }
+    ? { eyebrow: 'Administrator access', title: 'Sign in with the E.L.X Holdings Google account.', button: 'Continue with Google' }
     : copy[mode];
 
   return (
     <div className="mx-auto grid w-full max-w-[1050px] bg-white lg:grid-cols-[.68fr_1.32fr]">
       <aside className="flex flex-col justify-between bg-[#073C3E] p-7 text-white md:p-9">
-        <p className="text-xs font-black uppercase tracking-[.18em] text-[#DDF65C]">Elx Studio / Secure access</p>
+        <p className="text-xs font-black uppercase tracking-[.18em] text-[#DDF65C]">E.L.X Studio / Secure access</p>
         <div><p className="mt-8 text-3xl font-black leading-[.96] tracking-[-.055em]">One account.<br />Every project in sight.</p>
         <p className="mt-4 text-xs leading-5 text-white/55">Your briefs, files, messages and delivery status stay together in one secure workspace.</p></div>
         <div className="mt-7 grid grid-cols-3 border-y border-white/15 py-3 text-center text-[8px] font-black uppercase tracking-[.1em] text-white/45"><span>Private</span><span>Verified</span><span>Organized</span></div>
@@ -137,9 +138,9 @@ export default function AuthForm({ mode, next = '/dashboard', initialError = '' 
         {error && <p className="mt-4 bg-red-50 p-3 text-xs font-bold text-red-700">{error}</p>}
         {message && <p className="mt-4 bg-[#E8F3E7] p-3 text-xs font-bold text-[#164F22]">{message}</p>}
         {adminLogin
-          ? <button type="button" onClick={signInWithGoogle} disabled={loading} className="mt-6 flex items-center gap-3 border border-black/20 bg-white px-5 py-3 text-sm font-black text-black disabled:opacity-40"><span aria-hidden className="text-lg font-black text-[#4285F4]">G</span>{loading ? 'Opening Google...' : 'Continue with Google'}</button>
+          ? <button type="button" onClick={signInWithGoogle} disabled={loading} className="mt-6 flex items-center gap-3 border border-black/20 bg-white px-5 py-3 text-sm font-black text-black disabled:opacity-40"><GoogleLogo />{loading ? 'Opening Google...' : 'Continue with Google'}</button>
           : <button disabled={loading} className="mt-6 bg-[#102321] px-6 py-3 text-sm font-black text-white disabled:opacity-40">{loading ? 'Working...' : `${item.button} →`}</button>}
-        {!adminLogin && mode === 'login' && <button type="button" onClick={signInWithGoogle} disabled={loading} className="ml-3 mt-6 inline-flex items-center gap-3 border border-black/20 bg-white px-5 py-2.5 text-sm font-black text-black disabled:opacity-40"><span aria-hidden className="text-lg font-black text-[#4285F4]">G</span>Google</button>}
+        {!adminLogin && mode === 'login' && <button type="button" onClick={signInWithGoogle} disabled={loading} className="ml-3 mt-6 inline-flex items-center gap-3 border border-black/20 bg-white px-5 py-2.5 text-sm font-black text-black disabled:opacity-40"><GoogleLogo />Continue with Google</button>}
         {!adminLogin && <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-xs font-bold text-black/50">
           {mode !== 'login' && <Link href="/login">Already have an account?</Link>}
           {mode === 'login' && <><Link href="/register">Create an account</Link><Link href="/forgot-password">Forgot password?</Link></>}
