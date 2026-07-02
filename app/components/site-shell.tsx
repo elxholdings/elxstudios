@@ -5,14 +5,14 @@ import { languageOptions } from '../language-options';
 import AuthNav from './auth-nav';
 
 const navItems = [
-  ['How it works', '/services'],
+  ['How it works', '/?intro=1'],
   ['Pricing', '/pricing'],
   ['Shop', '/shop'],
   ['About', '/about'],
 ] as const;
 
 export function SiteHeader({ locale = 'en' }: { locale?: string }) {
-  const withLocale = (href: string) => `${href}?lang=${encodeURIComponent(locale)}`;
+  const withLocale = (href: string) => `${href}${href.includes('?') ? '&' : '?'}lang=${encodeURIComponent(locale)}`;
 
   return (
     <header className="sticky top-0 z-50 bg-[#F5F2E8] text-[#102321]">
@@ -35,7 +35,7 @@ export function SiteHeader({ locale = 'en' }: { locale?: string }) {
 }
 
 export function SiteFooter({ locale = 'en' }: { locale?: string }) {
-  const withLocale = (href: string) => `${href}?lang=${encodeURIComponent(locale)}`;
+  const withLocale = (href: string) => `${href}${href.includes('?') ? '&' : '?'}lang=${encodeURIComponent(locale)}`;
   return (
     <footer className="bg-[#102321] px-5 py-8 text-white md:px-10">
       <div className="mx-auto grid max-w-[1440px] gap-7 md:grid-cols-[1.35fr_.8fr_1.2fr] md:items-start">
@@ -45,7 +45,7 @@ export function SiteFooter({ locale = 'en' }: { locale?: string }) {
         </div>
         <div className="grid grid-cols-3 gap-3 text-xs text-white/60 md:grid-cols-1 md:gap-2">
           <p className="col-span-full mb-1 text-[9px] font-black uppercase tracking-[.14em] text-white">Explore</p>
-          <Link href={withLocale('/services')}>Services</Link>
+          <Link href={withLocale('/?intro=1')}>How it works</Link>
           <Link href={withLocale('/pricing')}>Pricing</Link>
           <Link href={withLocale('/contact')}>Contact</Link>
         </div>

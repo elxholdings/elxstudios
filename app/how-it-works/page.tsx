@@ -1,2 +1,2 @@
-import { permanentRedirect } from 'next/navigation';
-export default function RetiredHowItWorksPage() { permanentRedirect('/services#process'); }
+import { redirect } from 'next/navigation';
+export default function HowItWorksPage() { redirect('/?intro=1'); }

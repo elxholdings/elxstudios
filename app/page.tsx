@@ -8,7 +8,7 @@ import { resolveLocale } from './locale';
 export const dynamic = 'force-dynamic';
 
 type PageProps = {
-  searchParams?: Promise<{ lang?: string | string[]; code?: string | string[] }>;
+  searchParams?: Promise<{ lang?: string | string[]; code?: string | string[]; intro?: string | string[] }>;
 };
 
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
@@ -28,7 +28,8 @@ export default async function Page({ searchParams }: PageProps) {
   const code = Array.isArray(query?.code) ? query.code[0] : query?.code;
   if (code) redirect(`/auth/callback?code=${encodeURIComponent(code)}&next=/dashboard`);
   const locale = await resolveLocale(query?.lang);
+  const forceIntro = (Array.isArray(query?.intro) ? query.intro[0] : query?.intro) === '1';
   const { user } = await getAuthContext();
-  if (user) redirect(`/dashboard?lang=${encodeURIComponent(locale)}`);
-  return <LandingPage locale={locale} />;
+  if (user && !forceIntro) redirect(`/dashboard?lang=${encodeURIComponent(locale)}`);
+  return <LandingPage locale={locale} forceIntro={forceIntro} />;
 }
