@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { MiniChart, PlanSketch } from '../components/client-graphics';
 import { SiteShell } from '../components/site-shell';
 import { getPublishedProducts } from '../lib/site-content';
 import { resolveLocale } from '../locale';
@@ -23,6 +24,16 @@ export default async function ShopPage({ searchParams }: { searchParams?: Promis
         <div className="max-w-2xl lg:justify-self-end">
           <p className="text-xl font-black leading-8 md:text-2xl">Original architectural models, drawing sets and editable CAD packages for residential projects.</p>
           <p className="mt-5 leading-7 text-white/60">Start with a clean concept, compare bedrooms, area and file formats, then request the exact package before payment.</p>
+          <div className="mt-6 grid grid-cols-2 gap-3">
+            <div className="border border-white/10 bg-white/5 p-3 text-white">
+              <p className="text-[8px] font-black uppercase tracking-[.14em] text-[#DDF65C]">Plan logic</p>
+              <PlanSketch className="mt-2 h-20 w-full" />
+            </div>
+            <div className="border border-white/10 bg-white/5 p-3 text-white">
+              <p className="text-[8px] font-black uppercase tracking-[.14em] text-[#DDF65C]">Compare options</p>
+              <MiniChart className="mt-2 h-20 w-full" />
+            </div>
+          </div>
           <div className="mt-8 grid grid-cols-3 border-y border-white/15 py-4 text-[10px] font-black uppercase tracking-[.12em] text-white/70">
             <span>{products.length || 'New'} plans</span>
             <span>PDF + CAD</span>

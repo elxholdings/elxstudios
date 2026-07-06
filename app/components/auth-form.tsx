@@ -114,13 +114,13 @@ export default function AuthForm({ mode, next = '/dashboard', initialError = '' 
   }
 
   const item = adminLogin
-    ? { eyebrow: 'Administrator access', title: 'Sign in with the E.L.X Holdings Google account.', button: 'Continue with Google' }
+    ? { eyebrow: 'Administrator access', title: 'Sign in with the Elx Holdings Google account.', button: 'Continue with Google' }
     : copy[mode];
 
   return (
     <div className="mx-auto grid w-full max-w-[1050px] bg-white lg:grid-cols-[.68fr_1.32fr]">
       <aside className="flex flex-col justify-between bg-[#073C3E] p-7 text-white md:p-9">
-        <p className="text-xs font-black uppercase tracking-[.18em] text-[#DDF65C]">E.L.X Studio / Secure access</p>
+        <p className="text-xs font-black uppercase tracking-[.18em] text-[#DDF65C]">Elx Studio / Secure access</p>
         <div><p className="mt-8 text-3xl font-black leading-[.96] tracking-[-.055em]">One account.<br />Every project in sight.</p>
         <p className="mt-4 text-xs leading-5 text-white/55">Your briefs, files, messages and delivery status stay together in one secure workspace.</p></div>
         <div className="mt-7 grid grid-cols-3 border-y border-white/15 py-3 text-center text-[8px] font-black uppercase tracking-[.1em] text-white/45"><span>Private</span><span>Verified</span><span>Organized</span></div>

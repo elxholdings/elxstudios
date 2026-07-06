@@ -41,7 +41,7 @@ export function SiteFooter({ locale = 'en' }: { locale?: string }) {
       <div className="mx-auto grid max-w-[1440px] gap-7 md:grid-cols-[1.35fr_.8fr_1.2fr] md:items-start">
         <div>
           <p className="text-2xl font-black tracking-[-0.06em]">Elx<span className="text-[#F06449]">.</span>Studio</p>
-          <p className="mt-2 max-w-md text-xs leading-5 text-white/50">Professional and technical project support. One brief, a clear scope and accountable delivery.</p>
+          <p className="mt-2 max-w-md text-xs leading-5 text-white/50">Send one brief and receive a clear scope, accountable progress and files prepared for real use.</p>
         </div>
         <div className="grid grid-cols-3 gap-3 text-xs text-white/60 md:grid-cols-1 md:gap-2">
           <p className="col-span-full mb-1 text-[9px] font-black uppercase tracking-[.14em] text-white">Explore</p>

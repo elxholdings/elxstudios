@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { FormEvent, useMemo, useState } from 'react';
+import { ServiceGlyph } from '../components/client-graphics';
 import { serviceCategories } from '../data/services';
 import { saveLocalOrder } from '../lib/local-orders';
 
@@ -149,13 +150,19 @@ export default function ProjectWizard({ initialService = '', locale = 'en', auth
       <div className="p-5 md:p-7">
         {step === 0 && (
           <div>
-            <StepTitle number="01" title="What kind of support do you need?" text="Hover over a department to see its services. Select one to continue, double-click a department for its first option, or skip this step." />
+            <StepTitle number="01" title="What kind of support do you need?" text="Hover over a department to see the exact services. Choose the closest match now, or skip if you want us to classify the project from your brief." />
             <div className="mt-5 grid gap-2 sm:grid-cols-2">
               {serviceCategories.map((service) => (
                 <div key={service.slug} onMouseEnter={() => setOpenCategory(service.slug)} onMouseLeave={() => form.category !== service.slug && setOpenCategory('')} className={`group relative min-h-[74px] ${form.category === service.slug ? 'bg-[#DDF65C]' : 'bg-[#F5F2E8]'}`}>
                   <button type="button" onClick={() => { setForm((current) => ({ ...current, category: service.slug, subservice: '' })); setOpenCategory(service.slug); }} onDoubleClick={() => chooseSubservice(service.slug, service.subservices[0])} className="w-full px-4 py-3 text-left">
-                    <span className="text-[10px] font-black uppercase tracking-[.12em] text-black/45">{service.eyebrow}</span>
-                    <span className="mt-1 block pr-6 text-base font-black">{service.title}</span>
+                    <span className="flex items-start gap-3">
+                      <ServiceGlyph slug={service.slug} className="h-9 w-9 shrink-0" />
+                      <span className="min-w-0">
+                        <span className="text-[10px] font-black uppercase tracking-[.12em] text-black/45">{service.eyebrow}</span>
+                        <span className="mt-1 block pr-6 text-base font-black">{service.title}</span>
+                        <span className="mt-1 hidden text-[11px] leading-4 text-black/45 xl:block">{service.summary}</span>
+                      </span>
+                    </span>
                     <span className="absolute right-4 top-5 text-sm font-black">+</span>
                   </button>
                   <div className={`${openCategory === service.slug ? 'grid' : 'hidden'} absolute left-0 right-0 top-full z-30 grid-cols-2 gap-px bg-[#102321] p-px shadow-xl group-hover:grid`}>

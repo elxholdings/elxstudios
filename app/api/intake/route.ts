@@ -166,7 +166,7 @@ export async function POST(request: Request) {
     }
     await Promise.allSettled([sendEmail(record)]);
 
-    const businessNumber = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '254700000000').replace(/\D/g, '');
+    const businessNumber = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '254110008034').replace(/\D/g, '');
     const message = `Hello Elx Studio, I submitted a project brief.\n\nOrder ID: ${record.order_id}\nName: ${record.name}\nService: ${record.service}\nDeadline: ${record.deadline}\nBudget: ${record.budget || 'Not specified'}\nFiles: ${record.files_link || 'Will send on WhatsApp'}\n\nBrief: ${record.brief}`;
     const whatsappUrl = `https://wa.me/${businessNumber}?text=${encodeURIComponent(message)}`;
 
