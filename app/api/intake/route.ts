@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseAdminClient } from '../../lib/supabase/admin';
 import { getSupabaseServerClient } from '../../lib/supabase/server';
+import { buildWhatsAppUrl, getWhatsAppRoute } from '../../lib/whatsapp-config';
+import { getWhatsAppRouting } from '../../lib/whatsapp-routing';
 
 type IntakePayload = {
   name?: string;
@@ -166,9 +168,19 @@ export async function POST(request: Request) {
     }
     await Promise.allSettled([sendEmail(record)]);
 
-    const businessNumber = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '254110008034').replace(/\D/g, '');
-    const message = `Hello Elx Studio, I submitted a project brief.\n\nOrder ID: ${record.order_id}\nName: ${record.name}\nService: ${record.service}\nDeadline: ${record.deadline}\nBudget: ${record.budget || 'Not specified'}\nFiles: ${record.files_link || 'Will send on WhatsApp'}\n\nBrief: ${record.brief}`;
-    const whatsappUrl = `https://wa.me/${businessNumber}?text=${encodeURIComponent(message)}`;
+    const whatsappRouting = await getWhatsAppRouting();
+    const route = getWhatsAppRoute(whatsappRouting, 'intake_submitted');
+    const tokens = {
+      order_id: record.order_id,
+      name: record.name,
+      service: record.service,
+      deadline: record.deadline,
+      budget: record.budget || 'Not specified',
+      files: record.files_link || 'Will send on WhatsApp',
+      brief: record.brief,
+    };
+    const message = route.message.replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, (_, key: string) => tokens[key as keyof typeof tokens] || '');
+    const whatsappUrl = buildWhatsAppUrl(route, tokens, whatsappRouting.defaultCountryCode);
 
     return NextResponse.json({ orderId: record.order_id, cloudOrderId, cloudOrder: Boolean(cloudOrderId), whatsappUrl, message });
   } catch (error) {

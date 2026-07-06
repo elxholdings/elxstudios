@@ -2,13 +2,124 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { ServiceGlyph } from '../../components/client-graphics';
+import type { ServiceCategory } from '../../data/services';
 
-export type ServiceRow = { id: string; category: string; slug: string; title: string; pricing_model: string; base_price: number | null; currency: string; turnaround_hours: number | null; is_active: boolean; supported_formats: string[] };
+export type ServiceRow = {
+  id: string;
+  category: string;
+  slug: string;
+  title: string;
+  pricing_model: string;
+  base_price: number | null;
+  currency: string;
+  turnaround_hours: number | null;
+  is_active: boolean;
+  supported_formats: string[];
+};
 
-export default function ServicesClient({ services }: { services: ServiceRow[] }) {
-  const router = useRouter(); const [editing, setEditing] = useState(''); const [draft, setDraft] = useState<Partial<ServiceRow>>({}); const [busy, setBusy] = useState(false); const [error, setError] = useState('');
+export default function ServicesClient({ services, publicCategories }: { services: ServiceRow[]; publicCategories: ServiceCategory[] }) {
+  const router = useRouter();
+  const [editing, setEditing] = useState('');
+  const [draft, setDraft] = useState<Partial<ServiceRow>>({});
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
   const categories = Array.from(new Set(services.map((service) => service.category)));
-  function begin(service: ServiceRow) { setEditing(service.id); setDraft(service); setError(''); }
-  async function save() { setBusy(true); setError(''); const response = await fetch(`/api/admin/services/${editing}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(draft) }); const body = await response.json().catch(() => ({})) as { error?: string }; if (!response.ok) setError(body.error || 'Service could not be saved.'); else { setEditing(''); router.refresh(); } setBusy(false); }
-  return <div className="grid gap-6"><section className="bg-white p-7 md:p-9"><p className="text-xs font-black uppercase tracking-[.14em] text-[#F06449]">Catalogue control</p><h1 className="mt-2 text-5xl font-black tracking-[-.06em]">Services & pricing.</h1><p className="mt-4 max-w-2xl text-sm leading-6 text-black/50">Public availability, quote model, indicative base price and turnaround. Client orders remain manually scoped.</p></section>{categories.map((category) => <section key={category} className="bg-white p-6"><div className="flex items-end justify-between"><h2 className="text-2xl font-black">{category}</h2><span className="text-xs text-black/35">{services.filter((item) => item.category === category).length} services</span></div><div className="mt-5 grid gap-2">{services.filter((item) => item.category === category).map((service) => <article key={service.id} className="grid gap-3 bg-[#F5F2E8] p-4 lg:grid-cols-[1fr_150px_140px_120px_auto] lg:items-center"><div><strong>{service.title}</strong><p className="mt-1 text-xs text-black/40">{service.supported_formats.join(' · ') || 'Custom formats'}</p></div><span className="text-xs font-bold capitalize">{service.pricing_model.replaceAll('_', ' ')}</span><span className="text-sm font-black">{service.base_price === null ? 'Custom' : `${service.currency} ${Number(service.base_price).toLocaleString()}`}</span><span className={`text-xs font-black ${service.is_active ? 'text-[#164F22]' : 'text-black/35'}`}>{service.is_active ? 'Active' : 'Hidden'}</span><button onClick={() => begin(service)} className="text-left text-xs font-black underline">Edit</button>{editing === service.id && <div className="border-t border-black/10 pt-4 lg:col-span-5"><div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5"><label className="text-xs font-bold">Title<input className="elx-field" value={draft.title || ''} onChange={(event) => setDraft({ ...draft, title: event.target.value })} /></label><label className="text-xs font-bold">Pricing<select className="elx-field" value={draft.pricing_model || 'custom_quote'} onChange={(event) => setDraft({ ...draft, pricing_model: event.target.value })}><option value="custom_quote">Custom quote</option><option value="fixed">Fixed</option><option value="from_price">From price</option></select></label><label className="text-xs font-bold">Base price<input className="elx-field" type="number" min="0" value={draft.base_price ?? ''} onChange={(event) => setDraft({ ...draft, base_price: event.target.value ? Number(event.target.value) : null })} /></label><label className="text-xs font-bold">Turnaround hours<input className="elx-field" type="number" min="1" value={draft.turnaround_hours ?? ''} onChange={(event) => setDraft({ ...draft, turnaround_hours: event.target.value ? Number(event.target.value) : null })} /></label><label className="flex items-center gap-3 pt-5 text-xs font-bold"><input type="checkbox" checked={Boolean(draft.is_active)} onChange={(event) => setDraft({ ...draft, is_active: event.target.checked })} />Publicly active</label></div><div className="mt-4 flex gap-3"><button onClick={() => void save()} disabled={busy} className="bg-[#102321] px-4 py-2 text-xs font-black text-white">Save service</button><button onClick={() => setEditing('')} className="text-xs font-black">Cancel</button></div>{error && <p className="mt-3 text-xs font-bold text-red-700">{error}</p>}</div>}</article>)}</div></section>)}</div>;
+
+  function begin(service: ServiceRow) {
+    setEditing(service.id);
+    setDraft(service);
+    setError('');
+  }
+
+  async function save() {
+    setBusy(true);
+    setError('');
+    const response = await fetch(`/api/admin/services/${editing}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(draft),
+    });
+    const body = await response.json().catch(() => ({})) as { error?: string };
+    if (!response.ok) setError(body.error || 'Service could not be saved.');
+    else {
+      setEditing('');
+      router.refresh();
+    }
+    setBusy(false);
+  }
+
+  return (
+    <div className="grid gap-6">
+      <section className="bg-white p-7 md:p-9">
+        <p className="text-xs font-black uppercase tracking-[.14em] text-[#F06449]">Catalogue control</p>
+        <h1 className="mt-2 text-5xl font-black tracking-[-.06em]">Services, client copy and pricing.</h1>
+        <p className="mt-4 max-w-2xl text-sm leading-6 text-black/50">The public department cards now use direct client-facing copy and technical icons. Database service rows below still control availability, quote model, indicative base price and turnaround.</p>
+      </section>
+
+      <section className="bg-[#073C3E] p-6 text-white md:p-8">
+        <div className="flex flex-wrap items-end justify-between gap-5">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[.15em] text-[#DDF65C]">Public-facing departments</p>
+            <h2 className="mt-2 text-3xl font-black tracking-[-.04em]">What clients see first.</h2>
+          </div>
+          <span className="text-xs font-black uppercase tracking-[.12em] text-white/35">{publicCategories.length} departments</span>
+        </div>
+        <div className="mt-6 grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
+          {publicCategories.map((category) => (
+            <article key={category.slug} className="border border-white/10 bg-white/5 p-4">
+              <div className="flex items-start gap-3">
+                <ServiceGlyph slug={category.slug} className="h-12 w-12 shrink-0" />
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[.14em] text-[#DDF65C]">{category.eyebrow}</p>
+                  <h3 className="mt-1 text-xl font-black tracking-[-.03em]">{category.title}</h3>
+                  <p className="mt-2 text-xs leading-5 text-white/55">{category.summary}</p>
+                </div>
+              </div>
+              <p className="mt-4 border-t border-white/10 pt-3 text-[11px] leading-5 text-white/45">{category.whoFor}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {categories.map((category) => (
+        <section key={category} className="bg-white p-6">
+          <div className="flex items-end justify-between">
+            <h2 className="text-2xl font-black">{category}</h2>
+            <span className="text-xs text-black/35">{services.filter((item) => item.category === category).length} services</span>
+          </div>
+          <div className="mt-5 grid gap-2">
+            {services.filter((item) => item.category === category).map((service) => (
+              <article key={service.id} className="grid gap-3 bg-[#F5F2E8] p-4 lg:grid-cols-[1fr_150px_140px_120px_auto] lg:items-center">
+                <div>
+                  <strong>{service.title}</strong>
+                  <p className="mt-1 text-xs text-black/40">{service.supported_formats.join(' · ') || 'Custom formats'}</p>
+                </div>
+                <span className="text-xs font-bold capitalize">{service.pricing_model.replaceAll('_', ' ')}</span>
+                <span className="text-sm font-black">{service.base_price === null ? 'Custom' : `${service.currency} ${Number(service.base_price).toLocaleString()}`}</span>
+                <span className={`text-xs font-black ${service.is_active ? 'text-[#164F22]' : 'text-black/35'}`}>{service.is_active ? 'Active' : 'Hidden'}</span>
+                <button onClick={() => begin(service)} className="text-left text-xs font-black underline">Edit</button>
+                {editing === service.id && (
+                  <div className="border-t border-black/10 pt-4 lg:col-span-5">
+                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+                      <label className="text-xs font-bold">Title<input className="elx-field" value={draft.title || ''} onChange={(event) => setDraft({ ...draft, title: event.target.value })} /></label>
+                      <label className="text-xs font-bold">Pricing<select className="elx-field" value={draft.pricing_model || 'custom_quote'} onChange={(event) => setDraft({ ...draft, pricing_model: event.target.value })}><option value="custom_quote">Custom quote</option><option value="fixed">Fixed</option><option value="from_price">From price</option></select></label>
+                      <label className="text-xs font-bold">Base price<input className="elx-field" type="number" min="0" value={draft.base_price ?? ''} onChange={(event) => setDraft({ ...draft, base_price: event.target.value ? Number(event.target.value) : null })} /></label>
+                      <label className="text-xs font-bold">Turnaround hours<input className="elx-field" type="number" min="1" value={draft.turnaround_hours ?? ''} onChange={(event) => setDraft({ ...draft, turnaround_hours: event.target.value ? Number(event.target.value) : null })} /></label>
+                      <label className="flex items-center gap-3 pt-5 text-xs font-bold"><input type="checkbox" checked={Boolean(draft.is_active)} onChange={(event) => setDraft({ ...draft, is_active: event.target.checked })} />Publicly active</label>
+                    </div>
+                    <div className="mt-4 flex gap-3">
+                      <button onClick={() => void save()} disabled={busy} className="bg-[#102321] px-4 py-2 text-xs font-black text-white">Save service</button>
+                      <button onClick={() => setEditing('')} className="text-xs font-black">Cancel</button>
+                    </div>
+                    {error && <p className="mt-3 text-xs font-bold text-red-700">{error}</p>}
+                  </div>
+                )}
+              </article>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  );
 }
