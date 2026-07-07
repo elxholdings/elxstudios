@@ -39,7 +39,7 @@ export const defaultIntroAudioMix: IntroAudioMixSetting = {
   guideName: 'Pastor Wrench',
   voiceUrl: '/audio/elx-welcome.mp3',
   voiceVolume: 0.92,
-  voiceDuration: 84.8,
+  voiceDuration: 88.88,
   musicUrl: '',
   musicVolume: 0.18,
   musicStart: 0,
