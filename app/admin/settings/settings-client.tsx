@@ -1,8 +1,9 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import type { ReactNode } from 'react';
+import type { ChangeEvent, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
+import { defaultIntroAudioMix, normalizeIntroAudioMix, type IntroAudioMixSetting } from '../../lib/intro-audio-config';
 import { buildWhatsAppUrl, defaultWhatsAppRouting, normalizeWhatsAppRouting, type WhatsAppRoute, type WhatsAppRoutingSetting } from '../../lib/whatsapp-config';
 
 export type SettingRow = { key: string; value: unknown; updated_at: string };
@@ -12,8 +13,10 @@ const protectedContextIds = new Set(['start_floating', 'contact_page', 'intake_s
 export default function SettingsClient({ settings, canManage }: { settings: SettingRow[]; canManage: boolean }) {
   const router = useRouter();
   const whatsappSetting = settings.find((item) => item.key === 'whatsapp_routing');
+  const introAudioSetting = settings.find((item) => item.key === 'intro_audio_mix');
   const [routing, setRouting] = useState<WhatsAppRoutingSetting>(() => normalizeWhatsAppRouting(whatsappSetting?.value || defaultWhatsAppRouting));
-  const advancedSettings = settings.filter((item) => item.key !== 'whatsapp_routing');
+  const [introAudio, setIntroAudio] = useState<IntroAudioMixSetting>(() => normalizeIntroAudioMix(introAudioSetting?.value || defaultIntroAudioMix));
+  const advancedSettings = settings.filter((item) => !['whatsapp_routing', 'intro_audio_mix'].includes(item.key));
   const [drafts, setDrafts] = useState<Record<string, string>>(Object.fromEntries(advancedSettings.map((item) => [item.key, JSON.stringify(item.value, null, 2)])));
   const [busy, setBusy] = useState('');
   const [error, setError] = useState('');
@@ -51,6 +54,10 @@ export default function SettingsClient({ settings, canManage }: { settings: Sett
     await saveValue('whatsapp_routing', normalizeWhatsAppRouting(routing));
   }
 
+  async function saveIntroAudio() {
+    await saveValue('intro_audio_mix', normalizeIntroAudioMix(introAudio));
+  }
+
   return (
     <div className="grid gap-6">
       <section className="bg-white p-7 md:p-9">
@@ -61,6 +68,8 @@ export default function SettingsClient({ settings, canManage }: { settings: Sett
 
       {!canManage && <p className="bg-[#FFF0E8] p-4 text-sm font-bold">Read-only: administrator role is required to save settings.</p>}
       {(notice || error) && <p className={`p-4 text-sm font-bold ${error ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-800'}`}>{error || notice}</p>}
+
+      <IntroAudioManager audioMix={introAudio} setAudioMix={setIntroAudio} canManage={canManage} busy={busy === 'intro_audio_mix'} onSave={saveIntroAudio} updatedAt={introAudioSetting?.updated_at || null} />
 
       <WhatsAppManager routing={routing} setRouting={setRouting} canManage={canManage} busy={busy === 'whatsapp_routing'} onSave={saveWhatsApp} updatedAt={whatsappSetting?.updated_at || null} />
 
@@ -85,6 +94,136 @@ export default function SettingsClient({ settings, canManage }: { settings: Sett
         </div>
       </section>
     </div>
+  );
+}
+
+function IntroAudioManager({ audioMix, setAudioMix, canManage, busy, onSave, updatedAt }: { audioMix: IntroAudioMixSetting; setAudioMix: (value: IntroAudioMixSetting) => void; canManage: boolean; busy: boolean; onSave: () => void; updatedAt: string | null }) {
+  const timelineMax = Math.max(30, Math.ceil(audioMix.voiceDuration || 90), Math.ceil(audioMix.musicEnd || 0));
+  const [uploading, setUploading] = useState('');
+  const [uploadError, setUploadError] = useState('');
+
+  function patchAudio(patch: Partial<IntroAudioMixSetting>) {
+    setAudioMix(normalizeIntroAudioMix({ ...audioMix, ...patch }));
+  }
+
+  function setVolume(key: 'voiceVolume' | 'musicVolume', value: string) {
+    patchAudio({ [key]: Number(value) / 100 } as Partial<IntroAudioMixSetting>);
+  }
+
+  async function uploadAudio(event: ChangeEvent<HTMLInputElement>, target: 'voice' | 'music') {
+    const file = event.currentTarget.files?.[0];
+    if (!file) return;
+    setUploadError('');
+    setUploading(target);
+    const form = new FormData();
+    form.append('title', target === 'voice' ? `${audioMix.guideName || 'Pastor Wrench'} intro voice` : 'Intro background music');
+    form.append('altText', target === 'voice' ? 'Guided introduction narration' : 'Background music for the guided introduction');
+    form.append('file', file);
+    const response = await fetch('/api/admin/media', { method: 'POST', body: form });
+    const payload = await response.json().catch(() => ({})) as { error?: string; asset?: { public_url?: string; kind?: string } };
+    if (!response.ok || !payload.asset?.public_url) setUploadError(payload.error || 'Audio upload failed.');
+    else patchAudio(target === 'voice' ? { voiceUrl: payload.asset.public_url } : { musicUrl: payload.asset.public_url });
+    event.currentTarget.value = '';
+    setUploading('');
+  }
+
+  return (
+    <section className="grid gap-5">
+      <div className="bg-[#061b1a] p-7 text-white md:p-9">
+        <div className="flex flex-wrap items-end justify-between gap-6">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[.15em] text-[#DDF65C]">Intro voice and background music</p>
+            <h2 className="mt-2 max-w-4xl text-4xl font-black tracking-[-.05em] md:text-6xl">Pastor Wrench audio mix.</h2>
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-white/55">Control the guided introduction voice, music bed, timeline window and volume balance shown on the first-time visitor experience.</p>
+          </div>
+          <div className="text-xs text-white/45">{updatedAt ? `Updated ${new Date(updatedAt).toLocaleString()}` : 'Using default audio until saved'}</div>
+        </div>
+      </div>
+
+      {uploadError && <p className="bg-red-50 p-4 text-sm font-bold text-red-700">{uploadError}</p>}
+
+      <div className="grid gap-5 xl:grid-cols-[1fr_.8fr]">
+        <article className="bg-white p-6">
+          <p className="text-[10px] font-black uppercase tracking-[.14em] text-[#F06449]">Voice track</p>
+          <div className="mt-5 grid gap-4 md:grid-cols-[.7fr_1fr]">
+            <Field label="Guide name">
+              <input className="elx-field" value={audioMix.guideName} onChange={(event) => patchAudio({ guideName: event.target.value })} />
+            </Field>
+            <Field label="Voice file URL">
+              <input className="elx-field" value={audioMix.voiceUrl} onChange={(event) => patchAudio({ voiceUrl: event.target.value })} placeholder="/audio/elx-welcome.mp3" />
+            </Field>
+          </div>
+          <div className="mt-5 grid gap-4 md:grid-cols-2">
+            <Field label={`Voice volume: ${Math.round(audioMix.voiceVolume * 100)}%`}>
+              <input type="range" min="0" max="100" value={Math.round(audioMix.voiceVolume * 100)} onChange={(event) => setVolume('voiceVolume', event.target.value)} className="w-full accent-[#102321]" />
+            </Field>
+            <Field label={`Voice duration: ${formatSeconds(audioMix.voiceDuration)}`}>
+              <input type="number" min="10" max="600" step="0.1" className="elx-field" value={audioMix.voiceDuration} onChange={(event) => patchAudio({ voiceDuration: Number(event.target.value) })} />
+            </Field>
+          </div>
+          <Field label={uploading === 'voice' ? 'Uploading voice...' : 'Upload replacement voice audio'}>
+            <input type="file" accept="audio/mpeg,audio/mp3,audio/wav,audio/x-wav,audio/ogg,audio/mp4,audio/aac,audio/flac" onChange={(event) => void uploadAudio(event, 'voice')} className="elx-field" disabled={!canManage || uploading === 'voice'} />
+          </Field>
+          <div className="mt-5 bg-[#F5F2E8] p-4">
+            <p className="mb-2 text-xs font-black">Voice preview</p>
+            <audio controls src={audioMix.voiceUrl} className="w-full" />
+          </div>
+        </article>
+
+        <article className="bg-white p-6">
+          <p className="text-[10px] font-black uppercase tracking-[.14em] text-[#F06449]">Background music</p>
+          <Field label="Music file URL">
+            <input className="elx-field" value={audioMix.musicUrl} onChange={(event) => patchAudio({ musicUrl: event.target.value })} placeholder="/audio/intro-bed.mp3 or https://..." />
+          </Field>
+          <Field label={uploading === 'music' ? 'Uploading music...' : 'Upload background music'}>
+            <input type="file" accept="audio/mpeg,audio/mp3,audio/wav,audio/x-wav,audio/ogg,audio/mp4,audio/aac,audio/flac" onChange={(event) => void uploadAudio(event, 'music')} className="elx-field" disabled={!canManage || uploading === 'music'} />
+          </Field>
+          <Field label={`Music volume: ${Math.round(audioMix.musicVolume * 100)}%`}>
+            <input type="range" min="0" max="100" value={Math.round(audioMix.musicVolume * 100)} onChange={(event) => setVolume('musicVolume', event.target.value)} className="w-full accent-[#102321]" />
+          </Field>
+          <label className="mt-4 flex items-center gap-3 text-sm font-black">
+            <input type="checkbox" checked={audioMix.musicLoop} onChange={(event) => patchAudio({ musicLoop: event.target.checked })} />
+            Loop selected music segment during intro
+          </label>
+          {audioMix.musicUrl ? <div className="mt-5 bg-[#F5F2E8] p-4"><p className="mb-2 text-xs font-black">Music preview</p><audio controls src={audioMix.musicUrl} className="w-full" /></div> : <p className="mt-5 bg-[#F5F2E8] p-4 text-xs font-bold text-black/45">Upload a music file, paste a public audio URL, or use a file path from /public/audio to enable background music.</p>}
+        </article>
+      </div>
+
+      <article className="bg-white p-6">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[.14em] text-[#F06449]">Music timeline</p>
+            <h3 className="mt-1 text-2xl font-black tracking-[-.04em]">Drag the music window that should play behind the voice.</h3>
+          </div>
+          <p className="text-xs font-black text-black/45">{formatSeconds(audioMix.musicStart)} → {formatSeconds(audioMix.musicEnd)}</p>
+        </div>
+
+        <div className="mt-6 grid gap-5 md:grid-cols-2">
+          <Field label={`Start: ${formatSeconds(audioMix.musicStart)}`}>
+            <input type="range" min="0" max={timelineMax} step="0.1" value={audioMix.musicStart} onChange={(event) => patchAudio({ musicStart: Number(event.target.value) })} className="w-full accent-[#DDF65C]" />
+          </Field>
+          <Field label={`End: ${formatSeconds(audioMix.musicEnd)}`}>
+            <input type="range" min="0" max={timelineMax} step="0.1" value={audioMix.musicEnd} onChange={(event) => patchAudio({ musicEnd: Number(event.target.value) })} className="w-full accent-[#DDF65C]" />
+          </Field>
+          <Field label="Fade in seconds">
+            <input type="number" min="0" max="20" step="0.1" className="elx-field" value={audioMix.musicFadeIn} onChange={(event) => patchAudio({ musicFadeIn: Number(event.target.value) })} />
+          </Field>
+          <Field label="Fade out seconds">
+            <input type="number" min="0" max="20" step="0.1" className="elx-field" value={audioMix.musicFadeOut} onChange={(event) => patchAudio({ musicFadeOut: Number(event.target.value) })} />
+          </Field>
+        </div>
+      </article>
+
+      <article className="bg-white p-6">
+        <Field label="Pastor Wrench script">
+          <textarea className="elx-field min-h-72 resize-y leading-6" value={audioMix.transcript} onChange={(event) => patchAudio({ transcript: event.target.value })} />
+        </Field>
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+          <p className="max-w-2xl text-xs leading-5 text-black/45">When you regenerate audio, keep “E. L. X.” written with periods or spaces so the voice reads the letters instead of saying “Elx.”</p>
+          <button type="button" onClick={onSave} disabled={!canManage || busy} className="bg-[#102321] px-6 py-4 text-sm font-black text-white disabled:opacity-35">{busy ? 'Saving...' : 'Save intro audio mix'}</button>
+        </div>
+      </article>
+    </section>
   );
 }
 
@@ -210,4 +349,10 @@ function WhatsAppManager({ routing, setRouting, canManage, busy, onSave, updated
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return <label className="mt-4 block"><span className="text-xs font-black">{label}</span>{children}</label>;
+}
+
+function formatSeconds(value: number) {
+  const seconds = Math.max(0, Math.floor(value || 0));
+  const minutes = Math.floor(seconds / 60);
+  return `${minutes}:${String(seconds % 60).padStart(2, '0')}`;
 }

@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import LandingPage from './landing-page';
 import { getSiteTranslations } from './google-translate';
 import { getAuthContext } from './lib/auth';
+import { getIntroAudioMix } from './lib/intro-audio-settings';
 import { resolveLocale } from './locale';
 
 export const dynamic = 'force-dynamic';
@@ -31,5 +32,6 @@ export default async function Page({ searchParams }: PageProps) {
   const forceIntro = (Array.isArray(query?.intro) ? query.intro[0] : query?.intro) === '1';
   const { user } = await getAuthContext();
   if (user && !forceIntro) redirect(`/dashboard?lang=${encodeURIComponent(locale)}`);
-  return <LandingPage locale={locale} forceIntro={forceIntro} />;
+  const introAudio = await getIntroAudioMix();
+  return <LandingPage locale={locale} forceIntro={forceIntro} introAudio={introAudio} />;
 }

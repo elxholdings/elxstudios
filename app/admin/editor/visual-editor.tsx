@@ -145,7 +145,8 @@ function CarouselEditor({ content, media, slide, slideIndex, setSlideIndex, upda
 }
 
 function MediaPicker({ label, value, media, onChange }: { label: string; value: string; media: MediaAsset[]; onChange: (url: string, kind: 'image' | 'video') => void }) {
-  return <label className="mt-5 block text-xs font-black">{label}<select className="elx-field" value={value} onChange={(event) => { const asset = media.find((item) => item.public_url === event.target.value); onChange(event.target.value, asset?.kind || 'image'); }}><option value={value}>Current media</option>{media.map((asset) => <option key={asset.id} value={asset.public_url}>{asset.title || asset.file_name} ({asset.kind})</option>)}</select></label>;
+  const visualMedia = media.filter((asset): asset is MediaAsset & { kind: 'image' | 'video' } => asset.kind === 'image' || asset.kind === 'video');
+  return <label className="mt-5 block text-xs font-black">{label}<select className="elx-field" value={value} onChange={(event) => { const asset = visualMedia.find((item) => item.public_url === event.target.value); onChange(event.target.value, asset?.kind || 'image'); }}><option value={value}>Current media</option>{visualMedia.map((asset) => <option key={asset.id} value={asset.public_url}>{asset.title || asset.file_name} ({asset.kind})</option>)}</select></label>;
 }
 
 function Editable({ selected, onClick, children }: { selected: boolean; onClick: () => void; children: ReactNode }) {

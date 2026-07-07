@@ -83,7 +83,7 @@ export type ProductPackage = {
 
 export type MediaAsset = {
   id: string;
-  kind: 'image' | 'video';
+  kind: 'image' | 'video' | 'audio';
   file_name: string;
   title: string;
   alt_text: string;
