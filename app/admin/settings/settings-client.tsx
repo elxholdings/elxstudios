@@ -231,6 +231,7 @@ function IntroAudioManager({ audioMix, setAudioMix, canManage, busy, onSave, upd
           <div>
             <p className="text-[10px] font-black uppercase tracking-[.14em] text-[#F06449]">Music timeline</p>
             <h3 className="mt-1 text-2xl font-black tracking-[-.04em]">Drag the music window that should play behind the voice.</h3>
+            <p className="mt-2 text-xs leading-5 text-black/45">Fade in/out follows the intro voice timeline, so music ramps up after narration starts and ramps down before the intro or selected segment ends.</p>
           </div>
           <p className="text-xs font-black text-black/45">{formatSeconds(audioMix.musicStart)} → {formatSeconds(audioMix.musicEnd)}</p>
         </div>
@@ -249,6 +250,7 @@ function IntroAudioManager({ audioMix, setAudioMix, canManage, busy, onSave, upd
             <input type="number" min="0" max="20" step="0.1" className="elx-field" value={audioMix.musicFadeOut} onChange={(event) => patchAudio({ musicFadeOut: Number(event.target.value) })} />
           </Field>
         </div>
+        <button type="button" onClick={() => void onSave(audioMix)} disabled={!canManage || busy || Boolean(uploading)} className="mt-5 w-full bg-[#102321] px-5 py-3 text-xs font-black text-white disabled:opacity-35">{busy ? 'Saving...' : 'Save timeline + fade settings'}</button>
       </article>
 
       <article className="bg-white p-6">

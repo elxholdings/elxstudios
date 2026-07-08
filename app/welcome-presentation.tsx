@@ -65,7 +65,7 @@ export default function WelcomePresentation({
         audio.volume = clampVolume(introAudio.voiceVolume);
         if (music && introAudio.musicUrl && !audio.paused) {
           keepMusicInWindow(music, introAudio);
-          music.volume = getMusicVolume(music.currentTime, introAudio);
+          music.volume = getMusicVolume(audio.currentTime, duration, introAudio);
         }
       }
       frameRef.current = window.requestAnimationFrame(tick);
@@ -130,7 +130,7 @@ export default function WelcomePresentation({
     audio.volume = clampVolume(introAudio.voiceVolume);
     if (musicRef.current && introAudio.musicUrl) {
       syncMusicToVoice(audio.currentTime);
-      musicRef.current.volume = getMusicVolume(musicRef.current.currentTime, introAudio);
+      musicRef.current.volume = getMusicVolume(audio.currentTime, duration, introAudio);
       void musicRef.current.play().catch(() => undefined);
     }
     try {
@@ -145,7 +145,12 @@ export default function WelcomePresentation({
     const music = musicRef.current;
     if (!music || !introAudio.musicUrl) return;
     const windowLength = Math.max(0, introAudio.musicEnd - introAudio.musicStart);
-    music.currentTime = windowLength > 0 ? introAudio.musicStart + (voiceTime % windowLength) : introAudio.musicStart;
+    if (windowLength <= 0) {
+      music.currentTime = introAudio.musicStart;
+      return;
+    }
+    const offset = introAudio.musicLoop ? voiceTime % windowLength : Math.min(voiceTime, Math.max(0, windowLength - 0.05));
+    music.currentTime = introAudio.musicStart + offset;
   }
 
   if (!checked) return <div className="fixed inset-0 z-[2000] bg-[#061b1a]" aria-hidden="true" />;
@@ -436,10 +441,12 @@ function keepMusicInWindow(music: HTMLAudioElement, mix: IntroAudioMixSetting) {
   }
 }
 
-function getMusicVolume(musicTime: number, mix: IntroAudioMixSetting) {
+function getMusicVolume(voiceTime: number, voiceDuration: number, mix: IntroAudioMixSetting) {
   let fade = 1;
-  if (mix.musicFadeIn > 0) fade = Math.min(fade, Math.max(0, (musicTime - mix.musicStart) / mix.musicFadeIn));
-  if (mix.musicFadeOut > 0 && mix.musicEnd > mix.musicStart) fade = Math.min(fade, Math.max(0, (mix.musicEnd - musicTime) / mix.musicFadeOut));
+  const segmentLength = mix.musicEnd > mix.musicStart ? mix.musicEnd - mix.musicStart : voiceDuration;
+  const effectiveEnd = mix.musicLoop ? voiceDuration : Math.min(voiceDuration, segmentLength || voiceDuration);
+  if (mix.musicFadeIn > 0) fade = Math.min(fade, Math.max(0, voiceTime / mix.musicFadeIn));
+  if (mix.musicFadeOut > 0) fade = Math.min(fade, Math.max(0, (effectiveEnd - voiceTime) / mix.musicFadeOut));
   return clampVolume(mix.musicVolume) * fade;
 }
 
