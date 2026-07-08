@@ -54,8 +54,8 @@ export default function SettingsClient({ settings, canManage }: { settings: Sett
     await saveValue('whatsapp_routing', normalizeWhatsAppRouting(routing));
   }
 
-  async function saveIntroAudio() {
-    await saveValue('intro_audio_mix', normalizeIntroAudioMix(introAudio));
+  async function saveIntroAudio(value: IntroAudioMixSetting = introAudio) {
+    await saveValue('intro_audio_mix', normalizeIntroAudioMix(value));
   }
 
   return (
@@ -97,13 +97,15 @@ export default function SettingsClient({ settings, canManage }: { settings: Sett
   );
 }
 
-function IntroAudioManager({ audioMix, setAudioMix, canManage, busy, onSave, updatedAt }: { audioMix: IntroAudioMixSetting; setAudioMix: (value: IntroAudioMixSetting) => void; canManage: boolean; busy: boolean; onSave: () => void; updatedAt: string | null }) {
+function IntroAudioManager({ audioMix, setAudioMix, canManage, busy, onSave, updatedAt }: { audioMix: IntroAudioMixSetting; setAudioMix: (value: IntroAudioMixSetting) => void; canManage: boolean; busy: boolean; onSave: (value?: IntroAudioMixSetting) => Promise<void>; updatedAt: string | null }) {
   const timelineMax = Math.max(30, Math.ceil(audioMix.voiceDuration || 90), Math.ceil(audioMix.musicEnd || 0));
   const [uploading, setUploading] = useState('');
   const [uploadError, setUploadError] = useState('');
 
   function patchAudio(patch: Partial<IntroAudioMixSetting>) {
-    setAudioMix(normalizeIntroAudioMix({ ...audioMix, ...patch }));
+    const next = normalizeIntroAudioMix({ ...audioMix, ...patch });
+    setAudioMix(next);
+    return next;
   }
 
   function setVolume(key: 'voiceVolume' | 'musicVolume', value: string) {
@@ -122,8 +124,35 @@ function IntroAudioManager({ audioMix, setAudioMix, canManage, busy, onSave, upd
     const response = await fetch('/api/admin/media', { method: 'POST', body: form });
     const payload = await response.json().catch(() => ({})) as { error?: string; asset?: { public_url?: string; kind?: string } };
     if (!response.ok || !payload.asset?.public_url) setUploadError(payload.error || 'Audio upload failed.');
-    else patchAudio(target === 'voice' ? { voiceUrl: payload.asset.public_url } : { musicUrl: payload.asset.public_url });
+    else {
+      const next = patchAudio(target === 'voice' ? { voiceUrl: payload.asset.public_url } : { musicUrl: payload.asset.public_url });
+      await onSave(next);
+    }
     event.currentTarget.value = '';
+    setUploading('');
+  }
+
+  async function applyBundledMusic() {
+    setUploadError('');
+    setUploading('bundled_music');
+    const next = patchAudio({
+      musicUrl: '/audio/intro-music.mp3',
+      musicVolume: 0.14,
+      musicStart: 0,
+      musicEnd: Math.min(88.88, audioMix.voiceDuration || 88.88),
+      musicFadeIn: 2,
+      musicFadeOut: 6,
+      musicLoop: false,
+    });
+    await onSave(next);
+    setUploading('');
+  }
+
+  async function clearMusic() {
+    setUploadError('');
+    setUploading('clear_music');
+    const next = patchAudio({ musicUrl: '', musicStart: 0, musicEnd: 15, musicLoop: false });
+    await onSave(next);
     setUploading('');
   }
 
@@ -172,6 +201,13 @@ function IntroAudioManager({ audioMix, setAudioMix, canManage, busy, onSave, upd
 
         <article className="bg-white p-6">
           <p className="text-[10px] font-black uppercase tracking-[.14em] text-[#F06449]">Background music</p>
+          <div className="mt-4 grid gap-3 bg-[#F5F2E8] p-4">
+            <p className="text-xs font-bold text-black/55">Fast path: use the optimized intro music already bundled with the website. No upload needed.</p>
+            <div className="flex flex-wrap gap-3">
+              <button type="button" onClick={() => void applyBundledMusic()} disabled={!canManage || Boolean(uploading) || busy} className="bg-[#102321] px-4 py-3 text-xs font-black text-white disabled:opacity-35">{uploading === 'bundled_music' ? 'Applying...' : 'Use bundled intro music'}</button>
+              <button type="button" onClick={() => void clearMusic()} disabled={!canManage || Boolean(uploading) || busy} className="border border-black/15 px-4 py-3 text-xs font-black disabled:opacity-35">{uploading === 'clear_music' ? 'Clearing...' : 'No background music'}</button>
+            </div>
+          </div>
           <Field label="Music file URL">
             <input className="elx-field" value={audioMix.musicUrl} onChange={(event) => patchAudio({ musicUrl: event.target.value })} placeholder="/audio/intro-bed.mp3 or https://..." />
           </Field>
@@ -186,6 +222,7 @@ function IntroAudioManager({ audioMix, setAudioMix, canManage, busy, onSave, upd
             Loop selected music segment during intro
           </label>
           {audioMix.musicUrl ? <div className="mt-5 bg-[#F5F2E8] p-4"><p className="mb-2 text-xs font-black">Music preview</p><audio controls src={audioMix.musicUrl} className="w-full" /></div> : <p className="mt-5 bg-[#F5F2E8] p-4 text-xs font-bold text-black/45">Upload a music file, paste a public audio URL, or use a file path from /public/audio to enable background music.</p>}
+          <button type="button" onClick={() => void onSave(audioMix)} disabled={!canManage || busy || Boolean(uploading)} className="mt-5 w-full bg-[#DDF65C] px-5 py-3 text-xs font-black text-[#102321] disabled:opacity-35">{busy ? 'Saving...' : 'Save current music settings'}</button>
         </article>
       </div>
 
@@ -220,7 +257,7 @@ function IntroAudioManager({ audioMix, setAudioMix, canManage, busy, onSave, upd
         </Field>
         <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
           <p className="max-w-2xl text-xs leading-5 text-black/45">When you regenerate audio, keep “E. L. X.” written with periods or spaces so the voice reads the letters instead of saying “Elx.”</p>
-          <button type="button" onClick={onSave} disabled={!canManage || busy} className="bg-[#102321] px-6 py-4 text-sm font-black text-white disabled:opacity-35">{busy ? 'Saving...' : 'Save intro audio mix'}</button>
+          <button type="button" onClick={() => void onSave(audioMix)} disabled={!canManage || busy || Boolean(uploading)} className="bg-[#102321] px-6 py-4 text-sm font-black text-white disabled:opacity-35">{busy ? 'Saving...' : 'Save intro audio mix'}</button>
         </div>
       </article>
     </section>

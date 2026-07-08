@@ -154,7 +154,7 @@ export default function WelcomePresentation({
   return (
     <div className="fixed inset-0 z-[2000] overflow-hidden bg-[#061b1a] text-white" role="dialog" aria-label="Welcome to E L X Studio">
       <audio ref={audioRef} src={introAudio.voiceUrl} preload="auto" onEnded={() => { setPlaying(false); setTime(duration); musicRef.current?.pause(); continueToIntake(); }} />
-      {introAudio.musicUrl && <audio ref={musicRef} src={introAudio.musicUrl} preload="auto" loop={introAudio.musicLoop} />}
+      {introAudio.musicUrl && <audio ref={musicRef} src={introAudio.musicUrl} preload="metadata" loop={introAudio.musicLoop} />}
       <div className="absolute inset-0 process-grid opacity-25" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_35%,rgba(221,246,92,.12),transparent_28%),linear-gradient(120deg,#061b1a_0%,#082a28_55%,#061b1a_100%)]" />
 

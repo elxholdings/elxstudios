@@ -40,13 +40,13 @@ export const defaultIntroAudioMix: IntroAudioMixSetting = {
   voiceUrl: '/audio/elx-welcome.mp3',
   voiceVolume: 0.92,
   voiceDuration: 88.88,
-  musicUrl: '',
-  musicVolume: 0.18,
+  musicUrl: '/audio/intro-music.mp3',
+  musicVolume: 0.14,
   musicStart: 0,
-  musicEnd: 45,
+  musicEnd: 88.88,
   musicFadeIn: 2,
-  musicFadeOut: 3,
-  musicLoop: true,
+  musicFadeOut: 6,
+  musicLoop: false,
   transcript: defaultIntroTranscript,
 };
 
