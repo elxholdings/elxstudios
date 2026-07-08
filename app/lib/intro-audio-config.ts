@@ -40,7 +40,7 @@ export const defaultIntroAudioMix: IntroAudioMixSetting = {
   voiceUrl: '/audio/elx-welcome.mp3',
   voiceVolume: 0.92,
   voiceDuration: 88.88,
-  musicUrl: '/audio/intro-music.mp3',
+  musicUrl: '/audio/busic.mp3',
   musicVolume: 0.14,
   musicStart: 0,
   musicEnd: 88.88,
@@ -63,7 +63,7 @@ export function normalizeIntroAudioMix(value: unknown): IntroAudioMixSetting {
     voiceUrl: cleanUrl(source.voiceUrl, defaultIntroAudioMix.voiceUrl),
     voiceVolume: clampNumber(source.voiceVolume, 0, 1, defaultIntroAudioMix.voiceVolume),
     voiceDuration,
-    musicUrl: cleanUrl(source.musicUrl, ''),
+    musicUrl: migrateLegacyMusicUrl(cleanUrl(source.musicUrl, '')),
     musicVolume: clampNumber(source.musicVolume, 0, 1, defaultIntroAudioMix.musicVolume),
     musicStart,
     musicEnd,
@@ -88,6 +88,10 @@ function cleanUrl(value: unknown, fallback: string) {
   if (!text) return fallback;
   if (text.startsWith('/') || text.startsWith('https://') || text.startsWith('http://')) return text.slice(0, 1000);
   return fallback;
+}
+
+function migrateLegacyMusicUrl(value: string) {
+  return value === '/audio/intro-music.mp3' ? '/audio/busic.mp3' : value;
 }
 
 function clampNumber(value: unknown, min: number, max: number, fallback: number) {

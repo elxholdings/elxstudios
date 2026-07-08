@@ -136,7 +136,7 @@ function IntroAudioManager({ audioMix, setAudioMix, canManage, busy, onSave, upd
     setUploadError('');
     setUploading('bundled_music');
     const next = patchAudio({
-      musicUrl: '/audio/intro-music.mp3',
+      musicUrl: '/audio/busic.mp3',
       musicVolume: 0.14,
       musicStart: 0,
       musicEnd: Math.min(88.88, audioMix.voiceDuration || 88.88),
@@ -202,9 +202,9 @@ function IntroAudioManager({ audioMix, setAudioMix, canManage, busy, onSave, upd
         <article className="bg-white p-6">
           <p className="text-[10px] font-black uppercase tracking-[.14em] text-[#F06449]">Background music</p>
           <div className="mt-4 grid gap-3 bg-[#F5F2E8] p-4">
-            <p className="text-xs font-bold text-black/55">Fast path: use the optimized intro music already bundled with the website. No upload needed.</p>
+            <p className="text-xs font-bold text-black/55">Fast path: use the full busic.mp3 track already bundled with the website. No upload needed.</p>
             <div className="flex flex-wrap gap-3">
-              <button type="button" onClick={() => void applyBundledMusic()} disabled={!canManage || Boolean(uploading) || busy} className="bg-[#102321] px-4 py-3 text-xs font-black text-white disabled:opacity-35">{uploading === 'bundled_music' ? 'Applying...' : 'Use bundled intro music'}</button>
+              <button type="button" onClick={() => void applyBundledMusic()} disabled={!canManage || Boolean(uploading) || busy} className="bg-[#102321] px-4 py-3 text-xs font-black text-white disabled:opacity-35">{uploading === 'bundled_music' ? 'Applying...' : 'Use full busic.mp3'}</button>
               <button type="button" onClick={() => void clearMusic()} disabled={!canManage || Boolean(uploading) || busy} className="border border-black/15 px-4 py-3 text-xs font-black disabled:opacity-35">{uploading === 'clear_music' ? 'Clearing...' : 'No background music'}</button>
             </div>
           </div>
