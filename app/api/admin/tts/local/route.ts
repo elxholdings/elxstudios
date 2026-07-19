@@ -9,7 +9,8 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const pythonPath = process.env.CHATTERBOX_PYTHON || 'C:\\Amazon\\chatterbox\\venv\\Scripts\\python.exe';
-const ttsScriptPath = join(process.cwd(), 'scripts', 'generate_intro_tts.py');
+const personaPath = process.env.CHATTERBOX_PERSONA || 'C:\\Amazon\\chatterbox\\persona.py';
+const outputWavPath = process.env.CHATTERBOX_OUTPUT_WAV || 'C:\\Amazon\\videos\\Voice\\persona.wav';
 const jobRoot = join(process.cwd(), '.local-tts');
 const publicAudioDir = join(process.cwd(), 'public', 'audio');
 const publicTranscriptPath = join(publicAudioDir, 'elx-welcome-transcript.txt');
@@ -31,8 +32,8 @@ export async function POST(request: Request) {
   if (process.env.VERCEL || process.platform !== 'win32') {
     return NextResponse.json({ error: 'Local Chatterbox TTS is only available when this Next.js admin app is running on the Windows computer that has C:\\Amazon\\chatterbox installed.' }, { status: 503 });
   }
-  if (!existsSync(pythonPath) || !existsSync(ttsScriptPath)) {
-    return NextResponse.json({ error: `Chatterbox runner paths were not found. Expected ${pythonPath} and ${ttsScriptPath}.` }, { status: 503 });
+  if (!existsSync(pythonPath) || !existsSync(personaPath)) {
+    return NextResponse.json({ error: `Chatterbox paths were not found. Expected ${pythonPath} and ${personaPath}.` }, { status: 503 });
   }
 
   const body = await request.json().catch(() => ({})) as Record<string, unknown>;
@@ -50,7 +51,6 @@ export async function POST(request: Request) {
   const logPath = join(jobDir, 'persona.log');
   const ffmpegLogPath = join(jobDir, 'ffmpeg.log');
   const runnerPath = join(jobDir, 'run.ps1');
-  const outputWavPath = join(jobDir, 'elx-welcome.wav');
 
   mkdirSync(jobDir, { recursive: true });
   mkdirSync(publicAudioDir, { recursive: true });
@@ -64,7 +64,7 @@ export async function POST(request: Request) {
     logPath,
     ffmpegLogPath,
     pythonPath,
-    ttsScriptPath,
+    personaPath,
     outputWavPath,
     publicMp3Path,
     exaggeration,
@@ -116,7 +116,7 @@ function buildRunner(input: {
   logPath: string;
   ffmpegLogPath: string;
   pythonPath: string;
-  ttsScriptPath: string;
+  personaPath: string;
   outputWavPath: string;
   publicMp3Path: string;
   exaggeration: number;
@@ -144,8 +144,15 @@ function Write-LocalTtsStatus {
 try {
   Write-LocalTtsStatus -Status 'running' -Message 'Generating Pastor Wrench voice with Chatterbox.'
   $outputWav = ${psQuote(input.outputWavPath)}
+  $outputDir = Split-Path -Path $outputWav -Parent
+  New-Item -ItemType Directory -Force -Path $outputDir | Out-Null
+  if (Test-Path -LiteralPath $outputWav) {
+    $backup = Join-Path $outputDir ('persona-admin-' + (Get-Date -Format 'yyyyMMdd-HHmmss') + '.backup.wav')
+    Move-Item -LiteralPath $outputWav -Destination $backup -Force
+  }
+  $monologue = Get-Content -LiteralPath ${psQuote(input.transcriptPath)} -Raw
   $ErrorActionPreference = 'Continue'
-  & ${psQuote(input.pythonPath)} ${psQuote(input.ttsScriptPath)} --text-file ${psQuote(input.transcriptPath)} --output $outputWav --exaggeration ${toInvariant(input.exaggeration)} --pace ${toInvariant(input.pace)} --temperature ${toInvariant(input.temperature)} --mode ${psQuote(input.mode)} *> ${psQuote(input.logPath)}
+  & ${psQuote(input.pythonPath)} ${psQuote(input.personaPath)} $monologue ${toInvariant(input.exaggeration)} ${toInvariant(input.pace)} ${toInvariant(input.temperature)} ${psQuote(input.mode)} *> ${psQuote(input.logPath)}
   $personaExitCode = $LASTEXITCODE
   $ErrorActionPreference = 'Stop'
   if ($personaExitCode -ne 0) { throw "Chatterbox exited with code $personaExitCode." }

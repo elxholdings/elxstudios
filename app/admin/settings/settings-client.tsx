@@ -113,7 +113,7 @@ function IntroAudioManager({ audioMix, setAudioMix, canManage, busy, onSave, upd
   const timelineMax = Math.max(30, Math.ceil(audioMix.voiceDuration || 90), Math.ceil(audioMix.musicEnd || 0));
   const [uploading, setUploading] = useState('');
   const [uploadError, setUploadError] = useState('');
-  const [ttsParams, setTtsParams] = useState({ exaggeration: '0.45', pace: '0.5', temperature: '0.8', mode: 'normal' });
+  const [ttsParams, setTtsParams] = useState({ exaggeration: '0.45', pace: '0.5', temperature: '0.8', mode: 'turbo' });
   const [ttsJobId, setTtsJobId] = useState('');
   const [ttsStatus, setTtsStatus] = useState<LocalTtsStatus | null>(null);
   const ttsRunning = ['queued', 'running', 'converting'].includes(ttsStatus?.status || '') || uploading === 'tts';
@@ -338,7 +338,7 @@ function IntroAudioManager({ audioMix, setAudioMix, canManage, busy, onSave, upd
             <div>
               <p className="text-[10px] font-black uppercase tracking-[.14em] text-[#F06449]">Local Chatterbox TTS</p>
               <h3 className="mt-1 text-2xl font-black tracking-[-.04em]">Generate Pastor Wrench on this computer.</h3>
-              <p className="mt-2 max-w-2xl text-xs leading-5 text-black/45">This calls C:\Amazon\chatterbox locally, generates a workspace WAV, converts it to /public/audio/elx-welcome.mp3, then updates the voice duration. Normal mode is calmer and uses pace. Turbo is faster but the current turbo branch ignores pace.</p>
+              <p className="mt-2 max-w-2xl text-xs leading-5 text-black/45">This calls C:\Amazon\chatterbox\persona.py locally with the same arguments used in your n8n flow, then converts the generated WAV to /public/audio/elx-welcome.mp3 and updates the voice duration.</p>
             </div>
             <button type="button" onClick={() => void runLocalTts()} disabled={!canManage || busy || ttsRunning} className="bg-[#DDF65C] px-5 py-3 text-xs font-black text-[#102321] disabled:opacity-35">{ttsRunning ? 'Generating...' : 'Run local Chatterbox TTS'}</button>
           </div>
