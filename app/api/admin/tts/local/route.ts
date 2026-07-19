@@ -38,11 +38,11 @@ export async function POST(request: Request) {
 
   const body = await request.json().catch(() => ({})) as Record<string, unknown>;
   const transcript = cleanText(body.transcript, 6000);
-  if (!transcript) return NextResponse.json({ error: 'Dr. Maritha Wrench script is required.' }, { status: 400 });
+  if (!transcript) return NextResponse.json({ error: 'Martha Wrench script is required.' }, { status: 400 });
 
-  const exaggeration = clampNumber(body.exaggeration, 0, 2, 0.5);
+  const exaggeration = clampNumber(body.exaggeration, 0, 2, 0.45);
   const pace = clampNumber(body.pace, 0.1, 2, 0.5);
-  const temperature = clampNumber(body.temperature, 0, 2, 0.8);
+  const temperature = clampNumber(body.temperature, 0, 2, 0.7);
   const mode = cleanMode(body.mode);
   const jobId = randomUUID();
   const jobDir = join(jobRoot, jobId);
@@ -80,7 +80,7 @@ export async function POST(request: Request) {
   });
   child.unref();
 
-  return NextResponse.json({ jobId, status: 'queued', message: 'Dr. Maritha Wrench generation started on this computer.' });
+  return NextResponse.json({ jobId, status: 'queued', message: 'Martha Wrench generation started on this computer.' });
 }
 
 export async function GET(request: Request) {
@@ -142,7 +142,7 @@ function Write-LocalTtsStatus {
 }
 
 try {
-  Write-LocalTtsStatus -Status 'running' -Message 'Generating Dr. Maritha Wrench voice with Chatterbox.'
+  Write-LocalTtsStatus -Status 'running' -Message 'Generating Martha Wrench voice with Chatterbox.'
   $outputWav = ${psQuote(input.outputWavPath)}
   $outputDir = Split-Path -Path $outputWav -Parent
   New-Item -ItemType Directory -Force -Path $outputDir | Out-Null
@@ -167,7 +167,7 @@ try {
   if ($durationText) {
     [void][double]::TryParse($durationText.Trim(), [System.Globalization.NumberStyles]::Float, [System.Globalization.CultureInfo]::InvariantCulture, [ref]$duration)
   }
-  Write-LocalTtsStatus -Status 'done' -Message 'Dr. Maritha Wrench voice generated and copied into public/audio/elx-welcome.mp3.' -Duration $duration
+  Write-LocalTtsStatus -Status 'done' -Message 'Martha Wrench voice generated and copied into public/audio/elx-welcome.mp3.' -Duration $duration
 } catch {
   $message = $_.Exception.Message
   Write-LocalTtsStatus -Status 'error' -Message $message

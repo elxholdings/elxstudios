@@ -113,7 +113,7 @@ function IntroAudioManager({ audioMix, setAudioMix, canManage, busy, onSave, upd
   const timelineMax = Math.max(30, Math.ceil(audioMix.voiceDuration || 90), Math.ceil(audioMix.musicEnd || 0));
   const [uploading, setUploading] = useState('');
   const [uploadError, setUploadError] = useState('');
-  const [ttsParams, setTtsParams] = useState({ exaggeration: '0.5', pace: '0.5', temperature: '0.8', mode: 'turbo' });
+  const [ttsParams, setTtsParams] = useState({ exaggeration: '0.45', pace: '0.5', temperature: '0.7', mode: 'turbo' });
   const [ttsJobId, setTtsJobId] = useState('');
   const [ttsStatus, setTtsStatus] = useState<LocalTtsStatus | null>(null);
   const ttsRunning = ['queued', 'running', 'converting'].includes(ttsStatus?.status || '') || uploading === 'tts';
@@ -129,7 +129,7 @@ function IntroAudioManager({ audioMix, setAudioMix, canManage, busy, onSave, upd
       if (response.ok && payload.status === 'done') {
         const next = normalizeIntroAudioMix({
           ...audioMix,
-          guideName: 'Dr. Maritha Wrench',
+          guideName: 'Martha Wrench',
           voiceUrl: `/audio/elx-welcome.mp3?t=${Date.now()}`,
           voiceDuration: payload.duration || audioMix.voiceDuration,
           musicEnd: payload.duration || audioMix.musicEnd,
@@ -163,7 +163,7 @@ function IntroAudioManager({ audioMix, setAudioMix, canManage, busy, onSave, upd
     setUploadError('');
     setUploading(target);
     const form = new FormData();
-    form.append('title', target === 'voice' ? `${audioMix.guideName || 'Dr. Maritha Wrench'} intro voice` : 'Intro background music');
+    form.append('title', target === 'voice' ? `${audioMix.guideName || 'Martha Wrench'} intro voice` : 'Intro background music');
     form.append('altText', target === 'voice' ? 'Guided introduction narration' : 'Background music for the guided introduction');
     form.append('file', file);
     const response = await fetch('/api/admin/media', { method: 'POST', body: form });
@@ -233,7 +233,7 @@ function IntroAudioManager({ audioMix, setAudioMix, canManage, busy, onSave, upd
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
             <p className="text-xs font-black uppercase tracking-[.15em] text-[#DDF65C]">Intro voice and background music</p>
-            <h2 className="mt-2 max-w-4xl text-4xl font-black tracking-[-.05em] md:text-6xl">Dr. Maritha Wrench audio mix.</h2>
+            <h2 className="mt-2 max-w-4xl text-4xl font-black tracking-[-.05em] md:text-6xl">Martha Wrench audio mix.</h2>
             <p className="mt-4 max-w-2xl text-sm leading-6 text-white/55">Control the guided introduction voice, music bed, timeline window and volume balance shown on the first-time visitor experience.</p>
           </div>
           <div className="text-xs text-white/45">{updatedAt ? `Updated ${new Date(updatedAt).toLocaleString()}` : 'Using default audio until saved'}</div>
@@ -325,11 +325,11 @@ function IntroAudioManager({ audioMix, setAudioMix, canManage, busy, onSave, upd
       </article>
 
       <article className="bg-white p-6">
-        <Field label="Dr. Maritha Wrench script">
+        <Field label="Martha Wrench script">
           <textarea className="elx-field min-h-72 resize-y leading-6" value={audioMix.transcript} onChange={(event) => patchAudio({ transcript: event.target.value })} />
         </Field>
         <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-          <p className="max-w-2xl text-xs leading-5 text-black/45">For pronunciation, write the spoken intro as “Dr. Ma-ri-tha Wrench” and keep “E. L. X.” written with periods or spaces so the voice reads the letters instead of saying “Elx.”</p>
+          <p className="max-w-2xl text-xs leading-5 text-black/45">For pronunciation, write the spoken intro as “Martha Wrench” and keep “E. L. X.” written with periods or spaces so the voice reads the letters instead of saying “Elx.”</p>
           <button type="button" onClick={() => void onSave(audioMix)} disabled={!canManage || busy || Boolean(uploading)} className="bg-[#102321] px-6 py-4 text-sm font-black text-white disabled:opacity-35">{busy ? 'Saving...' : 'Save intro audio mix'}</button>
         </div>
 
@@ -337,7 +337,7 @@ function IntroAudioManager({ audioMix, setAudioMix, canManage, busy, onSave, upd
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[.14em] text-[#F06449]">Local Chatterbox TTS</p>
-              <h3 className="mt-1 text-2xl font-black tracking-[-.04em]">Generate Dr. Maritha Wrench on this computer.</h3>
+              <h3 className="mt-1 text-2xl font-black tracking-[-.04em]">Generate Martha Wrench on this computer.</h3>
               <p className="mt-2 max-w-2xl text-xs leading-5 text-black/45">This calls C:\Amazon\chatterbox\personi.py locally with the same arguments used in your n8n flow, then converts the generated WAV to /public/audio/elx-welcome.mp3 and updates the voice duration.</p>
             </div>
             <button type="button" onClick={() => void runLocalTts()} disabled={!canManage || busy || ttsRunning} className="bg-[#DDF65C] px-5 py-3 text-xs font-black text-[#102321] disabled:opacity-35">{ttsRunning ? 'Generating...' : 'Run local Chatterbox TTS'}</button>

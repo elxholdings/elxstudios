@@ -1,17 +1,22 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { ServiceGlyph } from './components/client-graphics';
+import { serviceCategories, type ServiceCategory } from './data/services';
 import { clampVolume, defaultIntroAudioMix, normalizeIntroAudioMix, type IntroAudioMixSetting } from './lib/intro-audio-config';
 
-const INTRO_KEY = 'elx-guided-intro-v4';
+const INTRO_KEY = 'elx-guided-intro-v5';
+const wizardSteps = ['Service', 'Project brief', 'Delivery', 'Contact & review'];
 
 const sceneTemplates = [
-  { cut: 0, label: 'Start', title: 'Watch the real site.', copy: 'The intro now mirrors the actual project intake, so clients see where to click, what to type and how the shop works before they ever fill a form.' },
-  { cut: 0.14, label: 'Choose', title: 'Pick the closest service.', copy: 'Hover or select a department. The exact service can be refined after the brief is reviewed.' },
-  { cut: 0.32, label: 'Brief', title: 'Type only what matters.', copy: 'A title, goal, files, dimensions, software, deadline or final format is enough. Blank fields are allowed.' },
-  { cut: 0.50, label: 'Files', title: 'Send the working material.', copy: 'Documents, drawings, models, data and dashboards can all become clear deliverables.' },
-  { cut: 0.66, label: 'Shop', title: 'Browse architectural plans.', copy: 'The shop introduces ready plan designs, details and customization requests for architecture clients.' },
-  { cut: 0.82, label: 'Holdings', title: 'One studio inside Elx Holdings.', copy: 'Elx Studio handles research, documentation and technical support while Elx Holdings covers the wider built-environment work.' },
+  { cut: 0, label: 'Welcome', title: 'Skip, or watch the real flow.', copy: 'Martha Wrench walks through the actual interface clients use, with the skip button always visible.' },
+  { cut: 0.16, label: 'Start', title: 'Open Start Project.', copy: 'The intake has the brief on the left and the four-step form on the right. No payment is collected here.' },
+  { cut: 0.25, label: 'Service', title: 'Choose the closest service.', copy: 'Hover a department to reveal exact services. Click one, double-click the department, or skip the step.' },
+  { cut: 0.38, label: 'Brief', title: 'Add only useful details.', copy: 'Every brief field is optional. A short title and a few instructions are enough to start a manual quote.' },
+  { cut: 0.49, label: 'Delivery', title: 'Set files and formats.', copy: 'Choose deadlines and formats only when they matter, then point us to source files by private link or WhatsApp.' },
+  { cut: 0.66, label: 'Review', title: 'Send for scope review.', copy: 'WhatsApp or email lets the team return the quote. The summary confirms what the client selected.' },
+  { cut: 0.76, label: 'Shop', title: 'Browse architectural plans.', copy: 'The shop uses filters, compact plan cards, details, and customization requests for house designs.' },
+  { cut: 0.87, label: 'Holdings', title: 'One studio inside Elx Holdings.', copy: 'Elx Studio handles research and documentation while Elx Holdings covers wider built-environment work.' },
 ] as const;
 
 function buildScenes(duration: number) {
@@ -74,7 +79,7 @@ export default function WelcomePresentation({
     return () => {
       if (frameRef.current !== null) window.cancelAnimationFrame(frameRef.current);
     };
-  }, [introAudio, playing]);
+  }, [introAudio, playing, duration]);
 
   useEffect(() => {
     if (audioRef.current) audioRef.current.volume = clampVolume(introAudio.voiceVolume);
@@ -161,43 +166,43 @@ export default function WelcomePresentation({
       <audio ref={audioRef} src={introAudio.voiceUrl} preload="auto" onEnded={() => { setPlaying(false); setTime(duration); musicRef.current?.pause(); continueToIntake(); }} />
       {introAudio.musicUrl && <audio ref={musicRef} src={introAudio.musicUrl} preload="metadata" loop={introAudio.musicLoop} />}
       <div className="absolute inset-0 process-grid opacity-25" />
-      <div className="absolute inset-0 intro-energy-field" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_35%,rgba(221,246,92,.12),transparent_28%),linear-gradient(120deg,#061b1a_0%,#082a28_55%,#061b1a_100%)]" />
+      <div className="absolute inset-0 intro-energy-field opacity-70" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_74%_34%,rgba(221,246,92,.11),transparent_26%),linear-gradient(120deg,#061b1a_0%,#082a28_54%,#061b1a_100%)]" />
 
       {!started ? (
         <IntroGate onBegin={begin} onSkip={continueToIntake} />
       ) : (
-        <div className="relative z-10 mx-auto flex h-full max-w-[1600px] flex-col px-5 py-5 md:px-10 md:py-7">
+        <div className="relative z-10 mx-auto flex h-full max-w-[1640px] flex-col px-5 py-5 md:px-10 md:py-7">
           <div className="flex items-center justify-between gap-5">
             <p className="text-xl font-black tracking-[-.06em]">Elx<span className="text-[#F06449]">.</span>Studio</p>
             <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[.16em] text-white/50">
-              <span>Welcome tour</span>
+              <span>Real interface tour</span>
               <span className="hidden h-px w-10 bg-white/20 sm:block" />
               <span>{formatTime(time)} / {formatTime(duration)}</span>
             </div>
             <button type="button" onClick={continueToIntake} className="border-b border-white/30 pb-1 text-xs font-black">Skip to project intake</button>
           </div>
 
-          <div className="grid min-h-0 flex-1 grid-rows-[auto_1fr] items-center gap-3 py-3 lg:grid-cols-[.82fr_1.18fr] lg:grid-rows-none lg:gap-6 lg:py-5">
+          <div className="grid min-h-0 flex-1 grid-rows-[auto_1fr] items-center gap-3 py-3 lg:grid-cols-[.78fr_1.22fr] lg:grid-rows-none lg:gap-6 lg:py-5">
             <div className="relative z-10">
               <p className="text-[10px] font-black uppercase tracking-[.2em] text-[#DDF65C]">0{active + 1} / {scene.label}</p>
-              <h1 key={scene.title} className="intro-copy-in mt-3 max-w-2xl text-[clamp(2.35rem,5.8vw,6.8rem)] font-black leading-[.82] tracking-[-.075em]">{scene.title}</h1>
+              <h1 key={scene.title} className="intro-copy-in mt-3 max-w-2xl text-[clamp(2.25rem,5.3vw,6.3rem)] font-black leading-[.84] tracking-[-.075em]">{scene.title}</h1>
               <p key={scene.copy} className="intro-copy-in mt-3 max-w-xl text-xs leading-5 text-white/60 md:mt-5 md:text-lg md:leading-8">{scene.copy}</p>
               <div className="mt-4 flex items-center gap-3 md:mt-7">
                 <button type="button" onClick={toggle} className="min-w-14 bg-[#DDF65C] px-4 py-3 text-xs font-black text-[#102321]">{playing ? 'Pause' : 'Play'}</button>
                 <div>
                   <p className="text-xs font-black">{introAudio.guideName} / Your Elx Studio guide</p>
-                  <p className="mt-1 text-[10px] text-white/40">Follow along, skip, or choose any chapter</p>
+                  <p className="mt-1 text-[10px] text-white/40">Follow along, skip, or choose a chapter</p>
                 </div>
               </div>
             </div>
 
-            <div className="relative min-h-[230px] overflow-hidden self-stretch md:min-h-[320px] lg:min-h-0">
+            <div className="relative min-h-[260px] overflow-hidden self-stretch md:min-h-[350px] lg:min-h-0">
               <SynchronizedVisual scene={active} progress={sceneProgress} />
             </div>
           </div>
 
-          <div className="grid grid-cols-6 gap-1">
+          <div className="grid gap-1" style={{ gridTemplateColumns: `repeat(${scenes.length}, minmax(0, 1fr))` }}>
             {scenes.map((item, index) => (
               <button type="button" key={item.label} onClick={() => void goTo(index)} className="group text-left">
                 <span className="mb-2 hidden text-[8px] font-black uppercase tracking-[.12em] text-white/35 md:block">{item.label}</span>
@@ -215,11 +220,11 @@ export default function WelcomePresentation({
 
 function IntroGate({ onBegin, onSkip }: { onBegin: () => void; onSkip: () => void }) {
   return (
-    <div className="relative z-10 mx-auto grid h-full max-w-[1500px] items-center gap-8 px-5 md:px-10 lg:grid-cols-[1fr_.72fr]">
+    <div className="relative z-10 mx-auto grid h-full max-w-[1500px] items-center gap-8 px-5 md:px-10 lg:grid-cols-[1fr_.78fr]">
       <div>
         <p className="text-xs font-black uppercase tracking-[.2em] text-[#DDF65C]">Welcome to Elx Studio</p>
-        <h1 className="mt-5 max-w-4xl text-[clamp(3rem,8vw,9rem)] font-black leading-[.78] tracking-[-.085em]">Let us show you<br /><span className="text-[#DDF65C]">how it works.</span></h1>
-        <p className="mt-6 max-w-xl text-sm leading-6 text-white/60 md:mt-7 md:text-xl md:leading-8">A short guided walkthrough that mirrors the real start-project page, file handoff and architectural plan shop. You can skip it right after the opening if you already know what you need.</p>
+        <h1 className="mt-5 max-w-4xl text-[clamp(3rem,8vw,9rem)] font-black leading-[.78] tracking-[-.085em]">Watch the real<br /><span className="text-[#DDF65C]">order flow.</span></h1>
+        <p className="mt-6 max-w-xl text-sm leading-6 text-white/60 md:mt-7 md:text-xl md:leading-8">Martha Wrench gives a short walkthrough of the actual Start Project page, the optional fields, the file handoff, and the architectural plan shop.</p>
         <div className="mt-7 flex flex-col gap-3 sm:flex-row">
           <button type="button" onClick={onBegin} className="bg-[#DDF65C] px-7 py-4 text-sm font-black text-[#102321]">Begin with sound</button>
           <button type="button" onClick={onSkip} className="border border-white/30 px-7 py-4 text-sm font-black">Skip to project intake</button>
@@ -235,38 +240,28 @@ function SynchronizedVisual({ scene, progress }: { scene: number; progress: numb
   return <div className="absolute inset-0 grid place-items-center"><TutorialMirror scene={scene} p={progress} /></div>;
 }
 
-function VisualFrame({ children, label }: { children: ReactNode; label: string }) {
-  return (
-    <div className="relative h-full w-full max-w-[780px] overflow-hidden p-2 md:p-4">
-      <div className="mb-2 flex items-center justify-between text-[8px] font-black uppercase tracking-[.18em] text-white/35">
-        <span>Your project journey</span>
-        <span>{label}</span>
-      </div>
-      {children}
-    </div>
-  );
-}
-
 function TutorialMirror({ scene, p }: { scene: number; p: number }) {
-  const titles = ['elxholdings.com/start', 'Select a department', 'Describe the outcome', 'Files and formats', 'Architectural plan shop', 'Elx Holdings'];
+  const titles = ['elxholdings.com/start', 'Start project intake', 'Select a department', 'Describe the outcome', 'Delivery requirements', 'Contact and review', 'Architectural plan shop', 'Elx Holdings'];
   return (
-    <div className="relative h-full w-full max-w-[860px]">
-      <div className="absolute inset-4 rotate-[-1.5deg] bg-[#DDF65C]/20 blur-2xl" />
+    <div className="relative h-full w-full max-w-[940px]">
+      <div className="absolute inset-4 rotate-[-1.2deg] bg-[#DDF65C]/20 blur-2xl" />
       <div className="relative h-full overflow-hidden border border-white/15 bg-[#F5F2E8] text-[#102321] shadow-2xl">
         <div className="flex h-9 items-center justify-between border-b border-black/10 bg-white px-4 text-[9px] font-black uppercase tracking-[.12em]">
           <div className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[#F06449]" /><span className="h-2 w-2 rounded-full bg-[#DDF65C]" /><span className="h-2 w-2 rounded-full bg-[#073C3E]" /></div>
           <span>{titles[scene] || titles[0]}</span>
           <span>{Math.round(p * 100)}%</span>
         </div>
-        <div className="relative h-[calc(100%-36px)] overflow-hidden p-4 md:p-5">
+        <div className="relative h-[calc(100%-36px)] overflow-hidden">
           <KineticBackdrop scene={scene} p={p} />
           <div className="relative z-10 h-full">
-            {scene === 0 && <StartProjectDemo p={p} />}
-            {scene === 1 && <ServiceSelectDemo p={p} />}
-            {scene === 2 && <BriefTypingDemo p={p} />}
-            {scene === 3 && <FilesFormatsDemo p={p} />}
-            {scene === 4 && <ShopDemo p={p} />}
-            {scene === 5 && <HoldingsDemo p={p} />}
+            {scene === 0 && <StartProjectPageDemo p={p} step={0} intro />}
+            {scene === 1 && <StartProjectPageDemo p={p} step={0} focused />}
+            {scene === 2 && <StartProjectPageDemo p={p} step={0} serviceFocus />}
+            {scene === 3 && <StartProjectPageDemo p={p} step={1} />}
+            {scene === 4 && <StartProjectPageDemo p={p} step={2} />}
+            {scene === 5 && <StartProjectPageDemo p={p} step={3} />}
+            {scene === 6 && <ShopDemo p={p} />}
+            {scene === 7 && <HoldingsDemo p={p} />}
           </div>
           <SceneSignal scene={scene} p={p} />
           <Pointer p={p} scene={scene} />
@@ -276,161 +271,227 @@ function TutorialMirror({ scene, p }: { scene: number; p: number }) {
   );
 }
 
-function KineticBackdrop({ scene, p }: { scene: number; p: number }) {
-  const rows = [18, 34, 58, 76];
+function StartProjectPageDemo({ p, step, intro = false, focused = false, serviceFocus = false }: { p: number; step: number; intro?: boolean; focused?: boolean; serviceFocus?: boolean }) {
   return (
-    <div className="pointer-events-none absolute inset-0 opacity-80">
-      <div className="absolute -right-16 top-5 h-44 w-44 rounded-full bg-[#DDF65C]/20 blur-3xl" style={{ transform: `scale(${0.65 + p * 0.45}) translateX(${Math.sin(p * Math.PI * 2) * 16}px)` }} />
-      <div className="absolute -left-10 bottom-0 h-36 w-36 rounded-full bg-[#F06449]/10 blur-2xl" style={{ transform: `translateY(${Math.cos(p * Math.PI * 2) * 18}px)` }} />
-      {rows.map((top, index) => (
-        <span
-          key={top}
-          className="absolute left-0 h-px bg-[#102321]/10"
-          style={{ top: `${top}%`, width: `${34 + ((scene + index) % 3) * 18}%`, transform: `translateX(${(p * 120 + index * 18) % 72}px)` }}
-        />
-      ))}
-      <div className="absolute bottom-5 right-5 grid h-24 w-40 grid-cols-7 items-end gap-1 opacity-45">
-        {[42, 76, 51, 89, 64, 96, 72].map((height, index) => (
-          <span key={index} className="bg-[#102321]" style={{ height: `${height * Math.max(0.2, Math.min(1, p * 2 - index * 0.08))}%` }} />
-        ))}
+    <div className="grid h-full grid-rows-[auto_1fr] overflow-hidden bg-[#F8F7F2]">
+      <MiniSiteHeader active="Start project" />
+      <div className="grid min-h-0 grid-cols-[.5fr_1fr] gap-4 p-4">
+        <IntakeSidebar p={p} focused={focused || intro} />
+        <WizardPanel step={step} p={p}>
+          {step === 0 && <ServiceStepDemo p={p} serviceFocus={serviceFocus || focused || intro} />}
+          {step === 1 && <BriefStepDemo p={p} />}
+          {step === 2 && <DeliveryStepDemo p={p} />}
+          {step === 3 && <ReviewStepDemo p={p} />}
+        </WizardPanel>
       </div>
     </div>
   );
 }
 
-function SceneSignal({ scene, p }: { scene: number; p: number }) {
-  const signals = ['click', 'hover', 'type', 'upload', 'browse', 'deliver'];
+function MiniSiteHeader({ active = '' }: { active?: string }) {
   return (
-    <div className="pointer-events-none absolute bottom-3 left-4 right-4 z-10 flex items-center gap-2">
-      <span className="h-1.5 flex-1 overflow-hidden bg-[#102321]/10"><span className="block h-full bg-[#DDF65C]" style={{ width: `${Math.max(12, p * 100)}%` }} /></span>
-      <span className="bg-[#102321] px-2 py-1 text-[8px] font-black uppercase tracking-[.12em] text-[#DDF65C]">{signals[scene]}</span>
+    <div className="flex h-12 items-center justify-between border-b border-black/10 bg-[#F5F2E8] px-4 text-[10px] font-black">
+      <span className="text-xl tracking-[-.06em]">Elx<span className="text-[#F06449]">.</span>Studio</span>
+      <span className="hidden items-center gap-5 text-black/60 md:flex">
+        {['Services', 'Pricing', 'Shop', 'About'].map((item) => <span key={item} className={active === item ? 'text-[#F06449]' : ''}>{item}</span>)}
+      </span>
+      <span className="bg-[#102321] px-4 py-2 text-white">{active || 'Start project'}</span>
     </div>
   );
 }
 
-function StartProjectDemo({ p }: { p: number }) {
+function IntakeSidebar({ p, focused }: { p: number; focused: boolean }) {
   return (
-    <div className="grid h-full grid-cols-[.72fr_1.28fr] gap-4">
-      <div className="grid content-center">
-        <p className="text-[9px] font-black uppercase tracking-[.16em] text-[#F06449]">Project intake</p>
-        <h3 className="mt-2 text-5xl font-black leading-[.82] tracking-[-.07em]">Build a clear brief.</h3>
-        <p className="mt-4 text-xs leading-5 text-black/55">A guided form, not a test. Clients can skip anything they are unsure about.</p>
-        <button className="mt-5 w-max bg-[#102321] px-5 py-3 text-xs font-black text-white">Start project →</button>
+    <div className="grid content-start pt-2">
+      <p className="text-[8px] font-black uppercase tracking-[.16em] text-[#F06449]">Project intake</p>
+      <h3 className="mt-2 text-[clamp(2rem,4.8vw,4.4rem)] font-black leading-[.84] tracking-[-.075em]">Build a clear brief.</h3>
+      <p className="mt-3 max-w-[18rem] text-[11px] leading-5 text-black/55">Start with the details you have. Your quote confirms deliverables, timing and price before paid work begins.</p>
+      <div className="mt-4 max-w-[18rem] border-t border-black/15 pt-3 text-[10px] leading-5 text-black/50">No payment is collected here.<br />Files can be shared by private link or WhatsApp.<br />Academic-use confirmation is required.</div>
+      <div className="mt-4 grid max-w-[15rem] grid-cols-3 gap-px bg-black/10 text-center text-[8px] font-black uppercase tracking-[.1em] text-black/45">
+        {['Scope', 'Files', 'Quote'].map((item, i) => <span key={item} className="bg-white p-2" style={{ opacity: Math.max(0.35, Math.min(1, p * 2 - i * 0.12)) }}>{item}</span>)}
       </div>
-      <div className="grid content-center gap-2">
-        {['01 Service', '02 Project brief', '03 Delivery', '04 Contact & review'].map((item, i) => <div key={item} className={`p-4 text-xs font-black ${i === 0 ? 'bg-[#DDF65C]' : 'bg-[#102321] text-white'}`} style={{ opacity: Math.max(0.35, Math.min(1, p * 2 - i * 0.12)) }}>{item}</div>)}
-        <div className="mt-2 grid grid-cols-3 gap-2">
-          {['CAD', 'PDF', 'QUOTE'].map((item, i) => <span key={item} className="intro-pop bg-white px-3 py-2 text-center text-[10px] font-black shadow-sm" style={{ animationDelay: `${i * 120}ms`, opacity: p > i * 0.12 ? 1 : 0.18 }}>{item}</span>)}
-        </div>
-      </div>
+      <button className={`mt-4 w-max px-4 py-3 text-[10px] font-black ${focused ? 'bg-[#DDF65C] text-[#102321]' : 'bg-[#102321] text-white'}`}>Start project →</button>
     </div>
   );
 }
 
-function ServiceSelectDemo({ p }: { p: number }) {
-  const cards = [
-    ['Clarity', 'Writing & documentation', ['Reports', 'Proposals', 'Editing']],
-    ['Reasoning', 'STEM & technical support', ['Calculations', 'Lab support', 'Data analysis']],
-    ['Precision', 'CAD & technical drawing', ['AutoCAD drafting', 'Revit support', '2D to 3D']],
-    ['Visualize', '3D modeling & rendering', ['Models', 'Renderings', 'Boards']],
-  ];
+function WizardPanel({ step, p, children }: { step: number; p: number; children: ReactNode }) {
   return (
-    <div className="grid h-full grid-rows-[auto_1fr] gap-3">
-      <div><p className="text-[9px] font-black uppercase tracking-[.14em] text-[#F06449]">Step 01</p><h3 className="text-2xl font-black tracking-[-.04em]">What kind of support do you need?</h3></div>
-      <div className="grid gap-3 sm:grid-cols-2">
-        {cards.map(([eyebrow, title, subs], i) => (
-          <div key={title as string} className={`relative overflow-hidden border border-black/10 p-4 ${i === 2 ? 'bg-[#DDF65C]' : 'bg-white'}`} style={{ transform: i === 2 ? `scale(${1 + p * 0.035})` : `translateY(${Math.sin((p + i * 0.13) * Math.PI) * -4}px)` }}>
-            <span className="absolute right-3 top-3 text-xl font-black text-black/10">0{i + 1}</span>
-            <p className="text-[9px] font-black uppercase tracking-[.14em] text-black/45">{eyebrow}</p>
-            <p className="mt-2 text-lg font-black">{title}</p>
-            {i === 2 && <div className="mt-3 grid gap-1">{(subs as string[]).map((sub) => <span key={sub} className="bg-[#102321] px-2 py-1 text-[10px] font-black text-white">Click: {sub}</span>)}</div>}
+    <div className="grid min-h-0 grid-rows-[auto_auto_1fr] overflow-hidden bg-white shadow-sm">
+      <div className="bg-[#DDF65C] px-4 py-2 text-[10px] font-bold">Want this project saved online? <span className="underline">Sign in</span> or <span className="underline">create an account</span> before submitting.</div>
+      <div className="grid grid-cols-4 bg-[#102321] text-white">
+        {wizardSteps.map((label, index) => (
+          <div key={label} className={`min-h-12 px-3 py-2 text-left text-[9px] font-black uppercase tracking-[.1em] ${index === step ? 'bg-[#DDF65C] text-[#102321]' : index < step ? 'text-white' : 'text-white/35'}`} style={{ opacity: Math.max(0.5, Math.min(1, p * 1.7 - index * 0.06)) }}>
+            <span className="block text-[8px] opacity-55">0{index + 1}</span>{label}
           </div>
         ))}
       </div>
+      <div className="min-h-0 overflow-hidden p-4">{children}</div>
     </div>
   );
 }
 
-function BriefTypingDemo({ p }: { p: number }) {
+function StepMiniTitle({ number, title, text }: { number: string; title: string; text: string }) {
+  return <div><p className="text-[9px] font-black uppercase tracking-[.16em] text-[#F06449]">Step {number}</p><h3 className="mt-1 text-[clamp(1.35rem,2.5vw,2.35rem)] font-black leading-none tracking-[-.05em]">{title}</h3><p className="mt-2 max-w-2xl text-[11px] leading-5 text-black/55">{text}</p></div>;
+}
+
+function ServiceStepDemo({ p, serviceFocus }: { p: number; serviceFocus: boolean }) {
+  const activeIndex = serviceFocus ? 2 : Math.min(6, Math.floor(p * 7));
+  return (
+    <div className="grid h-full grid-rows-[auto_1fr_auto]">
+      <StepMiniTitle number="01" title="What kind of support do you need?" text="Hover over a department to see the exact services. Choose the closest match now, or skip if you want us to classify the project from your brief." />
+      <div className="mt-3 grid min-h-0 gap-2 sm:grid-cols-2">
+        {serviceCategories.map((service, index) => <ServiceMiniCard key={service.slug} service={service} active={index === activeIndex} p={p} index={index} />)}
+      </div>
+      <WizardFooter primary={serviceFocus ? 'Continue →' : 'Skip for now →'} muted="Selected: Architecture & design / Floor plans" />
+    </div>
+  );
+}
+
+function ServiceMiniCard({ service, active, p, index }: { service: ServiceCategory; active: boolean; p: number; index: number }) {
+  return (
+    <div className={`relative min-h-[4.2rem] overflow-hidden ${active ? 'bg-[#DDF65C]' : 'bg-[#F5F2E8]'}`} style={{ opacity: Math.max(0.4, Math.min(1, p * 2.2 - index * 0.08)) }}>
+      <div className="flex items-start gap-2 px-3 py-2">
+        <ServiceGlyph slug={service.slug} className="h-7 w-7 shrink-0" />
+        <div className="min-w-0">
+          <p className="text-[8px] font-black uppercase tracking-[.11em] text-black/45">{service.eyebrow}</p>
+          <p className="mt-0.5 truncate text-[13px] font-black">{service.title}</p>
+          <p className="mt-0.5 hidden truncate text-[9px] leading-4 text-black/45 xl:block">{service.summary}</p>
+        </div>
+        <span className="ml-auto text-xs font-black">+</span>
+      </div>
+      {active && (
+        <div className="grid grid-cols-2 gap-px bg-[#102321] p-px text-[9px] font-bold leading-3">
+          {service.subservices.slice(0, 4).map((item, i) => <span key={item} className={`${i === 0 ? 'bg-[#DDF65C]' : 'bg-white'} px-2 py-1.5`}>{item}</span>)}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function BriefStepDemo({ p }: { p: number }) {
   const typed = 'Three-bedroom floor plan revision'.slice(0, Math.floor(p * 34));
   return (
-    <div className="grid h-full grid-rows-[auto_1fr_auto] gap-4 bg-white p-5">
-      <div><p className="text-[9px] font-black uppercase tracking-[.14em] text-[#F06449]">Step 02</p><h3 className="text-3xl font-black tracking-[-.05em]">Describe the outcome.</h3></div>
-      <div className="grid gap-4">
-        <label className="text-xs font-black">Project title<div className="mt-2 border-b border-black/25 py-3 text-lg font-bold text-black/70">{typed}<span className="animate-pulse">|</span></div></label>
-        <label className="text-xs font-black">Instructions<textarea readOnly className="mt-2 h-28 w-full resize-none bg-[#F5F2E8] p-4 text-sm outline-none" value={'Need clean dimensions, revised room layout, PDF sheets and editable CAD files if possible.'} /></label>
-        <div className="grid grid-cols-3 gap-2 text-[10px] font-black">
-          {['dimensions', 'deadline', 'format'].map((item, i) => <span key={item} className="bg-[#DDF65C] px-3 py-2" style={{ opacity: Math.max(0.2, Math.min(1, p * 2 - i * 0.18)) }}>+ {item}</span>)}
+    <div className="grid h-full grid-rows-[auto_1fr_auto]">
+      <StepMiniTitle number="02" title="Describe the outcome." text="Add only what is useful. Every field on this step is optional; more context simply helps us quote more accurately." />
+      <div className="mt-4 grid min-h-0 gap-3">
+        <MiniField label="Project title (optional)"><div className="border-b border-black/25 py-2 text-[15px] font-bold text-black/70">{typed}<span className="animate-pulse">|</span></div></MiniField>
+        <MiniField label="Purpose"><div className="grid grid-cols-2 gap-2">{['Professional', 'Academic support'].map((purpose, i) => <span key={purpose} className={`p-3 text-xs font-black ${i === 0 ? 'bg-[#DDF65C]' : 'bg-[#F5F2E8]'}`}>{purpose}</span>)}</div></MiniField>
+        <MiniField label="Instructions (optional)"><div className="h-20 bg-[#F5F2E8] p-3 text-[11px] leading-5 text-black/50">Goal, dimensions, source material, software, references, standards and what a successful final file should contain...</div></MiniField>
+      </div>
+      <WizardFooter primary="Continue →" muted="Optional fields can stay blank" />
+    </div>
+  );
+}
+
+function DeliveryStepDemo({ p }: { p: number }) {
+  const formats = ['PDF', 'DWG', 'PPTX', 'XLSX', 'Revit', 'Power BI'];
+  return (
+    <div className="grid h-full grid-rows-[auto_1fr_auto]">
+      <StepMiniTitle number="03" title="Set the delivery requirements." text="Everything here is optional. Add what matters to your project and leave the rest for our scope conversation." />
+      <div className="mt-4 grid min-h-0 gap-3">
+        <div className="grid grid-cols-2 gap-3">
+          <MiniField label="Deadline"><div className="bg-[#F5F2E8] px-3 py-3 text-[11px] text-black/45">Only if time matters</div></MiniField>
+          <MiniField label="Primary output format"><div className="bg-[#F5F2E8] px-3 py-3 text-[11px] font-bold">{formats[Math.min(formats.length - 1, Math.floor(p * formats.length))]}</div></MiniField>
+        </div>
+        <MiniField label="Optional add-ons"><div className="grid grid-cols-2 gap-2">{['Editable source files', 'Priority scheduling', 'Presentation-ready formatting', 'Additional revision round'].map((item, i) => <span key={item} className="bg-[#F5F2E8] px-3 py-2 text-[10px] font-bold" style={{ opacity: Math.max(0.25, Math.min(1, p * 2 - i * 0.18)) }}>□ {item}</span>)}</div></MiniField>
+        <MiniField label="Supporting file link (optional)"><div className="grid grid-cols-[1fr_auto] items-center bg-[#F5F2E8] px-3 py-2"><span className="truncate text-[11px] text-black/45">Drive, Dropbox, OneDrive or WeTransfer link</span><span className="text-[10px] font-black text-[#F06449]">{Math.round(p * 8)} files</span></div></MiniField>
+        <div className="grid grid-cols-6 gap-1">
+          {formats.map((item, i) => <FormatPill key={item} name={item} active={p > i * 0.11} />)}
         </div>
       </div>
-      <div className="flex justify-between border-t border-black/10 pt-3 text-xs font-black"><span>Optional fields can stay blank</span><button className="bg-[#102321] px-4 py-2 text-white">Continue →</button></div>
+      <WizardFooter primary="Continue →" muted="Files can be sent later by link or WhatsApp" />
     </div>
   );
 }
 
-function FilesFormatsDemo({ p }: { p: number }) {
-  const badges = [
-    ['PDF', '#E53935'], ['PPTX', '#D24726'], ['Adobe', '#FF0000'], ['AutoCAD', '#C62828'], ['Power BI', '#F2C811'], ['DWG', '#073C3E'], ['XLSX', '#217346'], ['Revit', '#186BFF'],
-  ];
+function ReviewStepDemo({ p }: { p: number }) {
   return (
-    <div className="grid h-full grid-cols-[1fr_.85fr] gap-4">
-      <div className="grid content-center">
-        <p className="text-[9px] font-black uppercase tracking-[.14em] text-[#F06449]">Formats</p>
-        <h3 className="text-4xl font-black leading-none tracking-[-.06em]">Send what you already have.</h3>
-        <p className="mt-4 text-xs leading-5 text-black/55">Sketches, tables, dashboards, drawings and references can all become organized project material.</p>
-      </div>
-      <div className="grid grid-cols-2 content-center gap-2">
-        {badges.map(([name, color], i) => <BrandBadge key={name} name={name} color={color} show={p > i * 0.08} />)}
-        <div className="col-span-2 grid h-16 grid-cols-[1fr_auto] items-center bg-white p-3 text-xs font-black">
-          <span className="h-2 overflow-hidden bg-[#102321]/10"><span className="block h-full bg-[#DDF65C]" style={{ width: `${p * 100}%` }} /></span>
-          <span className="ml-3 text-[#F06449]">{Math.round(p * 8)} files</span>
+    <div className="grid h-full grid-rows-[auto_1fr_auto]">
+      <StepMiniTitle number="04" title="Review and send the brief." text="Use either WhatsApp or email so we can return the quote. The other project fields may remain blank." />
+      <div className="mt-4 grid min-h-0 gap-3">
+        <div className="grid grid-cols-2 gap-3">
+          <MiniField label="Full name (optional)"><div className="border-b border-black/20 py-2 text-[12px] text-black/35">Optional</div></MiniField>
+          <MiniField label="WhatsApp number"><div className="border-b border-black/20 py-2 text-[12px] font-bold">0110008034</div></MiniField>
         </div>
+        <MiniField label="Email"><div className="border-b border-black/20 py-2 text-[12px] text-black/45">Required only when WhatsApp is blank</div></MiniField>
+        <div className="bg-[#F5F2E8] p-4 text-xs leading-5"><p className="font-black">Brief summary</p><p className="mt-1 text-black/60">Architecture & design / Floor plans<br />Three-bedroom floor plan revision<br />Due Flexible / PDF + DWG</p></div>
+        <div className="bg-[#FFF4E8] p-3 text-[10px] leading-4 text-black/60"><span className="font-black">{p > 0.45 ? '☑' : '□'}</span> I confirm responsible use and accept the Academic Integrity Policy.</div>
       </div>
+      <WizardFooter primary="Submit for manual quote →" muted="Manual quote before paid work begins" />
     </div>
   );
 }
 
-function BrandBadge({ name, color, show }: { name: string; color: string; show: boolean }) {
+function MiniField({ label, children }: { label: string; children: ReactNode }) {
+  return <label className="block"><span className="mb-1.5 block text-[10px] font-black">{label}</span>{children}</label>;
+}
+
+function WizardFooter({ primary, muted }: { primary: string; muted: string }) {
   return (
-    <div className="grid h-16 grid-cols-[2.5rem_1fr] items-center gap-2 border border-black/10 bg-white px-2 text-xs font-black shadow-sm transition" style={{ opacity: show ? 1 : 0.15, transform: show ? 'translateY(0)' : 'translateY(8px)' }}>
-      <span className="grid h-10 w-10 place-items-center bg-[#F5F2E8]" style={{ color }}><FormatGlyph name={name} /></span>
-      <span className="leading-none">{name}</span>
+    <div className="mt-3 flex items-center justify-between border-t border-black/10 pt-3 text-xs font-black">
+      <span className="text-black/35">← Back</span>
+      <span className="hidden text-[10px] text-black/35 sm:block">{muted}</span>
+      <span className="bg-[#102321] px-4 py-2 text-white">{primary}</span>
     </div>
   );
 }
 
-function FormatGlyph({ name }: { name: string }) {
-  if (name === 'Power BI') {
-    return <svg viewBox="0 0 32 32" className="h-7 w-7" fill="none"><rect x="6" y="16" width="4" height="10" fill="currentColor" /><rect x="14" y="9" width="4" height="17" fill="currentColor" /><rect x="22" y="5" width="4" height="21" fill="currentColor" /></svg>;
-  }
-  if (name === 'AutoCAD' || name === 'DWG') {
-    return <svg viewBox="0 0 32 32" className="h-7 w-7" fill="none"><path d="M16 4 27 27h-5l-2-5h-8l-2 5H5L16 4Z" stroke="currentColor" strokeWidth="2.5" /><path d="M13 17h6" stroke="currentColor" strokeWidth="2.5" /></svg>;
-  }
-  if (name === 'PPTX') {
-    return <svg viewBox="0 0 32 32" className="h-7 w-7" fill="none"><rect x="6" y="7" width="20" height="18" stroke="currentColor" strokeWidth="2.5" /><path d="M11 13h10M11 18h7" stroke="currentColor" strokeWidth="2.5" /></svg>;
-  }
-  if (name === 'XLSX') {
-    return <svg viewBox="0 0 32 32" className="h-7 w-7" fill="none"><rect x="6" y="7" width="20" height="18" stroke="currentColor" strokeWidth="2.5" /><path d="M11 12h10M11 17h10M11 22h10M16 8v17" stroke="currentColor" strokeWidth="1.8" /></svg>;
-  }
-  return <svg viewBox="0 0 32 32" className="h-7 w-7" fill="none"><path d="M9 4h10l5 5v19H9V4Z" stroke="currentColor" strokeWidth="2.5" /><path d="M19 4v6h6M12 18h8M12 23h6" stroke="currentColor" strokeWidth="2" /></svg>;
+function FormatPill({ name, active }: { name: string; active: boolean }) {
+  return <span className={`grid min-h-10 place-items-center text-[9px] font-black transition ${active ? 'bg-[#DDF65C] text-[#102321]' : 'bg-[#F5F2E8] text-black/35'}`}>{name}</span>;
 }
 
 function ShopDemo({ p }: { p: number }) {
+  const products = [
+    ['ELX-PLN-001', 'Modern Maisonette', '$65', '3', '2', '184'],
+    ['ELX-PLN-014', 'Compact Bungalow', '$42', '2', '1', '96'],
+    ['ELX-PLN-022', 'Courtyard House', '$88', '4', '2', '238'],
+    ['ELX-PLN-031', 'Narrow Plot Plan', '$55', '3', '1', '121'],
+  ];
   return (
-    <div className="grid h-full grid-rows-[auto_1fr] gap-3">
-      <div className="flex items-center justify-between"><div><p className="text-[9px] font-black uppercase tracking-[.14em] text-[#F06449]">Shop</p><h3 className="text-3xl font-black tracking-[-.05em]">Architectural plans.</h3></div><button className="bg-[#102321] px-4 py-2 text-xs font-black text-white">Home</button></div>
-      <div className="grid grid-cols-[.55fr_1fr_1fr] gap-3">
-        <aside className="bg-white p-3 text-[10px] font-black"><p>FILTERS</p>{['Bedrooms', 'Floors', 'Style', 'Budget'].map((item) => <div key={item} className="mt-3 border-t border-black/10 pt-2 text-black/45">{item}</div>)}</aside>
-        {[['Modern Maisonette', '3 bed / 2 floors'], ['Compact Bungalow', '2 bed / 1 floor']].map(([title, meta], i) => <article key={title} className="overflow-hidden bg-white shadow-sm" style={{ transform: `translateY(${Math.sin((p + i * 0.2) * Math.PI) * -5}px)` }}><div className="relative h-28 bg-[#102321] p-3 text-[#DDF65C]"><svg viewBox="0 0 120 70" className="h-full w-full" fill="none"><path d="M10 60h100M22 60V25l38-16 38 16v35M36 60V37h18v23M66 60V34h22v26" stroke="currentColor" strokeWidth="4" strokeDasharray="230" strokeDashoffset={230 - p * 230} /></svg><span className="absolute right-3 top-3 bg-white px-2 py-1 text-[9px] font-black text-[#102321]">{i === 0 ? 'CUSTOMIZE' : 'PDF'}</span></div><div className="p-3"><p className="font-black">{title}</p><p className="mt-1 text-xs text-black/45">{meta}</p><button className={`mt-3 w-full px-3 py-2 text-xs font-black ${p > 0.55 || i === 0 ? 'bg-[#DDF65C]' : 'bg-[#F5F2E8]'}`}>View plan</button></div></article>)}
+    <div className="grid h-full grid-rows-[auto_auto_1fr] overflow-hidden bg-[#F8F7F2]">
+      <MiniSiteHeader active="Shop" />
+      <div className="grid grid-cols-[.86fr_1.14fr] items-end gap-3 bg-[#073C3E] px-4 py-4 text-white">
+        <div><p className="text-[8px] font-black uppercase tracking-[.16em] text-[#DDF65C]">Elx Studio / House plans</p><h3 className="mt-1 text-4xl font-black leading-none tracking-[-.06em]">Architectural plan shop.</h3></div>
+        <p className="text-[11px] leading-5 text-white/60">Compare bedrooms, floors, area and file packages. Open a plan, then request customization before use.</p>
+      </div>
+      <div className="grid min-h-0 grid-rows-[auto_auto_1fr]">
+        <div className="grid grid-cols-[auto_1fr_repeat(4,.7fr)_auto] gap-1 border-b border-black/10 bg-[#F8F7F2]/95 px-4 py-2 text-[9px] font-black">
+          <span className="grid h-8 place-items-center bg-[#102321] px-3 text-white">Home</span>
+          {['Search', 'Beds', 'Floors', 'Type', 'Sort'].map((item, i) => <span key={item} className="bg-white px-2 py-1.5" style={{ opacity: Math.max(0.45, Math.min(1, p * 2 - i * 0.09)) }}><small className="block text-[7px] uppercase text-black/35">{item}</small>{i === 0 ? 'Style, bedroom...' : i === 1 ? 'Any' : i === 2 ? 'Two' : i === 3 ? 'All' : 'Featured'}</span>)}
+          <span className="grid place-items-center border border-black/15 px-2">24 plans</span>
+        </div>
+        <div className="flex justify-between px-4 py-2 text-[8px] font-black uppercase tracking-[.14em] text-black/40"><span>Product slide 01 / 03</span><span>8 shown here</span></div>
+        <div className="grid min-h-0 grid-cols-4 gap-2 px-4 pb-4">
+          {products.map((product, i) => <PlanCard key={product[0]} product={product} p={p} index={i} />)}
+        </div>
       </div>
     </div>
+  );
+}
+
+function PlanCard({ product, p, index }: { product: string[]; p: number; index: number }) {
+  const [sku, title, price, beds, floors, sqm] = product;
+  return (
+    <article className="overflow-hidden border border-black/10 bg-white" style={{ transform: `translateY(${Math.sin((p + index * 0.13) * Math.PI) * -4}px)`, opacity: Math.max(0.35, Math.min(1, p * 2 - index * 0.12)) }}>
+      <div className="relative h-20 bg-[#102321] p-2 text-[#DDF65C]">
+        <svg viewBox="0 0 120 70" className="h-full w-full" fill="none" aria-hidden="true"><path d="M10 60h100M22 60V25l38-16 38 16v35M36 60V37h18v23M66 60V34h22v26" stroke="currentColor" strokeWidth="4" strokeDasharray="230" strokeDashoffset={230 - p * 230} /></svg>
+        <span className="absolute left-2 top-2 bg-[#DDF65C] px-1.5 py-1 text-[7px] font-black text-[#102321]">{index === 0 ? 'Best' : 'Digital'}</span>
+      </div>
+      <div className="p-2">
+        <p className="truncate text-[7px] font-black uppercase tracking-[.1em] text-[#F06449]">{sku}</p>
+        <p className="mt-1 line-clamp-2 text-sm font-black leading-none">{title}</p>
+        <div className="mt-2 grid grid-cols-3 border-y border-black/10 py-1 text-center text-[8px]"><span><b>{beds}</b><br />Beds</span><span><b>{floors}</b><br />Floors</span><span><b>{sqm}</b><br />sqm</span></div>
+        <div className="mt-2 flex justify-between text-[9px]"><strong>{price}</strong><span className="font-black underline decoration-[#DDF65C] decoration-4 underline-offset-2">Open</span></div>
+      </div>
+    </article>
   );
 }
 
 function HoldingsDemo({ p }: { p: number }) {
   const departments = ['Architecture', 'Electrical', 'Construction', 'Installations & fittings', 'Networking', 'Server rooms'];
   return (
-    <div className="grid h-full grid-cols-[.8fr_1.2fr] gap-4">
+    <div className="grid h-full grid-cols-[.8fr_1.2fr] gap-4 bg-[#F8F7F2] p-5">
       <div className="grid place-items-center bg-[#102321] p-5 text-white"><div className="text-center"><p className="text-[10px] font-black uppercase tracking-[.18em] text-[#DDF65C]">Elx Holdings</p><p className="mt-3 text-5xl font-black tracking-[-.08em]">Studio</p><p className="mt-3 text-xs text-white/50">Research, documentation and technical project support.</p></div></div>
       <div className="grid content-center gap-2">
         <p className="text-xs font-black uppercase tracking-[.14em] text-[#F06449]">Wider company work</p>
@@ -440,183 +501,42 @@ function HoldingsDemo({ p }: { p: number }) {
   );
 }
 
+function KineticBackdrop({ scene, p }: { scene: number; p: number }) {
+  return (
+    <div className="pointer-events-none absolute inset-0 opacity-55">
+      <div className="absolute -right-14 top-5 h-36 w-36 rounded-full bg-[#DDF65C]/15 blur-3xl" style={{ transform: `scale(${0.7 + p * 0.3}) translateX(${Math.sin(p * Math.PI * 2) * 12}px)` }} />
+      <div className="absolute -left-10 bottom-0 h-28 w-28 rounded-full bg-[#F06449]/10 blur-2xl" />
+      {[18, 43, 68].map((top, index) => <span key={top} className="absolute left-0 h-px bg-[#102321]/10" style={{ top: `${top}%`, width: `${36 + ((scene + index) % 3) * 18}%`, transform: `translateX(${(p * 90 + index * 18) % 64}px)` }} />)}
+    </div>
+  );
+}
+
+function SceneSignal({ scene, p }: { scene: number; p: number }) {
+  const signals = ['intro', 'start', 'hover', 'type', 'files', 'review', 'shop', 'deliver'];
+  return (
+    <div className="pointer-events-none absolute bottom-3 left-4 right-4 z-10 flex items-center gap-2">
+      <span className="h-1.5 flex-1 overflow-hidden bg-[#102321]/10"><span className="block h-full bg-[#DDF65C]" style={{ width: `${Math.max(12, p * 100)}%` }} /></span>
+      <span className="bg-[#102321] px-2 py-1 text-[8px] font-black uppercase tracking-[.12em] text-[#DDF65C]">{signals[scene]}</span>
+    </div>
+  );
+}
+
 function Pointer({ p, scene }: { p: number; scene: number }) {
   const positions = [
-    [67, 63], [66, 53], [42, 33], [70, 61], [71, 72], [58, 49],
+    [76, 88], [29, 63], [70, 36], [47, 37], [66, 57], [76, 82], [78, 76], [62, 48],
   ];
   const [left, top] = positions[scene] || positions[0];
-  return <div className="pointer-events-none absolute z-20 transition-all duration-300" style={{ left: `${left}%`, top: `${top}%`, transform: `translate(${Math.sin(p * Math.PI * 2) * 8}px, ${Math.cos(p * Math.PI * 2) * 4}px)` }}><div className="relative"><div className="absolute -inset-3 rounded-full border-2 border-[#DDF65C] opacity-70" /><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M4 3l18 12-8 2-4 8L4 3Z" fill="#DDF65C" stroke="#102321" strokeWidth="2" /></svg></div></div>;
-}
-
-function NetworkVisual({ p }: { p: number }) {
-  const nodes: Array<[string, number, number]> = [['STEM', 18, 32], ['CAD', 80, 34], ['3D', 50, 18], ['FINANCE', 76, 72], ['BUSINESS', 24, 72], ['WRITING', 50, 82]];
-  return (
-    <VisualFrame label="All the support you need">
-      <div className="grid h-[calc(100%-18px)] grid-cols-[.72fr_1fr] gap-3">
-        <div className="grid content-center gap-2">
-          {[
-            ['Brief', 'goal + files'],
-            ['Scope', 'price + timing'],
-            ['Output', 'usable files'],
-          ].map(([title, text], index) => (
-            <div key={title} className="border border-white/10 bg-white/5 p-3" style={{ opacity: Math.max(0.2, Math.min(1, p * 2 - index * 0.16)) }}>
-              <p className="text-[8px] font-black uppercase tracking-[.14em] text-[#DDF65C]">{title}</p>
-              <p className="mt-1 text-[11px] font-bold text-white/70">{text}</p>
-            </div>
-          ))}
-          <svg viewBox="0 0 180 72" className="mt-1 h-20 w-full text-white" fill="none" aria-hidden="true">
-            <path d="M12 60h154M12 10v50" stroke="currentColor" strokeOpacity=".18" />
-            <path d="M16 48c19-24 32 2 49-19 15-18 28-5 42-15 12-8 27-4 50-8" stroke="#DDF65C" strokeWidth="4" strokeDasharray="210" strokeDashoffset={210 - p * 210} />
-            {[22, 52, 82, 112, 142].map((x, i) => <rect key={x} x={x} y={62 - (i + 2) * 7} width="13" height={(i + 2) * 7 - 2} fill="white" opacity=".13" />)}
-          </svg>
-        </div>
-        <svg viewBox="0 0 100 100" className="h-full w-full" aria-hidden="true">
-          <g stroke="rgba(255,255,255,.18)" strokeWidth=".55">
-            {nodes.map(([name, x, y]) => <line key={name} x1="50" y1="51" x2={x} y2={y} strokeDasharray="50" strokeDashoffset={50 - p * 50} />)}
-          </g>
-          <circle cx="50" cy="51" r={7 + p * 1.8} fill="#DDF65C" />
-          <text x="50" y="52" textAnchor="middle" dominantBaseline="middle" fill="#102321" fontSize="3.8" fontWeight="900">Elx</text>
-          {nodes.map(([name, x, y], i) => (
-            <g key={name} style={{ opacity: Math.max(0, Math.min(1, p * 2.2 - i * 0.12)), transform: `translateY(${(1 - p) * 2}px)`, transformOrigin: `${x}px ${y}px` }}>
-              <rect x={x - 7} y={y - 5} width="14" height="10" fill="#0e3d3a" stroke="#DDF65C" strokeWidth=".65" />
-              <text x={x} y={y + 0.4} textAnchor="middle" dominantBaseline="middle" fill="white" fontSize="2.3" fontWeight="900">{name}</text>
-            </g>
-          ))}
-        </svg>
-      </div>
-    </VisualFrame>
-  );
-}
-
-function CapabilitiesVisual({ p }: { p: number }) {
-  const items = ['Documentation', 'STEM', 'Architecture', 'CAD', '3D rendering', 'Finance', 'Business'];
-  return (
-    <VisualFrame label="Choose what you need">
-      <div className="grid h-[calc(100%-20px)] grid-cols-[1fr_1.2fr] gap-6">
-        <div className="flex flex-col justify-center gap-2">
-          {items.map((item, i) => (
-            <div key={item} className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[.08em]" style={{ opacity: Math.max(0.18, Math.min(1, p * 2 - i * 0.12)) }}>
-              <span className="w-5 text-[#DDF65C]">0{i + 1}</span>
-              <span>{item}</span>
-            </div>
-          ))}
-        </div>
-        <div className="flex items-end gap-2 border-b border-l border-white/20 p-3">
-          {[62, 88, 54, 96, 76, 68, 83].map((height, i) => (
-            <div key={i} className="relative flex-1 bg-[#DDF65C]" style={{ height: `${height * Math.max(0, Math.min(1, p * 1.8 - i * 0.08))}%` }}>
-              <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[7px] font-black text-white">{height}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </VisualFrame>
-  );
-}
-
-function BriefVisual({ p }: { p: number }) {
-  const fields = ['Department', 'Specific service', 'Goal or problem', 'Deadline', 'Required format'];
-  return (
-    <VisualFrame label="Flexible brief">
-      <div className="grid h-[calc(100%-20px)] grid-cols-[1.2fr_.8fr] gap-5">
-        <div className="bg-white p-5 text-[#102321]">
-          <p className="text-[9px] font-black uppercase tracking-[.14em] text-[#F06449]">Project brief</p>
-          <div className="mt-4 grid gap-3">
-            {fields.map((field, i) => (
-              <div key={field} className="border-b border-black/20 pb-2" style={{ opacity: Math.max(0.2, Math.min(1, p * 2 - i * 0.16)) }}>
-                <span className="text-[8px] font-black uppercase text-black/40">{field}</span>
-                <span className="ml-3 text-[10px] font-bold">{i < 2 ? 'Selected' : 'Optional'}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="flex flex-col justify-between bg-[#DDF65C] p-5 text-[#102321]">
-          <div>
-            <p className="text-[9px] font-black uppercase">Only useful details</p>
-            <p className="mt-3 text-2xl font-black leading-none">Skip what does not apply.</p>
-          </div>
-          <div className="h-2 bg-black/15"><div className="h-full bg-[#102321]" style={{ width: `${20 + p * 80}%` }} /></div>
-        </div>
-      </div>
-    </VisualFrame>
-  );
-}
-
-function QuoteVisual({ p }: { p: number }) {
-  return (
-    <VisualFrame label="Your clear quote">
-      <div className="grid h-[calc(100%-20px)] grid-cols-[1fr_.85fr] gap-5">
-        <div className="relative flex items-center justify-between">
-          {['YOUR BRIEF', 'WE REVIEW', 'YOUR QUOTE'].map((item, i) => (
-            <div key={item} className={`relative z-10 grid h-16 w-16 place-items-center border px-1 text-center text-[8px] font-black ${p > (i * 0.28) ? 'border-[#DDF65C] bg-[#DDF65C] text-[#102321]' : 'border-white/20 bg-[#082725]'}`}>{item}</div>
-          ))}
-          <div className="absolute left-8 right-8 top-1/2 h-px bg-white/20"><div className="h-full bg-[#DDF65C]" style={{ width: `${p * 100}%` }} /></div>
-        </div>
-        <div className="flex flex-col justify-between bg-white p-5 text-[#102321]">
-          <div>
-            <p className="text-[8px] font-black uppercase text-[#F06449]">What you will receive</p>
-            <p className="mt-2 text-xl font-black">Clear before commitment.</p>
-          </div>
-          {['Final files', 'Delivery date', 'Agreed price'].map((item, i) => (
-            <div key={item} className="flex justify-between border-t border-black/10 py-2 text-[9px] font-bold">
-              <span>{item}</span>
-              <span style={{ opacity: Math.max(0, Math.min(1, p * 2 - i * 0.2)) }}>CONFIRMED ✓</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </VisualFrame>
-  );
-}
-
-function WorkspaceVisual({ p }: { p: number }) {
-  const cols: Array<[string, number]> = [['UPDATES', 3], ['PROGRESS', 5], ['YOUR FILES', 4]];
-  return (
-    <VisualFrame label="Everything in one workspace">
-      <div className="grid h-[calc(100%-20px)] grid-cols-3 gap-3">
-        {cols.map(([label, count], i) => (
-          <div key={label} className="bg-white/5 p-3">
-            <p className="text-[8px] font-black tracking-[.12em] text-[#DDF65C]">{label}</p>
-            <div className="mt-4 grid gap-2">
-              {Array.from({ length: count }).map((_, j) => (
-                <div key={j} className="h-7 border border-white/10 bg-white/10" style={{ opacity: Math.max(0.12, Math.min(1, p * 2 - j * 0.15 - i * 0.1)), transform: `translateY(${Math.max(0, 1 - p) * 8}px)` }} />
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="absolute bottom-8 left-8 right-8 h-1 bg-white/15"><div className="h-full bg-[#DDF65C]" style={{ width: `${p * 100}%` }} /></div>
-    </VisualFrame>
-  );
-}
-
-function DeliveryVisual({ p }: { p: number }) {
-  return (
-    <VisualFrame label="Delivery package">
-      <div className="relative grid h-[calc(100%-20px)] place-items-center">
-        <div className="relative h-48 w-64">
-          {['SOURCE', 'REVIEW', 'FINAL'].map((label, i) => (
-            <div key={label} className="absolute left-1/2 top-1/2 grid h-36 w-52 place-items-center border border-[#102321] bg-white text-[#102321] shadow-xl transition" style={{ transform: `translate(-50%,-50%) translate(${(i - 1) * Math.max(0, p) * 52}px, ${(i - 1) * Math.max(0, p) * 14}px) rotate(${(i - 1) * Math.max(0, p) * 4}deg)`, zIndex: i }}>
-              <span className="text-xs font-black">{label} FILE</span>
-            </div>
-          ))}
-        </div>
-        <svg viewBox="0 0 44 44" className="absolute bottom-1 right-1 h-20 w-20">
-          <circle cx="22" cy="22" r="18" fill="#DDF65C" />
-          <path d="m13 22 6 6 13-15" fill="none" stroke="#102321" strokeWidth="3" strokeDasharray="32" strokeDashoffset={32 - p * 32} />
-        </svg>
-      </div>
-    </VisualFrame>
-  );
+  return <div className="pointer-events-none absolute z-20 transition-all duration-300" style={{ left: `${left}%`, top: `${top}%`, transform: `translate(${Math.sin(p * Math.PI * 2) * 7}px, ${Math.cos(p * Math.PI * 2) * 4}px)` }}><div className="relative"><div className="absolute -inset-3 rounded-full border-2 border-[#DDF65C] opacity-70" /><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M4 3l18 12-8 2-4 8L4 3Z" fill="#DDF65C" stroke="#102321" strokeWidth="2" /></svg></div></div>;
 }
 
 function GateGraphic() {
   return (
     <div className="relative mx-auto aspect-square max-w-[420px]">
-      <div className="absolute inset-[12%] animate-[spin_28s_linear_infinite] rounded-full border border-[#DDF65C]/40" />
-      <div className="absolute inset-[25%] animate-[spin_18s_linear_infinite_reverse] rounded-full border border-white/20" />
-      <div className="absolute inset-[38%] grid place-items-center rounded-full bg-[#DDF65C] text-4xl font-black text-[#102321]">Elx</div>
-      {['SUM', 'CAD', '3D', 'DATA', 'FIN', 'DOC'].map((item, i) => (
-        <div key={item} className="absolute grid h-11 w-11 place-items-center border border-white/25 bg-[#082725] text-[10px] font-black" style={{ left: `${50 + 40 * Math.cos(i * Math.PI / 3)}%`, top: `${50 + 40 * Math.sin(i * Math.PI / 3)}%`, transform: 'translate(-50%,-50%)' }}>
+      <div className="absolute inset-[10%] animate-[spin_24s_linear_infinite] border border-[#DDF65C]/35" />
+      <div className="absolute inset-[22%] animate-[spin_16s_linear_infinite_reverse] border border-white/20" />
+      <div className="absolute inset-[35%] grid place-items-center bg-[#DDF65C] text-4xl font-black text-[#102321]">Elx</div>
+      {['START', 'CAD', 'PDF', 'SHOP', 'QUOTE', 'FILES'].map((item, i) => (
+        <div key={item} className="absolute grid h-12 w-16 place-items-center border border-white/25 bg-[#082725] text-[9px] font-black" style={{ left: `${50 + 40 * Math.cos(i * Math.PI / 3)}%`, top: `${50 + 40 * Math.sin(i * Math.PI / 3)}%`, transform: 'translate(-50%,-50%)' }}>
           {item}
         </div>
       ))}
