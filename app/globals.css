@@ -32,9 +32,21 @@ body:has(.no-scroll-experience) {
   overscroll-behavior: none;
 }
 
-.intro-copy-in { animation: intro-copy-in 520ms cubic-bezier(.2,.8,.2,1) both; }
-.process-line { animation: process-line 4s ease-in-out infinite; transform-origin: left; }
+.intro-copy-in { animation: intro-copy-in 360ms cubic-bezier(.2,.8,.2,1) both; }
+.intro-pop { animation: intro-pop 1.15s cubic-bezier(.2,.8,.2,1) infinite alternate both; }
+.intro-energy-field {
+  opacity: .52;
+  background-image:
+    radial-gradient(circle at 20% 28%, rgba(221,246,92,.14) 0 2px, transparent 3px),
+    radial-gradient(circle at 76% 60%, rgba(240,100,73,.12) 0 2px, transparent 3px),
+    linear-gradient(110deg, transparent 0 38%, rgba(221,246,92,.08) 42%, transparent 48% 100%);
+  background-size: 78px 78px, 96px 96px, 220% 100%;
+  animation: intro-energy-field 5s linear infinite;
+}
+.process-line { animation: process-line 2.2s ease-in-out infinite; transform-origin: left; }
 @keyframes intro-copy-in { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes intro-pop { from { transform: translateY(0) scale(1); } to { transform: translateY(-4px) scale(1.03); } }
+@keyframes intro-energy-field { from { background-position: 0 0, 0 0, 0 0; } to { background-position: 78px 78px, -96px 96px, 220% 0; } }
 @keyframes process-line { 0%, 10% { transform: scaleX(0); } 80%, 100% { transform: scaleX(1); } }
 
 a { color: inherit; text-decoration: none; }
@@ -46,7 +58,7 @@ img, video, svg { max-width: 100%; }
 .service-icon { background: var(--service-accent); transition: transform 220ms ease, background-color 220ms ease; }
 .service-compact:hover .service-icon { background: #fff; transform: rotate(-4deg) scale(1.08); }
 .process-grid { background-image: linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.08) 1px, transparent 1px); background-size: 28px 28px; }
-.process-pulse { transform-box: fill-box; transform-origin: center; animation: process-pulse 1.8s ease-out infinite; }
+.process-pulse { transform-box: fill-box; transform-origin: center; animation: process-pulse 1.05s ease-out infinite; }
 @keyframes process-pulse { 0% { transform: scale(.6); opacity: .9; } 100% { transform: scale(1.45); opacity: 0; } }
 
 .elx-scroll-rail {

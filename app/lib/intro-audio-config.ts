@@ -15,7 +15,7 @@ export type IntroAudioMixSetting = {
 
 export const introAudioSettingKey = 'intro_audio_mix';
 
-export const defaultIntroTranscript = `Welcome to E. L. X. Studio. I am Pastor Wrench, your guide.
+export const defaultIntroTranscript = `Welcome to E. L. X. Studio. I am Dr. Ma-ri-tha Wrench, your guide.
 
 If you already know what you need, skip now and go straight to Start Project. If you stay, watch the floating window. It mirrors the real site, points where to click, and shows what to type.
 
@@ -36,14 +36,14 @@ E. L. X. Studio is a department inside E. L. X. Holdings. The studio handles res
 E. L. X. Holdings also offers architectural work, electrical work, construction, installations and fittings, networking, and server rooms.`;
 
 export const defaultIntroAudioMix: IntroAudioMixSetting = {
-  guideName: 'Pastor Wrench',
+  guideName: 'Dr. Maritha Wrench',
   voiceUrl: '/audio/elx-welcome.mp3',
   voiceVolume: 0.92,
-  voiceDuration: 111.28,
+  voiceDuration: 115.8,
   musicUrl: '/audio/busic.mp3',
   musicVolume: 0.14,
   musicStart: 0,
-  musicEnd: 111.28,
+  musicEnd: 115.8,
   musicFadeIn: 2,
   musicFadeOut: 6,
   musicLoop: false,
@@ -69,7 +69,7 @@ export function normalizeIntroAudioMix(value: unknown): IntroAudioMixSetting {
     musicEnd,
     musicFadeIn: clampNumber(source.musicFadeIn, 0, 20, defaultIntroAudioMix.musicFadeIn),
     musicFadeOut: clampNumber(source.musicFadeOut, 0, 20, defaultIntroAudioMix.musicFadeOut),
-    musicLoop: source.musicLoop !== false,
+    musicLoop: typeof source.musicLoop === 'boolean' ? source.musicLoop : defaultIntroAudioMix.musicLoop,
     transcript: cleanText(source.transcript, defaultIntroTranscript, 6000),
   };
 }

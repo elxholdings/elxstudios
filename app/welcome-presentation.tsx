@@ -11,7 +11,7 @@ const sceneTemplates = [
   { cut: 0.32, label: 'Brief', title: 'Type only what matters.', copy: 'A title, goal, files, dimensions, software, deadline or final format is enough. Blank fields are allowed.' },
   { cut: 0.50, label: 'Files', title: 'Send the working material.', copy: 'Documents, drawings, models, data and dashboards can all become clear deliverables.' },
   { cut: 0.66, label: 'Shop', title: 'Browse architectural plans.', copy: 'The shop introduces ready plan designs, details and customization requests for architecture clients.' },
-  { cut: 0.82, label: 'Holdings', title: 'One studio inside E.L.X Holdings.', copy: 'E.L.X Studio handles research, documentation and technical support while E.L.X Holdings covers the wider built-environment work.' },
+  { cut: 0.82, label: 'Holdings', title: 'One studio inside Elx Holdings.', copy: 'Elx Studio handles research, documentation and technical support while Elx Holdings covers the wider built-environment work.' },
 ] as const;
 
 function buildScenes(duration: number) {
@@ -161,6 +161,7 @@ export default function WelcomePresentation({
       <audio ref={audioRef} src={introAudio.voiceUrl} preload="auto" onEnded={() => { setPlaying(false); setTime(duration); musicRef.current?.pause(); continueToIntake(); }} />
       {introAudio.musicUrl && <audio ref={musicRef} src={introAudio.musicUrl} preload="metadata" loop={introAudio.musicLoop} />}
       <div className="absolute inset-0 process-grid opacity-25" />
+      <div className="absolute inset-0 intro-energy-field" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_35%,rgba(221,246,92,.12),transparent_28%),linear-gradient(120deg,#061b1a_0%,#082a28_55%,#061b1a_100%)]" />
 
       {!started ? (
@@ -168,7 +169,7 @@ export default function WelcomePresentation({
       ) : (
         <div className="relative z-10 mx-auto flex h-full max-w-[1600px] flex-col px-5 py-5 md:px-10 md:py-7">
           <div className="flex items-center justify-between gap-5">
-            <p className="text-xl font-black tracking-[-.06em]">E.L.X<span className="text-[#F06449]">.</span>Studio</p>
+            <p className="text-xl font-black tracking-[-.06em]">Elx<span className="text-[#F06449]">.</span>Studio</p>
             <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[.16em] text-white/50">
               <span>Welcome tour</span>
               <span className="hidden h-px w-10 bg-white/20 sm:block" />
@@ -185,7 +186,7 @@ export default function WelcomePresentation({
               <div className="mt-4 flex items-center gap-3 md:mt-7">
                 <button type="button" onClick={toggle} className="min-w-14 bg-[#DDF65C] px-4 py-3 text-xs font-black text-[#102321]">{playing ? 'Pause' : 'Play'}</button>
                 <div>
-                  <p className="text-xs font-black">{introAudio.guideName} / Your E. L. X. Studio guide</p>
+                  <p className="text-xs font-black">{introAudio.guideName} / Your Elx Studio guide</p>
                   <p className="mt-1 text-[10px] text-white/40">Follow along, skip, or choose any chapter</p>
                 </div>
               </div>
@@ -216,7 +217,7 @@ function IntroGate({ onBegin, onSkip }: { onBegin: () => void; onSkip: () => voi
   return (
     <div className="relative z-10 mx-auto grid h-full max-w-[1500px] items-center gap-8 px-5 md:px-10 lg:grid-cols-[1fr_.72fr]">
       <div>
-        <p className="text-xs font-black uppercase tracking-[.2em] text-[#DDF65C]">Welcome to E. L. X. Studio</p>
+        <p className="text-xs font-black uppercase tracking-[.2em] text-[#DDF65C]">Welcome to Elx Studio</p>
         <h1 className="mt-5 max-w-4xl text-[clamp(3rem,8vw,9rem)] font-black leading-[.78] tracking-[-.085em]">Let us show you<br /><span className="text-[#DDF65C]">how it works.</span></h1>
         <p className="mt-6 max-w-xl text-sm leading-6 text-white/60 md:mt-7 md:text-xl md:leading-8">A short guided walkthrough that mirrors the real start-project page, file handoff and architectural plan shop. You can skip it right after the opening if you already know what you need.</p>
         <div className="mt-7 flex flex-col gap-3 sm:flex-row">
@@ -247,7 +248,7 @@ function VisualFrame({ children, label }: { children: ReactNode; label: string }
 }
 
 function TutorialMirror({ scene, p }: { scene: number; p: number }) {
-  const titles = ['elxholdings.com/start', 'Select a department', 'Describe the outcome', 'Files and formats', 'Architectural plan shop', 'E.L.X Holdings'];
+  const titles = ['elxholdings.com/start', 'Select a department', 'Describe the outcome', 'Files and formats', 'Architectural plan shop', 'Elx Holdings'];
   return (
     <div className="relative h-full w-full max-w-[860px]">
       <div className="absolute inset-4 rotate-[-1.5deg] bg-[#DDF65C]/20 blur-2xl" />
@@ -257,16 +258,52 @@ function TutorialMirror({ scene, p }: { scene: number; p: number }) {
           <span>{titles[scene] || titles[0]}</span>
           <span>{Math.round(p * 100)}%</span>
         </div>
-        <div className="relative h-[calc(100%-36px)] p-4 md:p-5">
-          {scene === 0 && <StartProjectDemo p={p} />}
-          {scene === 1 && <ServiceSelectDemo p={p} />}
-          {scene === 2 && <BriefTypingDemo p={p} />}
-          {scene === 3 && <FilesFormatsDemo p={p} />}
-          {scene === 4 && <ShopDemo p={p} />}
-          {scene === 5 && <HoldingsDemo p={p} />}
+        <div className="relative h-[calc(100%-36px)] overflow-hidden p-4 md:p-5">
+          <KineticBackdrop scene={scene} p={p} />
+          <div className="relative z-10 h-full">
+            {scene === 0 && <StartProjectDemo p={p} />}
+            {scene === 1 && <ServiceSelectDemo p={p} />}
+            {scene === 2 && <BriefTypingDemo p={p} />}
+            {scene === 3 && <FilesFormatsDemo p={p} />}
+            {scene === 4 && <ShopDemo p={p} />}
+            {scene === 5 && <HoldingsDemo p={p} />}
+          </div>
+          <SceneSignal scene={scene} p={p} />
           <Pointer p={p} scene={scene} />
         </div>
       </div>
+    </div>
+  );
+}
+
+function KineticBackdrop({ scene, p }: { scene: number; p: number }) {
+  const rows = [18, 34, 58, 76];
+  return (
+    <div className="pointer-events-none absolute inset-0 opacity-80">
+      <div className="absolute -right-16 top-5 h-44 w-44 rounded-full bg-[#DDF65C]/20 blur-3xl" style={{ transform: `scale(${0.65 + p * 0.45}) translateX(${Math.sin(p * Math.PI * 2) * 16}px)` }} />
+      <div className="absolute -left-10 bottom-0 h-36 w-36 rounded-full bg-[#F06449]/10 blur-2xl" style={{ transform: `translateY(${Math.cos(p * Math.PI * 2) * 18}px)` }} />
+      {rows.map((top, index) => (
+        <span
+          key={top}
+          className="absolute left-0 h-px bg-[#102321]/10"
+          style={{ top: `${top}%`, width: `${34 + ((scene + index) % 3) * 18}%`, transform: `translateX(${(p * 120 + index * 18) % 72}px)` }}
+        />
+      ))}
+      <div className="absolute bottom-5 right-5 grid h-24 w-40 grid-cols-7 items-end gap-1 opacity-45">
+        {[42, 76, 51, 89, 64, 96, 72].map((height, index) => (
+          <span key={index} className="bg-[#102321]" style={{ height: `${height * Math.max(0.2, Math.min(1, p * 2 - index * 0.08))}%` }} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SceneSignal({ scene, p }: { scene: number; p: number }) {
+  const signals = ['click', 'hover', 'type', 'upload', 'browse', 'deliver'];
+  return (
+    <div className="pointer-events-none absolute bottom-3 left-4 right-4 z-10 flex items-center gap-2">
+      <span className="h-1.5 flex-1 overflow-hidden bg-[#102321]/10"><span className="block h-full bg-[#DDF65C]" style={{ width: `${Math.max(12, p * 100)}%` }} /></span>
+      <span className="bg-[#102321] px-2 py-1 text-[8px] font-black uppercase tracking-[.12em] text-[#DDF65C]">{signals[scene]}</span>
     </div>
   );
 }
@@ -282,6 +319,9 @@ function StartProjectDemo({ p }: { p: number }) {
       </div>
       <div className="grid content-center gap-2">
         {['01 Service', '02 Project brief', '03 Delivery', '04 Contact & review'].map((item, i) => <div key={item} className={`p-4 text-xs font-black ${i === 0 ? 'bg-[#DDF65C]' : 'bg-[#102321] text-white'}`} style={{ opacity: Math.max(0.35, Math.min(1, p * 2 - i * 0.12)) }}>{item}</div>)}
+        <div className="mt-2 grid grid-cols-3 gap-2">
+          {['CAD', 'PDF', 'QUOTE'].map((item, i) => <span key={item} className="intro-pop bg-white px-3 py-2 text-center text-[10px] font-black shadow-sm" style={{ animationDelay: `${i * 120}ms`, opacity: p > i * 0.12 ? 1 : 0.18 }}>{item}</span>)}
+        </div>
       </div>
     </div>
   );
@@ -299,7 +339,8 @@ function ServiceSelectDemo({ p }: { p: number }) {
       <div><p className="text-[9px] font-black uppercase tracking-[.14em] text-[#F06449]">Step 01</p><h3 className="text-2xl font-black tracking-[-.04em]">What kind of support do you need?</h3></div>
       <div className="grid gap-3 sm:grid-cols-2">
         {cards.map(([eyebrow, title, subs], i) => (
-          <div key={title as string} className={`relative border border-black/10 p-4 ${i === 2 ? 'bg-[#DDF65C]' : 'bg-white'}`} style={{ transform: i === 2 ? `scale(${1 + p * 0.025})` : undefined }}>
+          <div key={title as string} className={`relative overflow-hidden border border-black/10 p-4 ${i === 2 ? 'bg-[#DDF65C]' : 'bg-white'}`} style={{ transform: i === 2 ? `scale(${1 + p * 0.035})` : `translateY(${Math.sin((p + i * 0.13) * Math.PI) * -4}px)` }}>
+            <span className="absolute right-3 top-3 text-xl font-black text-black/10">0{i + 1}</span>
             <p className="text-[9px] font-black uppercase tracking-[.14em] text-black/45">{eyebrow}</p>
             <p className="mt-2 text-lg font-black">{title}</p>
             {i === 2 && <div className="mt-3 grid gap-1">{(subs as string[]).map((sub) => <span key={sub} className="bg-[#102321] px-2 py-1 text-[10px] font-black text-white">Click: {sub}</span>)}</div>}
@@ -318,6 +359,9 @@ function BriefTypingDemo({ p }: { p: number }) {
       <div className="grid gap-4">
         <label className="text-xs font-black">Project title<div className="mt-2 border-b border-black/25 py-3 text-lg font-bold text-black/70">{typed}<span className="animate-pulse">|</span></div></label>
         <label className="text-xs font-black">Instructions<textarea readOnly className="mt-2 h-28 w-full resize-none bg-[#F5F2E8] p-4 text-sm outline-none" value={'Need clean dimensions, revised room layout, PDF sheets and editable CAD files if possible.'} /></label>
+        <div className="grid grid-cols-3 gap-2 text-[10px] font-black">
+          {['dimensions', 'deadline', 'format'].map((item, i) => <span key={item} className="bg-[#DDF65C] px-3 py-2" style={{ opacity: Math.max(0.2, Math.min(1, p * 2 - i * 0.18)) }}>+ {item}</span>)}
+        </div>
       </div>
       <div className="flex justify-between border-t border-black/10 pt-3 text-xs font-black"><span>Optional fields can stay blank</span><button className="bg-[#102321] px-4 py-2 text-white">Continue →</button></div>
     </div>
@@ -337,6 +381,10 @@ function FilesFormatsDemo({ p }: { p: number }) {
       </div>
       <div className="grid grid-cols-2 content-center gap-2">
         {badges.map(([name, color], i) => <BrandBadge key={name} name={name} color={color} show={p > i * 0.08} />)}
+        <div className="col-span-2 grid h-16 grid-cols-[1fr_auto] items-center bg-white p-3 text-xs font-black">
+          <span className="h-2 overflow-hidden bg-[#102321]/10"><span className="block h-full bg-[#DDF65C]" style={{ width: `${p * 100}%` }} /></span>
+          <span className="ml-3 text-[#F06449]">{Math.round(p * 8)} files</span>
+        </div>
       </div>
     </div>
   );
@@ -373,7 +421,7 @@ function ShopDemo({ p }: { p: number }) {
       <div className="flex items-center justify-between"><div><p className="text-[9px] font-black uppercase tracking-[.14em] text-[#F06449]">Shop</p><h3 className="text-3xl font-black tracking-[-.05em]">Architectural plans.</h3></div><button className="bg-[#102321] px-4 py-2 text-xs font-black text-white">Home</button></div>
       <div className="grid grid-cols-[.55fr_1fr_1fr] gap-3">
         <aside className="bg-white p-3 text-[10px] font-black"><p>FILTERS</p>{['Bedrooms', 'Floors', 'Style', 'Budget'].map((item) => <div key={item} className="mt-3 border-t border-black/10 pt-2 text-black/45">{item}</div>)}</aside>
-        {[['Modern Maisonette', '3 bed / 2 floors'], ['Compact Bungalow', '2 bed / 1 floor']].map(([title, meta], i) => <article key={title} className="overflow-hidden bg-white"><div className="h-28 bg-[#102321] p-3 text-[#DDF65C]"><svg viewBox="0 0 120 70" className="h-full w-full" fill="none"><path d="M10 60h100M22 60V25l38-16 38 16v35M36 60V37h18v23M66 60V34h22v26" stroke="currentColor" strokeWidth="4" /></svg></div><div className="p-3"><p className="font-black">{title}</p><p className="mt-1 text-xs text-black/45">{meta}</p><button className={`mt-3 w-full px-3 py-2 text-xs font-black ${p > 0.55 || i === 0 ? 'bg-[#DDF65C]' : 'bg-[#F5F2E8]'}`}>View plan</button></div></article>)}
+        {[['Modern Maisonette', '3 bed / 2 floors'], ['Compact Bungalow', '2 bed / 1 floor']].map(([title, meta], i) => <article key={title} className="overflow-hidden bg-white shadow-sm" style={{ transform: `translateY(${Math.sin((p + i * 0.2) * Math.PI) * -5}px)` }}><div className="relative h-28 bg-[#102321] p-3 text-[#DDF65C]"><svg viewBox="0 0 120 70" className="h-full w-full" fill="none"><path d="M10 60h100M22 60V25l38-16 38 16v35M36 60V37h18v23M66 60V34h22v26" stroke="currentColor" strokeWidth="4" strokeDasharray="230" strokeDashoffset={230 - p * 230} /></svg><span className="absolute right-3 top-3 bg-white px-2 py-1 text-[9px] font-black text-[#102321]">{i === 0 ? 'CUSTOMIZE' : 'PDF'}</span></div><div className="p-3"><p className="font-black">{title}</p><p className="mt-1 text-xs text-black/45">{meta}</p><button className={`mt-3 w-full px-3 py-2 text-xs font-black ${p > 0.55 || i === 0 ? 'bg-[#DDF65C]' : 'bg-[#F5F2E8]'}`}>View plan</button></div></article>)}
       </div>
     </div>
   );
@@ -383,10 +431,10 @@ function HoldingsDemo({ p }: { p: number }) {
   const departments = ['Architecture', 'Electrical', 'Construction', 'Installations & fittings', 'Networking', 'Server rooms'];
   return (
     <div className="grid h-full grid-cols-[.8fr_1.2fr] gap-4">
-      <div className="grid place-items-center bg-[#102321] p-5 text-white"><div className="text-center"><p className="text-[10px] font-black uppercase tracking-[.18em] text-[#DDF65C]">E.L.X Holdings</p><p className="mt-3 text-5xl font-black tracking-[-.08em]">Studio</p><p className="mt-3 text-xs text-white/50">Research, documentation and technical project support.</p></div></div>
+      <div className="grid place-items-center bg-[#102321] p-5 text-white"><div className="text-center"><p className="text-[10px] font-black uppercase tracking-[.18em] text-[#DDF65C]">Elx Holdings</p><p className="mt-3 text-5xl font-black tracking-[-.08em]">Studio</p><p className="mt-3 text-xs text-white/50">Research, documentation and technical project support.</p></div></div>
       <div className="grid content-center gap-2">
         <p className="text-xs font-black uppercase tracking-[.14em] text-[#F06449]">Wider company work</p>
-        {departments.map((item, i) => <div key={item} className="flex items-center justify-between bg-white p-3 text-sm font-black" style={{ opacity: Math.max(0.25, Math.min(1, p * 2 - i * 0.12)) }}><span>{item}</span><span>→</span></div>)}
+        {departments.map((item, i) => <div key={item} className="flex items-center justify-between bg-white p-3 text-sm font-black" style={{ opacity: Math.max(0.25, Math.min(1, p * 2 - i * 0.12)), transform: `translateX(${Math.max(0, 1 - p) * (i % 2 ? 12 : -12)}px)` }}><span>{item}</span><span>→</span></div>)}
       </div>
     </div>
   );
@@ -427,7 +475,7 @@ function NetworkVisual({ p }: { p: number }) {
             {nodes.map(([name, x, y]) => <line key={name} x1="50" y1="51" x2={x} y2={y} strokeDasharray="50" strokeDashoffset={50 - p * 50} />)}
           </g>
           <circle cx="50" cy="51" r={7 + p * 1.8} fill="#DDF65C" />
-          <text x="50" y="52" textAnchor="middle" dominantBaseline="middle" fill="#102321" fontSize="3.6" fontWeight="900">E.L.X</text>
+          <text x="50" y="52" textAnchor="middle" dominantBaseline="middle" fill="#102321" fontSize="3.8" fontWeight="900">Elx</text>
           {nodes.map(([name, x, y], i) => (
             <g key={name} style={{ opacity: Math.max(0, Math.min(1, p * 2.2 - i * 0.12)), transform: `translateY(${(1 - p) * 2}px)`, transformOrigin: `${x}px ${y}px` }}>
               <rect x={x - 7} y={y - 5} width="14" height="10" fill="#0e3d3a" stroke="#DDF65C" strokeWidth=".65" />
@@ -566,7 +614,7 @@ function GateGraphic() {
     <div className="relative mx-auto aspect-square max-w-[420px]">
       <div className="absolute inset-[12%] animate-[spin_28s_linear_infinite] rounded-full border border-[#DDF65C]/40" />
       <div className="absolute inset-[25%] animate-[spin_18s_linear_infinite_reverse] rounded-full border border-white/20" />
-      <div className="absolute inset-[38%] grid place-items-center rounded-full bg-[#DDF65C] text-4xl font-black text-[#102321]">E.L.X</div>
+      <div className="absolute inset-[38%] grid place-items-center rounded-full bg-[#DDF65C] text-4xl font-black text-[#102321]">Elx</div>
       {['SUM', 'CAD', '3D', 'DATA', 'FIN', 'DOC'].map((item, i) => (
         <div key={item} className="absolute grid h-11 w-11 place-items-center border border-white/25 bg-[#082725] text-[10px] font-black" style={{ left: `${50 + 40 * Math.cos(i * Math.PI / 3)}%`, top: `${50 + 40 * Math.sin(i * Math.PI / 3)}%`, transform: 'translate(-50%,-50%)' }}>
           {item}
