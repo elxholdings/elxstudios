@@ -53,14 +53,19 @@ export const defaultIntroAudioMix: IntroAudioMixSetting = {
 export function normalizeIntroAudioMix(value: unknown): IntroAudioMixSetting {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return defaultIntroAudioMix;
   const source = value as Partial<IntroAudioMixSetting>;
-  const voiceDuration = clampNumber(source.voiceDuration, 10, 600, defaultIntroAudioMix.voiceDuration);
+  const rawGuideName = cleanText(source.guideName, defaultIntroAudioMix.guideName, 80);
+  const rawTranscript = cleanText(source.transcript, defaultIntroTranscript, 6000);
+  const hasLegacyGuide = /pastor\s+wrench|ryan/i.test(rawGuideName);
+  const hasLegacyTranscript = /pastor\s+wrench|ryan\s*\/\s*your/i.test(rawTranscript);
+  const shouldUseCurrentVoice = hasLegacyGuide || hasLegacyTranscript;
+  const voiceDuration = shouldUseCurrentVoice ? defaultIntroAudioMix.voiceDuration : clampNumber(source.voiceDuration, 10, 600, defaultIntroAudioMix.voiceDuration);
   const musicStart = clampNumber(source.musicStart, 0, 600, defaultIntroAudioMix.musicStart);
-  const rawMusicEnd = clampNumber(source.musicEnd, 0, 600, defaultIntroAudioMix.musicEnd);
+  const rawMusicEnd = shouldUseCurrentVoice ? defaultIntroAudioMix.musicEnd : clampNumber(source.musicEnd, 0, 600, defaultIntroAudioMix.musicEnd);
   const musicEnd = rawMusicEnd > musicStart ? rawMusicEnd : Math.min(600, musicStart + 15);
 
   return {
-    guideName: cleanText(source.guideName, defaultIntroAudioMix.guideName, 80),
-    voiceUrl: cleanUrl(source.voiceUrl, defaultIntroAudioMix.voiceUrl),
+    guideName: shouldUseCurrentVoice ? defaultIntroAudioMix.guideName : rawGuideName,
+    voiceUrl: shouldUseCurrentVoice ? defaultIntroAudioMix.voiceUrl : cleanUrl(source.voiceUrl, defaultIntroAudioMix.voiceUrl),
     voiceVolume: clampNumber(source.voiceVolume, 0, 1, defaultIntroAudioMix.voiceVolume),
     voiceDuration,
     musicUrl: migrateLegacyMusicUrl(cleanUrl(source.musicUrl, '')),
@@ -70,7 +75,7 @@ export function normalizeIntroAudioMix(value: unknown): IntroAudioMixSetting {
     musicFadeIn: clampNumber(source.musicFadeIn, 0, 20, defaultIntroAudioMix.musicFadeIn),
     musicFadeOut: clampNumber(source.musicFadeOut, 0, 20, defaultIntroAudioMix.musicFadeOut),
     musicLoop: typeof source.musicLoop === 'boolean' ? source.musicLoop : defaultIntroAudioMix.musicLoop,
-    transcript: cleanText(source.transcript, defaultIntroTranscript, 6000),
+    transcript: shouldUseCurrentVoice ? defaultIntroTranscript : rawTranscript,
   };
 }
 

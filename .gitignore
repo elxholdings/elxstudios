@@ -6,7 +6,7 @@
 /out
 
 # environment files
-.env*
+.env.local
 !.env.example
 
 # local tooling and logs
@@ -16,3 +16,5 @@
 Thumbs.db
 .vercel
 *.tsbuildinfo
+
+.env*
