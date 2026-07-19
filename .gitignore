@@ -11,6 +11,7 @@
 
 # local tooling and logs
 *.log
+.local-tts
 .DS_Store
 Thumbs.db
 .vercel

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { ChangeEvent, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { defaultIntroAudioMix, normalizeIntroAudioMix, type IntroAudioMixSetting } from '../../lib/intro-audio-config';
@@ -9,6 +9,18 @@ import { buildWhatsAppUrl, defaultWhatsAppRouting, normalizeWhatsAppRouting, typ
 export type SettingRow = { key: string; value: unknown; updated_at: string };
 
 const protectedContextIds = new Set(['start_floating', 'contact_page', 'intake_submitted', 'shop_inquiry']);
+
+type LocalTtsStatus = {
+  jobId?: string;
+  status?: 'queued' | 'running' | 'converting' | 'done' | 'error';
+  message?: string;
+  duration?: number;
+  audioUrl?: string;
+  log?: string;
+  ffmpegLog?: string;
+  error?: string;
+  updatedAt?: string;
+};
 
 export default function SettingsClient({ settings, canManage }: { settings: SettingRow[]; canManage: boolean }) {
   const router = useRouter();
@@ -101,6 +113,39 @@ function IntroAudioManager({ audioMix, setAudioMix, canManage, busy, onSave, upd
   const timelineMax = Math.max(30, Math.ceil(audioMix.voiceDuration || 90), Math.ceil(audioMix.musicEnd || 0));
   const [uploading, setUploading] = useState('');
   const [uploadError, setUploadError] = useState('');
+  const [ttsParams, setTtsParams] = useState({ exaggeration: '0.45', pace: '0.5', temperature: '0.8', mode: 'normal' });
+  const [ttsJobId, setTtsJobId] = useState('');
+  const [ttsStatus, setTtsStatus] = useState<LocalTtsStatus | null>(null);
+  const ttsRunning = ['queued', 'running', 'converting'].includes(ttsStatus?.status || '') || uploading === 'tts';
+
+  useEffect(() => {
+    if (!ttsJobId || !['queued', 'running', 'converting'].includes(ttsStatus?.status || 'queued')) return;
+    let cancelled = false;
+    async function poll() {
+      const response = await fetch(`/api/admin/tts/local?jobId=${encodeURIComponent(ttsJobId)}`, { cache: 'no-store' });
+      const payload = await response.json().catch(() => ({})) as LocalTtsStatus;
+      if (cancelled) return;
+      setTtsStatus(payload);
+      if (response.ok && payload.status === 'done') {
+        const next = normalizeIntroAudioMix({
+          ...audioMix,
+          guideName: 'Pastor Wrench',
+          voiceUrl: `/audio/elx-welcome.mp3?t=${Date.now()}`,
+          voiceDuration: payload.duration || audioMix.voiceDuration,
+          musicEnd: payload.duration || audioMix.musicEnd,
+          transcript: audioMix.transcript,
+        });
+        setAudioMix(next);
+        void onSave(next);
+      }
+    }
+    void poll();
+    const interval = window.setInterval(() => void poll(), 5000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
+  }, [ttsJobId, ttsStatus?.status]);
 
   function patchAudio(patch: Partial<IntroAudioMixSetting>) {
     const next = normalizeIntroAudioMix({ ...audioMix, ...patch });
@@ -139,7 +184,7 @@ function IntroAudioManager({ audioMix, setAudioMix, canManage, busy, onSave, upd
       musicUrl: '/audio/busic.mp3',
       musicVolume: 0.14,
       musicStart: 0,
-      musicEnd: Math.min(88.88, audioMix.voiceDuration || 88.88),
+      musicEnd: audioMix.voiceDuration || defaultIntroAudioMix.voiceDuration,
       musicFadeIn: 2,
       musicFadeOut: 6,
       musicLoop: false,
@@ -153,6 +198,32 @@ function IntroAudioManager({ audioMix, setAudioMix, canManage, busy, onSave, upd
     setUploading('clear_music');
     const next = patchAudio({ musicUrl: '', musicStart: 0, musicEnd: 15, musicLoop: false });
     await onSave(next);
+    setUploading('');
+  }
+
+  async function runLocalTts() {
+    setUploadError('');
+    setUploading('tts');
+    setTtsStatus({ status: 'queued', message: 'Starting local Chatterbox TTS...', updatedAt: new Date().toISOString() });
+    const response = await fetch('/api/admin/tts/local', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        transcript: audioMix.transcript,
+        exaggeration: Number(ttsParams.exaggeration),
+        pace: Number(ttsParams.pace),
+        temperature: Number(ttsParams.temperature),
+        mode: ttsParams.mode,
+      }),
+    });
+    const payload = await response.json().catch(() => ({})) as LocalTtsStatus;
+    if (!response.ok || !payload.jobId) {
+      setUploadError(payload.error || 'Local Chatterbox TTS could not start.');
+      setTtsStatus(payload);
+    } else {
+      setTtsJobId(payload.jobId);
+      setTtsStatus(payload);
+    }
     setUploading('');
   }
 
@@ -260,6 +331,39 @@ function IntroAudioManager({ audioMix, setAudioMix, canManage, busy, onSave, upd
         <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
           <p className="max-w-2xl text-xs leading-5 text-black/45">When you regenerate audio, keep “E. L. X.” written with periods or spaces so the voice reads the letters instead of saying “Elx.”</p>
           <button type="button" onClick={() => void onSave(audioMix)} disabled={!canManage || busy || Boolean(uploading)} className="bg-[#102321] px-6 py-4 text-sm font-black text-white disabled:opacity-35">{busy ? 'Saving...' : 'Save intro audio mix'}</button>
+        </div>
+
+        <div className="mt-6 border border-black/10 bg-[#F5F2E8] p-5">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[.14em] text-[#F06449]">Local Chatterbox TTS</p>
+              <h3 className="mt-1 text-2xl font-black tracking-[-.04em]">Generate Pastor Wrench on this computer.</h3>
+              <p className="mt-2 max-w-2xl text-xs leading-5 text-black/45">This calls C:\Amazon\chatterbox locally, generates a workspace WAV, converts it to /public/audio/elx-welcome.mp3, then updates the voice duration. Normal mode is calmer and uses pace. Turbo is faster but the current turbo branch ignores pace.</p>
+            </div>
+            <button type="button" onClick={() => void runLocalTts()} disabled={!canManage || busy || ttsRunning} className="bg-[#DDF65C] px-5 py-3 text-xs font-black text-[#102321] disabled:opacity-35">{ttsRunning ? 'Generating...' : 'Run local Chatterbox TTS'}</button>
+          </div>
+          <div className="mt-5 grid gap-4 md:grid-cols-4">
+            <Field label="Exaggeration">
+              <input type="number" step="0.01" min="0" max="2" className="elx-field" value={ttsParams.exaggeration} onChange={(event) => setTtsParams({ ...ttsParams, exaggeration: event.target.value })} />
+            </Field>
+            <Field label="Pace">
+              <input type="number" step="0.01" min="0.1" max="2" className="elx-field" value={ttsParams.pace} onChange={(event) => setTtsParams({ ...ttsParams, pace: event.target.value })} />
+            </Field>
+            <Field label="Temperature">
+              <input type="number" step="0.01" min="0" max="2" className="elx-field" value={ttsParams.temperature} onChange={(event) => setTtsParams({ ...ttsParams, temperature: event.target.value })} />
+            </Field>
+            <Field label="Mode">
+              <input className="elx-field" value={ttsParams.mode} onChange={(event) => setTtsParams({ ...ttsParams, mode: event.target.value })} />
+            </Field>
+          </div>
+          {ttsStatus && (
+            <div className={`mt-4 p-4 text-xs leading-5 ${ttsStatus.status === 'error' || ttsStatus.error ? 'bg-red-50 text-red-700' : ttsStatus.status === 'done' ? 'bg-green-50 text-green-800' : 'bg-white text-black/55'}`}>
+              <p className="font-black">{ttsStatus.status || 'status'}: {ttsStatus.error || ttsStatus.message || 'Waiting for local runner...'}</p>
+              {ttsStatus.duration ? <p className="mt-1">Generated duration: {formatSeconds(ttsStatus.duration)}</p> : null}
+              {ttsStatus.log ? <pre className="mt-3 max-h-40 overflow-auto whitespace-pre-wrap border border-black/10 bg-black/5 p-3 font-mono text-[10px]">{ttsStatus.log}</pre> : null}
+              {ttsStatus.ffmpegLog ? <pre className="mt-3 max-h-28 overflow-auto whitespace-pre-wrap border border-black/10 bg-black/5 p-3 font-mono text-[10px]">{ttsStatus.ffmpegLog}</pre> : null}
+            </div>
+          )}
         </div>
       </article>
     </section>

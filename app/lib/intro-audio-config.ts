@@ -15,35 +15,35 @@ export type IntroAudioMixSetting = {
 
 export const introAudioSettingKey = 'intro_audio_mix';
 
-export const defaultIntroTranscript = `Welcome to E. L. X. Studio. Complex work belongs here.
+export const defaultIntroTranscript = `Welcome to E. L. X. Studio. I am Pastor Wrench, your guide.
 
-If you already know what you need, you can skip this introduction now and go straight to Start Project. No pressure. I will see you on the other side.
+If you already know what you need, skip now and go straight to Start Project. If you stay, watch the floating window. It mirrors the real site, points where to click, and shows what to type.
 
-If you stay with me, here is the quick tour.
+First, click Start Project. Choose the closest support department: writing, STEM, architecture, CAD, 3D, finance, or business. Hover to see specific services, then click the closest match.
 
-E. L. X. Studio gives you one place to bring the difficult parts of a project: calculations, drawings, CAD files, 3D concepts, financial models, reports, presentations, and professional documents.
+Next, type only what matters. A title like three bedroom floor plan revision is enough to begin. Add goals, dimensions, deadlines, software, standards, references, or final files only when they help. Blank fields are allowed.
 
-Start by choosing the closest department. You do not have to know the perfect category. Pick what feels closest, and the team will refine the scope with you.
+Bring the material you already have. P D F files, P P T X decks, Adobe files, AutoCAD drawings, Revit, SolidWorks, Excel, Power B I, sketches, reports, data, and raw notes are welcome.
 
-Next, describe the outcome you want. Add the goal, files, dimensions, data, deadline, software, standards, or references you already have. Leave anything blank if it does not matter yet.
+After submission, E. L. X. Studio reviews the brief and confirms scope, timing, deliverables, formats, and price before paid work begins.
 
-Before paid work begins, you receive a clear proposed scope: what will be delivered, what files you should expect, timing, and the quoted price.
+The website also has a shop for architectural plans. Browse a house design, open the details, compare the plan information, and request customization before use.
 
-During production, your workspace keeps messages, progress, files, revisions, and delivery connected, so you are not hunting through scattered conversations.
+Your workspace keeps messages, files, revisions, progress, and delivery connected.
 
-When the work is ready, you receive the agreed files in a usable format, with review and revision support according to the scope.
+E. L. X. Studio is a department inside E. L. X. Holdings. The studio handles research, documentation, calculations, drawings, presentations, technical support, and project files.
 
-That is the idea: your project may be technical, messy, urgent, or hard to explain. Your next step should still be simple.`;
+E. L. X. Holdings also offers architectural work, electrical work, construction, installations and fittings, networking, and server rooms.`;
 
 export const defaultIntroAudioMix: IntroAudioMixSetting = {
   guideName: 'Pastor Wrench',
   voiceUrl: '/audio/elx-welcome.mp3',
   voiceVolume: 0.92,
-  voiceDuration: 88.88,
+  voiceDuration: 67.59,
   musicUrl: '/audio/busic.mp3',
   musicVolume: 0.14,
   musicStart: 0,
-  musicEnd: 88.88,
+  musicEnd: 67.59,
   musicFadeIn: 2,
   musicFadeOut: 6,
   musicLoop: false,
